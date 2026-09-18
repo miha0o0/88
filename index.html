@@ -696,7 +696,7 @@
                                 </tr>
                                 <tr>
                                     <td colspan="2" class="infobox-img-td">
-                                        <img id="out-img" src="https://via.placeholder.com/300x380/000000/FFFFFF?text=No+Image" alt="캐릭터 사진">
+                                        <img id="out-img" src="" alt="캐릭터 사진">
                                     </td>
                                 </tr>
                                 <tbody id="custom-fields-tbody"></tbody>
@@ -845,7 +845,6 @@
     let isPublic = true;
     let isLoggedIn = false;
     
-    // 사용자가 보내주신 프로필 데이터를 기본값으로 설정
     let characterList = [
         {
             "id": "char_1789717272522",
@@ -855,7 +854,7 @@
             "color": "#ff85a2",
             "spoilerOk": "NO",
             "spoilerMsg": "ㅇㅇ",
-            "img": "https://via.placeholder.com/300x380/000000/FFFFFF?text=No+Image",
+            "img": "IMG_DATA_PLACEHOLDER",
             "bgm": "https://youtu.be/GAYmvI-AmEs?si=trxZGQx0BUY3Bdez",
             "customFields": [
                 { "label": "본명", "value": "-", "spoiler": "NO" },
@@ -896,9 +895,7 @@
         if (saved) {
             try {
                 characterList = JSON.parse(saved);
-            } catch (e) {
-                // 에러 시 기본값 유지
-            }
+            } catch (e) {}
         }
         checkUrlHash();
     }
@@ -939,7 +936,7 @@
             document.getElementById('tab-btn-lobby').classList.add('active');
             renderLobby();
         } else if (tab === 'view' && charId !== null) {
-            window.location.hash = `character=${charId}`;
+            window.location.hash = `character=` + charId;
             lobbyTab.style.display = 'none';
             viewTab.style.display = 'block';
             editTab.style.display = 'none';
@@ -988,17 +985,14 @@
         const container = document.getElementById('custom-fields-container');
         const row = document.createElement('div');
         row.className = 'dynamic-field-row';
-        row.innerHTML = `
-            <button type="button" class="move-btn" onclick="moveUp(this)">▲</button>
-            <button type="button" class="move-btn" onclick="moveDown(this)">▼</button>
-            <input type="text" class="field-label" placeholder="항목 이름" value="${label}">
-            <input type="text" class="field-value" placeholder="내용" value="${value}">
-            <select class="field-spoiler" style="padding:2px 4px; font-size:0.75rem;">
-                <option value="NO" ${spoiler === 'NO' ? 'selected' : ''}>스포 NO</option>
-                <option value="OK" ${spoiler === 'OK' ? 'selected' : ''}>스포 OK</option>
-            </select>
-            <button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">-</button>
-        `;
+        row.innerHTML = '<button type="button" class="move-btn" onclick="moveUp(this)">▲</button>' +
+                        '<button type="button" class="move-btn" onclick="moveDown(this)">▼</button>' +
+                        '<input type="text" class="field-label" placeholder="항목 이름" value="' + label + '">' +
+                        '<input type="text" class="field-value" placeholder="내용" value="' + value + '">' +
+                        '<select class="field-spoiler" style="padding:2px 4px; font-size:0.75rem;">' +
+                        '<option value="NO" ' + (spoiler === 'NO' ? 'selected' : '') + '>스포 NO</option>' +
+                        '<option value="OK" ' + (spoiler === 'OK' ? 'selected' : '') + '>스포 OK</option></select>' +
+                        '<button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">-</button>';
         container.appendChild(row);
     }
 
@@ -1007,25 +1001,19 @@
         const box = document.createElement('div');
         box.className = 'dynamic-section-box';
 
-        box.innerHTML = `
-            <div class="dynamic-field-row">
-                <button type="button" class="move-btn" onclick="moveUp(this.parentElement)">▲</button>
-                <button type="button" class="move-btn" onclick="moveDown(this.parentElement)">▼</button>
-                <input type="text" class="section-title-input" placeholder="섹션 제목 (예: 개요)" value="${title}" required>
-                <select class="section-spoiler-input">
-                    <option value="NO" ${spoiler === 'NO' ? 'selected' : ''}>전체 스포 NO</option>
-                    <option value="OK" ${spoiler === 'OK' ? 'selected' : ''}>전체 스포 OK</option>
-                </select>
-                <button type="button" class="remove-field-btn" onclick="this.parentElement.parentElement.remove()">섹션 삭제</button>
-            </div>
-            <textarea class="section-content-input" placeholder="섹션 본문 내용을 입력하세요">${content}</textarea>
-            
-            <div style="margin-top: 8px;">
-                <label style="font-size:0.78rem; color:var(--accent-pink); margin-bottom:4px; display:block;">📷 본문 사진 추가 (사진마다 스포 여부 개별 지정 가능)</label>
-                <div class="section-images-list"></div>
-                <button type="button" class="add-field-btn" style="margin-top:6px;" onclick="addSectionImageRow(this.previousElementSibling)">+ 사진 추가</button>
-            </div>
-        `;
+        box.innerHTML = '<div class="dynamic-field-row">' +
+                        '<button type="button" class="move-btn" onclick="moveUp(this.parentElement)">▲</button>' +
+                        '<button type="button" class="move-btn" onclick="moveDown(this.parentElement)">▼</button>' +
+                        '<input type="text" class="section-title-input" placeholder="섹션 제목 (예: 개요)" value="' + title + '" required>' +
+                        '<select class="section-spoiler-input">' +
+                        '<option value="NO" ' + (spoiler === 'NO' ? 'selected' : '') + '>전체 스포 NO</option>' +
+                        '<option value="OK" ' + (spoiler === 'OK' ? 'selected' : '') + '>전체 스포 OK</option></select>' +
+                        '<button type="button" class="remove-field-btn" onclick="this.parentElement.parentElement.remove()">섹션 삭제</button></div>' +
+                        '<textarea class="section-content-input" placeholder="섹션 본문 내용을 입력하세요">' + content + '</textarea>' +
+                        '<div style="margin-top: 8px;">' +
+                        '<label style="font-size:0.78rem; color:var(--accent-pink); margin-bottom:4px; display:block;">📷 본문 사진 추가 (사진마다 스포 여부 개별 지정 가능)</label>' +
+                        '<div class="section-images-list"></div>' +
+                        '<button type="button" class="add-field-btn" style="margin-top:6px;" onclick="addSectionImageRow(this.previousElementSibling)">+ 사진 추가</button></div>';
         container.appendChild(box);
 
         const imgListContainer = box.querySelector('.section-images-list');
@@ -1039,15 +1027,12 @@
     function addSectionImageRow(container, url = "", spoiler = "NO") {
         const row = document.createElement('div');
         row.className = 'sub-img-row';
-        row.innerHTML = `
-            <input type="file" accept="image/*" style="font-size:0.75rem; flex:1;" onchange="previewSubImage(event, this)">
-            <input type="hidden" class="sub-img-data" value="${url}">
-            <select class="sub-img-spoiler" style="font-size:0.75rem; padding:2px;">
-                <option value="NO" ${spoiler === 'NO' ? 'selected' : ''}>사진 스포 NO</option>
-                <option value="OK" ${spoiler === 'OK' ? 'selected' : ''}>사진 스포 OK</option>
-            </select>
-            <button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">삭제</button>
-        `;
+        row.innerHTML = '<input type="file" accept="image/*" style="font-size:0.75rem; flex:1;" onchange="previewSubImage(event, this)">' +
+                        '<input type="hidden" class="sub-img-data" value="' + url + '">' +
+                        '<select class="sub-img-spoiler" style="font-size:0.75rem; padding:2px;">' +
+                        '<option value="NO" ' + (spoiler === 'NO' ? 'selected' : '') + '>사진 스포 NO</option>' +
+                        '<option value="OK" ' + (spoiler === 'OK' ? 'selected' : '') + '>사진 스포 OK</option></select>' +
+                        '<button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">삭제</button>';
         container.appendChild(row);
     }
 
@@ -1163,7 +1148,7 @@
         }
 
         const char = characterList.find(c => c.id === id);
-        if (confirm(`'${char ? char.name : ''}' 캐릭터 사이트를 정말 삭제하시겠습니까?`)) {
+        if (confirm('"' + (char ? char.name : '') + '" 캐릭터 사이트를 정말 삭제하시겠습니까?')) {
             characterList = characterList.filter(c => c.id !== id);
             saveData();
             switchTab('lobby');
@@ -1181,7 +1166,7 @@
         const char = characterList.find(c => c.id === id);
         if (!char) return;
 
-        document.getElementById('form-title').textContent = `'${char.name}' 캐릭터 사이트 수정`;
+        document.getElementById('form-title').textContent = "'" + char.name + "' 캐릭터 사이트 수정";
         document.getElementById('submit-btn-text').textContent = "수정사항 저장하기";
 
         document.getElementById('in-tags').value = char.tags || '';
@@ -1221,22 +1206,15 @@
             const card = document.createElement('div');
             card.className = 'character-card';
 
-            const actionBtns = isLoggedIn ? `
-                <div class="card-actions">
-                    <button onclick="editCharacter('${char.id}', event)">수정</button>
-                    <button onclick="deleteCharacter('${char.id}', event)">삭제</button>
-                </div>
-            ` : '';
+            const actionBtns = isLoggedIn ? 
+                '<div class="card-actions"><button onclick="editCharacter(\'' + char.id + '\', event)">수정</button><button onclick="deleteCharacter(\'' + char.id + '\', event)">삭제</button></div>' : '';
 
-            card.innerHTML = `
-                <img src="${char.img}" alt="${char.name}" onclick="switchTab('view', '${char.id}')">
-                <div class="card-info" onclick="switchTab('view', '${char.id}')">
-                    <div class="card-title">${char.name}</div>
-                    <div class="card-sub">${char.sub || ''}</div>
-                    ${char.spoilerOk === 'OK' ? '<div class="spoiler-tag">스포 방지 OK</div>' : ''}
-                </div>
-                ${actionBtns}
-            `;
+            card.innerHTML = '<img src="' + char.img + '" alt="' + char.name + '" onclick="switchTab(\'view\', \'' + char.id + '\')">' +
+                '<div class="card-info" onclick="switchTab(\'view\', \'' + char.id + '\')">' +
+                '<div class="card-title">' + char.name + '</div>' +
+                '<div class="card-sub">' + (char.sub || '') + '</div>' +
+                (char.spoilerOk === 'OK' ? '<div class="spoiler-tag">스포 방지 OK</div>' : '') +
+                '</div>' + actionBtns;
             container.appendChild(card);
         });
     }
@@ -1316,7 +1294,7 @@
             characterList.push(importedChar);
             saveData();
             closeImportModal();
-            alert(`'${importedChar.name}' 캐릭터 프로필이 성공적으로 추가(합치기)되었습니다!`);
+            alert('"' + importedChar.name + '" 캐릭터 프로필이 성공적으로 추가(합치기)되었습니다!');
             renderLobby();
             switchTab('view', importedChar.id);
         } catch (e) {
@@ -1345,14 +1323,14 @@
 
         document.getElementById('out-name').textContent = char.name;
         document.getElementById('out-sub').textContent = char.sub;
-        document.getElementById('out-card-title').textContent = char.name + (char.sub ? ` (${char.sub})` : '');
+        document.getElementById('out-card-title').textContent = char.name + (char.sub ? ' (' + char.sub + ')' : '');
         document.getElementById('out-img').src = char.img;
 
         const tbody = document.getElementById('custom-fields-tbody');
         tbody.innerHTML = '';
 
         const colorTr = document.createElement('tr');
-        colorTr.innerHTML = `<th>대표색</th><td><span class="color-badge" style="background-color:${infoboxColor};"></span>${infoboxColor}</td>`;
+        colorTr.innerHTML = '<th>대표색</th><td><span class="color-badge" style="background-color:' + infoboxColor + ';"></span>' + infoboxColor + '</td>';
         tbody.appendChild(colorTr);
 
         if (char.customFields && char.customFields.length > 0) {
@@ -1361,15 +1339,11 @@
                 let cellContent = f.value;
 
                 if (f.spoiler === 'OK') {
-                    cellContent = `
-                        <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)">
-                            <span>⚠️ 스포일러 보기</span>
-                        </div>
-                        <div class="spoiler-section-content">${f.value}</div>
-                    `;
+                    cellContent = '<div class="spoiler-section-blur" onclick="revealSpoilerSection(this)"><span>⚠️ 스포일러 보기</span></div>' +
+                                  '<div class="spoiler-section-content">' + f.value + '</div>';
                 }
 
-                tr.innerHTML = `<th>${f.label}</th><td>${cellContent}</td>`;
+                tr.innerHTML = '<th>' + f.label + '</th><td>' + cellContent + '</td>';
                 tbody.appendChild(tr);
             });
         }
@@ -1383,47 +1357,33 @@
 
         if (char.bodySections && char.bodySections.length > 0) {
             char.bodySections.forEach((sec, idx) => {
-                const secId = `sec-dyn-${idx + 1}`;
+                const secId = 'sec-dyn-' + (idx + 1);
                 
                 const li = document.createElement('li');
-                li.innerHTML = `<a href="#${secId}">${idx + 1}. ${sec.title}</a>`;
+                li.innerHTML = '<a href="#' + secId + '">' + (idx + 1) + '. ' + sec.title + '</a>';
                 tocList.appendChild(li);
 
                 let innerHtml = '';
-                if (sec.content) innerHtml += `<p>${sec.content}</p>`;
+                if (sec.content) innerHtml += '<p>' + sec.content + '</p>';
 
                 if (sec.images && sec.images.length > 0) {
                     sec.images.forEach(imgObj => {
                         if (imgObj.spoiler === 'OK') {
-                            innerHtml += `
-                                <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)">
-                                    <span>⚠️ 스포일러 사진 보기</span>
-                                </div>
-                                <div class="spoiler-section-content">
-                                    <img src="${imgObj.url}" class="section-image" alt="섹션 이미지">
-                                </div>
-                            `;
+                            innerHtml += '<div class="spoiler-section-blur" onclick="revealSpoilerSection(this)"><span>⚠️ 스포일러 사진 보기</span></div>' +
+                                         '<div class="spoiler-section-content"><img src="' + imgObj.url + '" class="section-image" alt="섹션 이미지"></div>';
                         } else {
-                            innerHtml += `<img src="${imgObj.url}" class="section-image" alt="섹션 이미지">`;
+                            innerHtml += '<img src="' + imgObj.url + '" class="section-image" alt="섹션 이미지">';
                         }
                     });
                 }
 
                 if (!innerHtml) innerHtml = '<p>내용이 없습니다.</p>';
 
-                let fullSectionHtml = `
-                    <div class="section-header" id="${secId}">
-                        ${idx + 1}. ${sec.title}
-                    </div>
-                `;
+                let fullSectionHtml = '<div class="section-header" id="' + secId + '">' + (idx + 1) + '. ' + sec.title + '</div>';
 
                 if (sec.spoiler === 'OK') {
-                    fullSectionHtml += `
-                        <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)">
-                            <span>⚠️ 클릭 시 '${sec.title}' 전체 스포일러 내용을 확인합니다.</span>
-                        </div>
-                        <div class="spoiler-section-content">${innerHtml}</div>
-                    `;
+                    fullSectionHtml += '<div class="spoiler-section-blur" onclick="revealSpoilerSection(this)"><span>⚠️ 클릭 시 \'' + sec.title + '\' 전체 스포일러 내용을 확인합니다.</span></div>' +
+                                       '<div class="spoiler-section-content">' + innerHtml + '</div>';
                 } else {
                     fullSectionHtml += innerHtml;
                 }
@@ -1438,7 +1398,7 @@
         const player = document.getElementById('youtube-player');
         const match = char.bgm ? char.bgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/) : null;
         if (match && match[2].length === 11) {
-            player.src = `https://www.youtube.com/embed/${match[2]}?autoplay=1`;
+            player.src = 'https://www.youtube.com/embed/' + match[2] + '?autoplay=1';
             bgmBox.style.display = 'block';
         } else {
             bgmBox.style.display = 'none';
