@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X WIKI :: Personal Homepage</title>
+    <title>X 위키 :: Personal Homepage</title>
     <style>
         :root {
             --bg-color: #fcf8fa;
@@ -65,16 +65,6 @@
         .auth-status {
             font-size: 0.8rem;
             color: var(--text-sub);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .logout-link {
-            font-size: 0.75rem;
-            color: #e57373;
-            cursor: pointer;
-            text-decoration: underline;
         }
 
         .nav-tabs {
@@ -240,7 +230,6 @@
         .wiki-btn-group {
             display: flex;
             gap: 4px;
-            align-items: center;
             flex-wrap: wrap;
         }
 
@@ -248,23 +237,23 @@
             background: #ffffff;
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            padding: 4px 10px;
-            font-size: 0.78rem;
+            padding: 3px 8px;
+            font-size: 0.75rem;
             border-radius: 3px;
             cursor: pointer;
             user-select: none;
-            font-weight: bold;
-        }
-
-        .action-btn.share {
-            background: var(--soft-pink-bg);
-            color: var(--accent-pink);
-            border-color: var(--accent-pink);
         }
 
         .action-btn.private {
             background: var(--badge-private);
             color: #ffffff;
+        }
+
+        .action-btn.copy-code {
+            background: var(--soft-pink-bg);
+            color: var(--accent-pink);
+            border-color: var(--accent-pink);
+            font-weight: bold;
         }
 
         .bgm-box {
@@ -589,7 +578,7 @@
             border: 1px solid var(--border-color);
             padding: 22px;
             border-radius: 6px;
-            max-width: 520px;
+            max-width: 380px;
             width: 90%;
             text-align: center;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -603,20 +592,8 @@
         .modal-box p {
             font-size: 0.85rem;
             color: var(--text-sub);
-            margin-bottom: 12px;
-        }
-
-        .modal-box textarea {
-            width: 100%;
-            height: 160px;
-            font-size: 0.75rem;
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            background: #fafafa;
-            border-radius: 4px;
-            resize: vertical;
-            margin-bottom: 12px;
-            font-family: monospace;
+            margin-bottom: 18px;
+            white-space: pre-line;
         }
 
         .modal-btns {
@@ -637,7 +614,7 @@
     <header class="site-header">
         <h1 onclick="switchTab('lobby')">X WIKI</h1>
         <div class="auth-status" id="auth-status-text">
-            <span>권한: 일반 방문자</span>
+            권한: 일반 방문자
         </div>
     </header>
 
@@ -650,7 +627,7 @@
     <div class="content-container">
         <!-- 1. 로비 화면 -->
         <div id="lobby-tab">
-            <h2 style="margin-bottom: 10px; color:var(--text-color); font-size: 1.3rem;">캐릭터 목록</h2>
+            <h2 style="margin-bottom: 10px; color:var(--text-color); font-size: 1.3rem;">캐릭터 목록 (개별 사이트)</h2>
             <div class="lobby-grid" id="lobby-list"></div>
         </div>
 
@@ -663,8 +640,7 @@
             <div class="wiki-title-area">
                 <h2><span id="out-name">캐릭터 이름</span> <span class="sub-title" id="out-sub"></span></h2>
                 <div class="wiki-btn-group">
-                    <span class="action-btn share" onclick="showExportCodeModal()">💾 HTML 복사</span>
-                    <span class="action-btn share" onclick="shareProfile()">🔗 링크 복사</span>
+                    <span class="action-btn copy-code" onclick="copyCharacterCode()">📋 이 캐릭터 HTML 복사</span>
                     <span class="action-btn" id="visibility-btn" onclick="toggleVisibility()">공개</span>
                     <button class="action-btn" onclick="switchTab('lobby')">목록으로</button>
                 </div>
@@ -724,15 +700,15 @@
                 <div class="login-box">
                     <div class="form-group">
                         <label>비밀번호 입력</label>
-                        <input type="password" id="admin-password" placeholder="비밀번호를 입력하세요" onkeydown="if(event.key==='Enter') checkLogin()">
+                        <input type="password" id="admin-password" placeholder="비밀번호를 입력하세요">
                     </div>
-                    <button type="button" class="login-btn" onclick="checkLogin()">로그인</button>
+                    <button class="login-btn" onclick="checkLogin()">로그인</button>
                 </div>
             </div>
 
             <div id="edit-form-container" style="display:none;">
                 <h2 style="margin-bottom:12px; color:var(--text-color); font-size:1.2rem;" id="form-title">새 캐릭터 사이트 생성 및 등록</h2>
-                <form id="wiki-form" onsubmit="saveWiki(event)">
+                <form onsubmit="saveWiki(event)">
                     <div class="form-grid">
                         <div class="form-group">
                             <label>태그 지정 (쉼표로 구분)</label>
@@ -760,7 +736,7 @@
 
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>캐릭터 이름</label>
+                            <label>캐릭터 이름 (고유 주소 생성)</label>
                             <input type="text" id="in-name" placeholder="이름을 입력하세요 (예: 루아)" required>
                         </div>
                         <div class="form-group">
@@ -810,27 +786,14 @@
     </div>
 </div>
 
-<!-- 모달 창 (스포일러용) -->
+<!-- 모달 창 -->
 <div class="modal-overlay" id="spoiler-modal" style="display:none;">
     <div class="modal-box">
         <h3>스포일러 주의</h3>
         <p id="spoiler-modal-text">해당 캐릭터 프로필에는 스포일러가 포함되어 있습니다.<br>계속해서 프로필을 열람하시겠습니까?</p>
         <div class="modal-btns">
-            <button type="button" class="modal-btn" onclick="confirmSpoilerView(true)">열람하기</button>
-            <button type="button" class="modal-btn cancel" onclick="confirmSpoilerView(false)">취소</button>
-        </div>
-    </div>
-</div>
-
-<!-- 모달 창 (HTML 코드 추출용) -->
-<div class="modal-overlay" id="code-export-modal" style="display:none;">
-    <div class="modal-box">
-        <h3>깃허브 업로드용 단독 HTML 코드</h3>
-        <p>이 코드를 복사해서 깃허브에 새 파일(예: <code>character.html</code>)로 저장하면 독립된 프로필 사이트가 됩니다!</p>
-        <textarea id="exported-code-textarea" readonly></textarea>
-        <div class="modal-btns">
-            <button type="button" class="modal-btn" onclick="copyExportedCode()">코드 복사하기</button>
-            <button type="button" class="modal-btn cancel" onclick="closeExportCodeModal()">닫기</button>
+            <button class="modal-btn" onclick="confirmSpoilerView(true)">열람하기</button>
+            <button class="modal-btn cancel" onclick="confirmSpoilerView(false)">취소</button>
         </div>
     </div>
 </div>
@@ -853,6 +816,7 @@
         { title: "여담", content: "", spoiler: "NO", images: [] }
     ];
 
+    // 브라우저 영구 저장소(localStorage) 로딩
     function loadSavedData() {
         const saved = localStorage.getItem('XWIKI_CHARACTERS_PERMANENT');
         if (saved) {
@@ -862,153 +826,26 @@
                 characterList = [];
             }
         }
-
-        const savedLogin = sessionStorage.getItem('XWIKI_IS_LOGGED_IN');
-        if (savedLogin === 'true') {
-            isLoggedIn = true;
-            document.getElementById('login-required').style.display = 'none';
-            document.getElementById('edit-form-container').style.display = 'block';
-            document.getElementById('auth-status-text').innerHTML = '<span>권한: 관리자</span> <span class="logout-link" onclick="logoutAdmin()">[로그아웃]</span>';
-        }
-
         checkUrlHash();
     }
 
     function saveData() {
-        try {
-            localStorage.setItem('XWIKI_CHARACTERS_PERMANENT', JSON.stringify(characterList));
-        } catch (e) {
-            alert('사진 용량이 브라우저 저장 공간을 초과했습니다. 더 작은 용량의 이미지를 올려주세요.');
-        }
+        // 새로고침해도 절대 안 날아가도록 영구 저장
+        localStorage.setItem('XWIKI_CHARACTERS_PERMANENT', JSON.stringify(characterList));
     }
 
     function checkLogin() {
         const pwInput = document.getElementById('admin-password').value;
         if (pwInput === ADMIN_PW) {
             isLoggedIn = true;
-            sessionStorage.setItem('XWIKI_IS_LOGGED_IN', 'true');
             document.getElementById('login-required').style.display = 'none';
             document.getElementById('edit-form-container').style.display = 'block';
-            document.getElementById('auth-status-text').innerHTML = '<span>권한: 관리자</span> <span class="logout-link" onclick="logoutAdmin()">[로그아웃]</span>';
+            document.getElementById('auth-status-text').textContent = '권한: 관리자 (수정/삭제 가능)';
             alert('로그인되었습니다.');
             renderLobby();
         } else {
             alert('비밀번호가 일치하지 않습니다.');
         }
-    }
-
-    function logoutAdmin() {
-        isLoggedIn = false;
-        sessionStorage.removeItem('XWIKI_IS_LOGGED_IN');
-        document.getElementById('login-required').style.display = 'block';
-        document.getElementById('edit-form-container').style.display = 'none';
-        document.getElementById('auth-status-text').innerHTML = '<span>권한: 일반 방문자</span>';
-        document.getElementById('admin-password').value = '';
-        alert('로그아웃되었습니다.');
-        renderLobby();
-    }
-
-    function shareProfile() {
-        const currentUrl = window.location.href;
-        navigator.clipboard.writeText(currentUrl).then(() => {
-            alert('현재 캐릭터 프로필의 링크가 복사되었습니다!');
-        }).catch(err => {
-            prompt('아래 링크를 복사하세요:', currentUrl);
-        });
-    }
-
-    function generateStandaloneHtml(char) {
-        return `<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${char.name} :: X WIKI</title>
-    <style>
-        :root { --bg-color: #fcf8fa; --card-bg: #ffffff; --header-bg: #fff0f5; --border-color: #f4c2d7; --text-color: #4a3b42; --text-sub: #9e7b8c; --accent-pink: ${char.color || '#ff85a2'}; --soft-pink-bg: #fff5f8; --wiki-table-header: #ffeef4; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; padding: 20px 10px; display: flex; justify-content: center; }
-        .main-wrapper { width: 100%; max-width: 960px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); padding: 20px; }
-        .wiki-category { background: var(--soft-pink-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 6px 12px; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px; }
-        .tag-item { color: var(--accent-pink); background: #ffffff; border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 3px; margin-left: 4px; font-weight: bold; }
-        .wiki-title-area { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--accent-pink); padding-bottom: 6px; margin-bottom: 12px; }
-        .wiki-title-area h2 { font-size: 1.8rem; color: var(--text-color); display: flex; align-items: baseline; gap: 8px; }
-        .sub-title { font-size: 0.9rem; color: var(--text-sub); font-weight: normal; }
-        .profile-grid { display: grid; grid-template-columns: 1fr 310px; gap: 18px; }
-        @media (max-width: 768px) { .profile-grid { grid-template-columns: 1fr; } }
-        .infobox { width: 100%; border-collapse: collapse; background: #ffffff; border: 2px solid var(--accent-pink); font-size: 0.85rem; }
-        .infobox-title { background: var(--accent-pink); color: #ffffff; font-size: 1rem; font-weight: bold; text-align: center; padding: 8px; }
-        .infobox-img-td { text-align: center; background: var(--soft-pink-bg); padding: 8px; }
-        .infobox-img-td img { width: 100%; max-height: 360px; object-fit: cover; border-radius: 4px; }
-        .infobox th { background: var(--wiki-table-header); color: var(--text-color); width: 32%; padding: 6px 8px; border: 1px solid var(--border-color); text-align: center; }
-        .infobox td { padding: 6px 8px; border: 1px solid var(--border-color); background: #ffffff; }
-        .toc-box { background: var(--soft-pink-bg); border: 1px solid var(--border-color); display: inline-block; min-width: 220px; padding: 10px 14px; margin-bottom: 18px; border-radius: 4px; }
-        .toc-title { font-weight: bold; font-size: 0.88rem; color: var(--accent-pink); margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 3px; }
-        .toc-list { list-style: none; font-size: 0.85rem; }
-        .toc-list a { color: var(--text-sub); text-decoration: none; }
-        .section-header { font-size: 1.2rem; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 3px; margin: 20px 0 10px 0; }
-        .quote-table { width: 100%; border-collapse: collapse; margin: 8px 0 14px 0; border: 1px solid var(--border-color); background: var(--soft-pink-bg); }
-        .quote-table td { padding: 10px 14px; text-align: center; font-style: italic; color: var(--accent-pink); font-weight: bold; }
-        .section-image { width: 100%; max-height: 400px; object-fit: cover; border-radius: 6px; margin: 8px 0; border: 1px solid var(--border-color); }
-        .back-btn { background: var(--accent-pink); color: #fff; border: none; padding: 5px 12px; border-radius: 4px; text-decoration: none; font-size: 0.8rem; font-weight: bold; display:inline-block; margin-bottom:15px; }
-    </style>
-</head>
-<body>
-<div class="main-wrapper">
-    <a href="index.html" class="back-btn">🏠 홈으로 돌아가기</a>
-    <div class="wiki-category">분류 : <span class="tag-item">${char.tags || '자캐'}</span></div>
-    <div class="wiki-title-area">
-        <h2>${char.name} <span class="sub-title">${char.sub || ''}</span></h2>
-    </div>
-    <div class="profile-grid">
-        <div>
-            <div class="toc-box">
-                <div class="toc-title">목차</div>
-                <ul class="toc-list">
-                    ${(char.bodySections || []).map((sec, i) => `<li><a href="#sec-${i}">${i+1}.${sec.title}</a></li>`).join('')}
-                </ul>
-            </div>
-            <table class="quote-table"><tr><td>“ ${char.quote || '...'} ”</td></tr></table>
-            <div>
-                ${(char.bodySections || []).map((sec, i) => `
-                    <div class="section-header" id="sec-${i}">${i+1}.${sec.title}</div>
-                    <p>${sec.content \vert{}\vert{} ''}</p>${(sec.images || []).map(img => `<img src="${img.url}" class="section-image" alt="이미지">`).join('')}
-                `).join('')}
-            </div>
-        </div>
-        <div>
-            <table class="infobox">
-                <tr><th colspan="2" class="infobox-title">${char.name}</th></tr>
-                <tr><td colspan="2" class="infobox-img-td"><img src="${char.img}" alt="대표사진"></td></tr>
-                ${(char.customFields || []).map(f => `<tr><th>${f.label}</th><td>${f.value}</td></tr>`).join('')}
-            </table>
-        </div>
-    </div>
-</div>
-</body>
-</html>`;
-    }
-
-    function showExportCodeModal() {
-        const char = characterList.find(c => c.id === selectedCharacterId);
-        if (!char) return;
-        const htmlCode = generateStandaloneHtml(char);
-        document.getElementById('exported-code-textarea').value = htmlCode;
-        document.getElementById('code-export-modal').style.display = 'flex';
-    }
-
-    function closeExportCodeModal() {
-        document.getElementById('code-export-modal').style.display = 'none';
-    }
-
-    function copyExportedCode() {
-        const textarea = document.getElementById('exported-code-textarea');
-        textarea.select();
-        document.execCommand('copy');
-        navigator.clipboard.writeText(textarea.value).then(() => {
-            alert('단독 HTML 코드가 복사되었습니다! 깃허브에 새 파일로 붙여넣어 보세요.');
-            closeExportCodeModal();
-        });
     }
 
     function switchTab(tab, charId = null) {
@@ -1184,12 +1021,6 @@
             return;
         }
 
-        const nameVal = document.getElementById('in-name').value.trim();
-        if (!nameVal) {
-            alert('캐릭터 이름을 입력해주세요!');
-            return;
-        }
-
         const customRows = document.querySelectorAll('#custom-fields-container .dynamic-field-row');
         const customFields = [];
         customRows.forEach(row => {
@@ -1225,7 +1056,7 @@
 
         const characterData = {
             id: editingCharacterId || 'char_' + Date.now(),
-            name: nameVal,
+            name: document.getElementById('in-name').value,
             sub: document.getElementById('in-sub').value,
             tags: document.getElementById('in-tags').value,
             color: document.getElementById('in-color').value,
@@ -1241,10 +1072,10 @@
         if (editingCharacterId !== null) {
             const index = characterList.findIndex(c => c.id === editingCharacterId);
             if (index !== -1) characterList[index] = characterData;
-            alert('캐릭터 사이트가 수정되었습니다!');
+            alert('캐릭터 사이트가 성공적으로 수정되었습니다! (새로고침해도 유지됨)');
         } else {
             characterList.push(characterData);
-            alert('새로운 캐릭터 사이트가 생성되었습니다!');
+            alert('새로운 캐릭터 사이트가 생성되었습니다! (새로고침해도 유지됨)');
         }
 
         saveData();
@@ -1259,7 +1090,7 @@
         }
 
         const char = characterList.find(c => c.id === id);
-        if (confirm(`'${char ? char.name : ''}' 캐릭터 사이트를 삭제하시겠습니까?`)) {
+        if (confirm(`'${char ? char.name : ''}' 캐릭터 사이트를 정말 삭제하시겠습니까?`)) {
             characterList = characterList.filter(c => c.id !== id);
             saveData();
             switchTab('lobby');
@@ -1309,7 +1140,7 @@
         container.innerHTML = '';
 
         if (characterList.length === 0) {
-            container.innerHTML = '<p style="color:var(--text-sub); grid-column: 1/-1; text-align:center; padding: 40px 0;">생성된 캐릭터 사이트가 없습니다. 상단 탭에서 로그인 후 새 캐릭터를 등록해 주세요.</p>';
+            container.innerHTML = '<p style="color:var(--text-sub); grid-column: 1/-1; text-align:center; padding: 40px 0;">생성된 캐릭터 사이트가 없습니다. 새 캐릭터를 등록해 주세요.</p>';
             return;
         }
 
@@ -1319,8 +1150,8 @@
 
             const actionBtns = isLoggedIn ? `
                 <div class="card-actions">
-                    <button type="button" onclick="editCharacter('${char.id}', event)">수정</button>
-                    <button type="button" onclick="deleteCharacter('${char.id}', event)">삭제</button>
+                    <button onclick="editCharacter('${char.id}', event)">수정</button>
+                    <button onclick="deleteCharacter('${char.id}', event)">삭제</button>
                 </div>
             ` : '';
 
@@ -1368,6 +1199,16 @@
     function revealSpoilerSection(element) {
         element.style.display = 'none';
         element.nextElementSibling.style.display = 'block';
+    }
+
+    // 현재 보고 있는 캐릭터의 전체 HTML 코드를 클립보드에 복사하는 기능
+    function copyCharacterCode() {
+        const fullHtml = `<!DOCTYPE html>\n` + document.documentElement.outerHTML;
+        navigator.clipboard.writeText(fullHtml).then(() => {
+            alert('현재 캐릭터 사이트의 전체 코드가 클립보드에 복사되었습니다!\n원하는 곳에 붙여넣어 독립된 HTML 파일로 사용할 수 있습니다.');
+        }).catch(err => {
+            alert('코드 복사에 실패했습니다.');
+        });
     }
 
     function showWikiDetails(char) {
@@ -1515,4 +1356,4 @@
 </script>
 
 </body>
-  </html>
+</html>
