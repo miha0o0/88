@@ -844,7 +844,39 @@
 <script>
     let isPublic = true;
     let isLoggedIn = false;
-    let characterList = [];
+    
+    // 사용자가 보내주신 프로필 데이터를 기본값으로 설정
+    let characterList = [
+        {
+            "id": "char_1789717272522",
+            "name": "ㅁㄴㄴ",
+            "sub": "ㄴㄴ",
+            "tags": "#ㅇ나ㅓㅇㄴㅇ",
+            "color": "#ff85a2",
+            "spoilerOk": "NO",
+            "spoilerMsg": "ㅇㅇ",
+            "img": "https://via.placeholder.com/300x380/000000/FFFFFF?text=No+Image",
+            "bgm": "https://youtu.be/GAYmvI-AmEs?si=trxZGQx0BUY3Bdez",
+            "customFields": [
+                { "label": "본명", "value": "-", "spoiler": "NO" },
+                { "label": "출생", "value": "-", "spoiler": "NO" },
+                { "label": "성별", "value": "-", "spoiler": "NO" },
+                { "label": "신체", "value": "-", "spoiler": "NO" },
+                { "label": "소속", "value": "-", "spoiler": "NO" },
+                { "label": "MBTI", "value": "-", "spoiler": "NO" },
+                { "label": "가족 관계", "value": "-", "spoiler": "NO" }
+            ],
+            "quote": "",
+            "bodySections": [
+                { "title": "개요", "content": "", "spoiler": "NO", "images": [] },
+                { "title": "특징 및 외모", "content": "", "spoiler": "NO", "images": [] },
+                { "title": "작중 행적", "content": "", "spoiler": "NO", "images": [] },
+                { "title": "대인 관계", "content": "", "spoiler": "NO", "images": [] },
+                { "title": "여담", "content": "", "spoiler": "NO", "images": [] }
+            ]
+        }
+    ];
+
     let selectedCharacterId = null;
     let editingCharacterId = null;
     let tempMainImg = null;
@@ -865,7 +897,7 @@
             try {
                 characterList = JSON.parse(saved);
             } catch (e) {
-                characterList = [];
+                // 에러 시 기본값 유지
             }
         }
         checkUrlHash();
@@ -1242,7 +1274,6 @@
         element.nextElementSibling.style.display = 'block';
     }
 
-    // 텍스트 상자 모달 창을 열어 데이터 전체 코드를 보여주는 함수
     function openDataModal() {
         const char = characterList.find(c => c.id === selectedCharacterId);
         if (!char) {
@@ -1434,7 +1465,6 @@
     }
 
     loadSavedData();
-    initDefaultForm();
 </script>
 
 </body>
