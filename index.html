@@ -655,7 +655,7 @@
             <div class="wiki-title-area">
                 <h2><span id="out-name">캐릭터 이름</span> <span class="sub-title" id="out-sub"></span></h2>
                 <div class="wiki-btn-group">
-                    <span class="action-btn copy-code" onclick="openDataModal()">📋 프로필 코드 백업/복사</span>
+                    <span class="action-btn copy-code" onclick="openDataModal()">💾 프로필 저장/코드 텍스트 보기</span>
                     <span class="action-btn" id="visibility-btn" onclick="toggleVisibility()">공개</span>
                     <button class="action-btn" onclick="switchTab('lobby')">목록으로</button>
                 </div>
@@ -724,7 +724,7 @@
             <div id="edit-form-container" style="display:none;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                     <h2 style="color:var(--text-color); font-size:1.2rem;" id="form-title">새 캐릭터 사이트 생성 및 등록</h2>
-                    <button type="button" class="action-btn copy-code" onclick="openImportModal()">📥 다른 곳에서 복사해둔 프로필 가져오기(합치기)</button>
+                    <button type="button" class="action-btn copy-code" onclick="openImportModal()">📥 코드로 프로필 가져오기(합치기)</button>
                 </div>
                 <form onsubmit="saveWiki(event)">
                     <div class="form-grid">
@@ -816,24 +816,24 @@
     </div>
 </div>
 
-<!-- 모달 창: 프로필 코드 백업/복사 -->
+<!-- 모달 창: 프로필 저장용 텍스트 상자 -->
 <div class="modal-overlay" id="data-export-modal" style="display:none;">
     <div class="modal-box">
-        <h3>프로필 데이터 코드 복사</h3>
-        <p>아래 상자 안의 전체 코드를 마우스로 드래그해서 복사해 두세요.<br>(사진, 정보, 스포 설정이 모두 포함되어 있습니다)</p>
-        <textarea id="export-textarea" class="modal-textarea" readonly></textarea>
+        <h3>프로필 데이터 저장용 텍스트 창</h3>
+        <p>아래 텍스트 상자의 내용을 전체 선택(Ctrl+A)하여 복사(Ctrl+C)한 뒤 메모장에 저장해 두세요.<br>(사진, 정보, 스포일러 여부가 전부 들어있습니다)</p>
+        <textarea id="export-textarea" class="modal-textarea"></textarea>
         <div class="modal-btns">
-            <button class="modal-btn" onclick="closeDataModal()">닫기</button>
+            <button class="modal-btn" onclick="closeDataModal()">확인 및 닫기</button>
         </div>
     </div>
 </div>
 
-<!-- 모달 창: 프로필 코드 가져오기(합치기) -->
+<!-- 모달 창: 코드로 프로필 가져오기(합치기) -->
 <div class="modal-overlay" id="data-import-modal" style="display:none;">
     <div class="modal-box">
-        <h3>프로필 데이터 합치기</h3>
-        <p>다른 곳에서 복사해 둔 프로필 JSON 코드를 아래에 붙여넣으세요.</p>
-        <textarea id="import-textarea" class="modal-textarea" placeholder="여기에 복사해 둔 코드를 붙여넣으세요..."></textarea>
+        <h3>프로필 코드로 가져오기 (합치기)</h3>
+        <p>미리 복사해 둔 캐릭터 JSON 코드를 아래 텍스트 상자에 붙여넣으세요.</p>
+        <textarea id="import-textarea" class="modal-textarea" placeholder="여기에 저장해 둔 코드를 붙여넣으세요..."></textarea>
         <div class="modal-btns">
             <button class="modal-btn" onclick="importCharacterData()">프로필 추가하기</button>
             <button class="modal-btn cancel" onclick="closeImportModal()">취소</button>
@@ -1242,7 +1242,7 @@
         element.nextElementSibling.style.display = 'block';
     }
 
-    // 팝업창을 통한 100% 확실한 데이터 코드 복사 함수
+    // 텍스트 상자 모달 창을 열어 데이터 전체 코드를 보여주는 함수
     function openDataModal() {
         const char = characterList.find(c => c.id === selectedCharacterId);
         if (!char) {
@@ -1258,7 +1258,6 @@
         document.getElementById('data-export-modal').style.display = 'none';
     }
 
-    // 다른 곳에서 가져온 프로필 데이터를 합치는 함수
     function openImportModal() {
         document.getElementById('import-textarea').value = '';
         document.getElementById('data-import-modal').style.display = 'flex';
@@ -1282,7 +1281,6 @@
                 return;
             }
 
-            // 고유 ID 중복 방지를 위해 새 ID 부여 혹은 기존 ID 유지
             importedChar.id = 'char_' + Date.now();
             characterList.push(importedChar);
             saveData();
@@ -1291,7 +1289,7 @@
             renderLobby();
             switchTab('view', importedChar.id);
         } catch (e) {
-            alert('JSON 형식 코드가 올바르지 않습니다. 복사한 코드를 전체 그대로 붙여넣었는지 확인해 주세요.');
+            alert('JSON 형식 코드가 올바르지 않습니다. 텍스트 상자의 내용을 전체 올바르게 붙여넣었는지 확인해 주세요.');
         }
     }
 
@@ -1440,4 +1438,4 @@
 </script>
 
 </body>
-</html>
+    </html>
