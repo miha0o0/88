@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X 위키 :: Personal Homepage</title>
+    <title>X 위키 :: Realtime Personal Homepage</title>
+    <!-- 파이어베이스 SDK 불러오기 -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
         :root {
             --bg-color: #fcf8fa;
@@ -642,7 +645,7 @@
     <div class="content-container">
         <!-- 1. 로비 화면 -->
         <div id="lobby-tab">
-            <h2 style="margin-bottom: 10px; color:var(--text-color); font-size: 1.3rem;">캐릭터 목록 (개별 사이트)</h2>
+            <h2 style="margin-bottom: 10px; color:var(--text-color); font-size: 1.3rem;">실시간 캐릭터 목록</h2>
             <div class="lobby-grid" id="lobby-list"></div>
         </div>
 
@@ -797,7 +800,7 @@
                         <div id="body-sections-container"></div>
                     </div>
 
-                    <button type="submit" class="submit-btn" id="submit-btn-text">새 캐릭터 사이트 생성하기</button>
+                    <button type="submit" class="submit-btn" id="submit-btn-text">실시간 서버에 등록하기</button>
                 </form>
             </div>
         </div>
@@ -842,6 +845,21 @@
 </div>
 
 <script>
+    // 🔌 파이어베이스 설정 반영 완료
+    const firebaseConfig = {
+        apiKey: "AIzaSyAMPkWKqJb2pR-HYVUdjtSVPq0Dp9Rin1w",
+        authDomain: "character-profile-38add.firebaseapp.com",
+        databaseURL: "https://character-profile-38add-default-rtdb.firebaseio.com",
+        projectId: "character-profile-38add",
+        storageBucket: "character-profile-38add.firebasestorage.app",
+        messagingSenderId: "913191700325",
+        appId: "1:913191700325:web:882770167576ea02dd838c",
+        measurementId: "G-JSZC5B8XR7"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     let isPublic = true;
     let isLoggedIn = false;
     let characterList = [];
@@ -859,20 +877,31 @@
         { title: "여담", content: "", spoiler: "NO", images: [] }
     ];
 
+    // 파이어베이스 실시간 데이터 연동 및 동기화 감지
     function loadSavedData() {
-        const saved = localStorage.getItem('XWIKI_CHARACTERS_PERMANENT');
-        if (saved) {
-            try {
-                characterList = JSON.parse(saved);
-            } catch (e) {
+        db.ref('characters').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                characterList = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+            } else {
                 characterList = [];
             }
-        }
-        checkUrlHash();
+            checkUrlHash();
+            if (document.getElementById('lobby-tab').style.display !== 'none') {
+                renderLobby();
+            }
+        });
     }
 
-    function saveData() {
-        localStorage.setItem('XWIKI_CHARACTERS_PERMANENT', JSON.stringify(characterList));
+    function saveDataToFirebase(charData) {
+        db.ref('characters/' + charData.id).set(charData, (error) => {
+            if (error) {
+                alert('저장 실패: ' + error.message);
+            } else {
+                alert('실시간 서버에 성공적으로 저장되었습니다!');
+                switchTab('view', charData.id);
+            }
+        });
     }
 
     function checkLogin() {
@@ -1051,7 +1080,7 @@
         document.getElementById('in-color').value = '#ff85a2';
         document.getElementById('in-bgm').value = '';
         document.getElementById('form-title').textContent = "새 캐릭터 사이트 생성 및 등록";
-        document.getElementById('submit-btn-text').textContent = "새 캐릭터 사이트 생성하기";
+        document.getElementById('submit-btn-text').textContent = "실시간 서버에 등록하기";
     }
 
     function saveWiki(e) {
@@ -1110,17 +1139,7 @@
             bodySections: bodySections
         };
 
-        if (editingCharacterId !== null) {
-            const index = characterList.findIndex(c => c.id === editingCharacterId);
-            if (index !== -1) characterList[index] = characterData;
-            alert('캐릭터 사이트가 성공적으로 수정되었습니다!');
-        } else {
-            characterList.push(characterData);
-            alert('새로운 캐릭터 사이트가 생성되었습니다!');
-        }
-
-        saveData();
-        switchTab('view', characterData.id);
+        saveDataToFirebase(characterData);
     }
 
     function deleteCharacter(id, event) {
@@ -1131,10 +1150,11 @@
         }
 
         const char = characterList.find(c => c.id === id);
-        if (confirm(`'${char ? char.name : ''}' 캐릭터 사이트를 정말 삭제하시겠습니까?`)) {
-            characterList = characterList.filter(c => c.id !== id);
-            saveData();
-            switchTab('lobby');
+        if (confirm(`'${char ? char.name : ''}' 캐릭터 사이트를 정말 삭제하시겠습니까? (실시간으로 모두에게 반영됩니다)`)) {
+            db.ref('characters/' + id).remove().then(() => {
+                alert('삭제되었습니다.');
+                switchTab('lobby');
+            });
         }
     }
 
@@ -1150,7 +1170,7 @@
         if (!char) return;
 
         document.getElementById('form-title').textContent = `'${char.name}' 캐릭터 사이트 수정`;
-        document.getElementById('submit-btn-text').textContent = "수정사항 저장하기";
+        document.getElementById('submit-btn-text').textContent = "수정사항 실시간 반영하기";
 
         document.getElementById('in-tags').value = char.tags || '';
         document.getElementById('in-color').value = char.color || '#ff85a2';
@@ -1188,6 +1208,7 @@
         characterList.forEach((char) => {
             const card = document.createElement('div');
             card.className = 'character-card';
+            card.onclick = () => switchTab('view', char.id);
 
             const actionBtns = isLoggedIn ? `
                 <div class="card-actions">
@@ -1197,8 +1218,8 @@
             ` : '';
 
             card.innerHTML = `
-                <img src="${char.img}" alt="${char.name}" onclick="switchTab('view', '${char.id}')">
-                <div class="card-info" onclick="switchTab('view', '${char.id}')">
+                <img src="${char.img}" alt="${char.name}">
+                <div class="card-info">
                     <div class="card-title">${char.name}</div>
                     <div class="card-sub">${char.sub || ''}</div>
                     ${char.spoilerOk === 'OK' ? '<div class="spoiler-tag">스포 방지 OK</div>' : ''}
@@ -1242,7 +1263,6 @@
         element.nextElementSibling.style.display = 'block';
     }
 
-    // 텍스트 상자 모달 창을 열어 데이터 전체 코드를 보여주는 함수
     function openDataModal() {
         const char = characterList.find(c => c.id === selectedCharacterId);
         if (!char) {
@@ -1282,14 +1302,10 @@
             }
 
             importedChar.id = 'char_' + Date.now();
-            characterList.push(importedChar);
-            saveData();
+            saveDataToFirebase(importedChar);
             closeImportModal();
-            alert(`'${importedChar.name}' 캐릭터 프로필이 성공적으로 추가(합치기)되었습니다!`);
-            renderLobby();
-            switchTab('view', importedChar.id);
         } catch (e) {
-            alert('JSON 형식 코드가 올바르지 않습니다. 텍스트 상자의 내용을 전체 올바르게 붙여넣었는지 확인해 주세요.');
+            alert('JSON 형식 코드가 올바르지 않습니다.');
         }
     }
 
@@ -1433,6 +1449,7 @@
         }
     }
 
+    // 초기 실행 (실시간 서버 데이터 연동 시작)
     loadSavedData();
     initDefaultForm();
 </script>
