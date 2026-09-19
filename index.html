@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X 위키 :: Nightmare & Secret Wiki</title>
+    <title>X 위키 :: Epilogue & Secret Wiki</title>
     <!-- 파이어베이스 SDK 불러오기 -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -676,38 +676,46 @@
             background: #cc0000;
         }
 
-        /* 🖼️ 풀스크린 스포일러/점프스케어 사진 오버레이 */
-        .fullscreen-jumpscare-overlay {
+        /* 📖 소설풍 에필로그 타이핑 화면 오버레이 */
+        .epilogue-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             background: #000000;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9998;
+            padding: 30px;
             cursor: pointer;
         }
 
-        .fullscreen-jumpscare-overlay img {
+        .epilogue-text-box {
+            max-width: 700px;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: contrast(1.1) brightness(0.9);
+            font-family: monospace;
+            font-size: 1.25rem;
+            line-height: 2.2;
+            white-space: pre-wrap;
+            text-align: left;
+            min-height: 180px;
         }
 
-        .fullscreen-jumpscare-text {
+        .epilogue-skip-hint {
             position: absolute;
-            bottom: 30px;
-            background: rgba(0, 0, 0, 0.7);
-            color: #ff0000;
-            border: 1px solid #ff0000;
-            padding: 10px 20px;
+            bottom: 40px;
+            color: #666;
+            font-size: 0.8rem;
             font-family: monospace;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            border-radius: 4px;
-            pointer-events: none;
+            letter-spacing: 1px;
+            animation: pulse-hint 1.5s infinite;
+        }
+
+        @keyframes pulse-hint {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
         }
 
         .modal-overlay {
@@ -901,13 +909,16 @@
                         </div>
                     </div>
 
-                    <!-- 🖼️ 비밀 프로필 전용 풀스크린 공포/점프스케어 사진 설정 -->
-                    <div class="form-group" id="jumpscare-img-group" style="display:none; background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
-                        <label style="color: #ff0055; margin-bottom: 4px;">💀 [비밀 진입용] 풀스크린 공포/점프스케어 사진 업로드</label>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="in-jumpscare-file" accept="image/*" onchange="previewJumpscareImage(event)">
+                    <!-- 📖 비밀 진입 에필로그 텍스트 & 글자 색상 설정 옵션 -->
+                    <div class="form-group" id="epilogue-options-group" style="display:none; background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
+                        <label style="color: #ff0055; margin-bottom: 4px;">📖 [비밀 진입] 소설풍 에필로그 텍스트 연출 설정</label>
+                        <textarea id="in-epilogue-text" placeholder="예: 어둠 속에서 누군가 속삭인다... '거기 {user} 씨, 결국 여기까지 찾아왔군요.'"></textarea>
+                        
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                            <label style="font-size:0.8rem; margin:0;">에필로그 글자 색상 선택:</label>
+                            <input type="color" id="in-epilogue-color" value="#ff0055" style="width: 60px; height: 30px;">
                         </div>
-                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 공개 프로필 사진을 누르고 오류창이 끝나기 전, 화면을 가득 채우며 나타날 공포의 사진입니다.</span>
+                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 텍스트 안에서 `{user}`를 적어두면 사이트에 접속한 사람의 ID(이름)로 자동 치환되어 출력됩니다.</span>
                     </div>
 
                     <div class="form-grid">
@@ -976,9 +987,9 @@
     </div>
 </div>
 
-<!-- 💀 공포 글리치 팝업 및 풀스크린 사진 렌더링 영역 -->
+<!-- 팝업 및 에필로그 타이핑 렌더링 영역 -->
 <div id="glitch-modal-container"></div>
-<div id="fullscreen-jumpscare-container"></div>
+<div id="epilogue-container"></div>
 
 <!-- 모달 창: 스포일러 주의 -->
 <div class="modal-overlay" id="spoiler-modal" style="display:none;">
@@ -1038,9 +1049,9 @@
     let selectedCharacterId = null;
     let editingCharacterId = null;
     let tempMainImg = null;
-    let tempJumpscareImg = null;
     let previousPublicCharacterId = null;
-    let currentVisitorName = "방문자"; // 방문자 식별용
+    let currentVisitorName = "방문자";
+    let activeTypingTimer = null;
 
     const ADMIN_PW = "0828";
     const defaultFields = ["본명", "출생", "성별", "신체", "소속", "MBTI", "가족 관계"];
@@ -1052,11 +1063,9 @@
         { title: "여담", content: "", spoiler: "NO", images: [] }
     ];
 
-    // 접속한 유저의 이름을 브라우저/로컬 환경에서 최대한 유추해냄 (심리 공포 연출용)
     function detectVisitorName() {
         let stored = localStorage.getItem('XWIKI_VISITOR_NAME');
         if (!stored) {
-            // 무작위 방문자 번호나 브라우저 정보 기반 ID 부여
             const randomId = Math.floor(1000 + Math.random() * 9000);
             stored = `User_${randomId}`;
             localStorage.setItem('XWIKI_VISITOR_NAME', stored);
@@ -1099,11 +1108,11 @@
 
     function toggleSecretOptions() {
         const type = document.getElementById('in-profile-type').value;
-        const jumpscareBox = document.getElementById('jumpscare-img-group');
+        const epilogueBox = document.getElementById('epilogue-options-group');
         if (type === 'secret') {
-            jumpscareBox.style.display = 'block';
+            epilogueBox.style.display = 'block';
         } else {
-            jumpscareBox.style.display = 'none';
+            epilogueBox.style.display = 'none';
         }
     }
 
@@ -1138,6 +1147,12 @@
         const editTab = document.getElementById('edit-tab');
         const tabBtnView = document.getElementById('tab-btn-view');
         const btns = document.querySelectorAll('.nav-tabs .tab-btn');
+
+        if (activeTypingTimer) {
+            clearTimeout(activeTypingTimer);
+            activeTypingTimer = null;
+        }
+        document.getElementById('epilogue-container').innerHTML = '';
 
         btns.forEach(btn => btn.classList.remove('active'));
 
@@ -1274,15 +1289,6 @@
         }
     }
 
-    function previewJumpscareImage(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(evt) { tempJumpscareImg = evt.target.result; };
-            reader.readAsDataURL(file);
-        }
-    }
-
     function previewSubImage(e, inputElem) {
         const file = e.target.files[0];
         if (file) {
@@ -1303,11 +1309,12 @@
 
         editingCharacterId = null;
         tempMainImg = null;
-        tempJumpscareImg = null;
         document.getElementById('in-color').value = '#ff85a2';
         document.getElementById('in-bgm').value = '';
         document.getElementById('in-profile-type').value = 'public';
         document.getElementById('in-linked-public-id').value = '';
+        document.getElementById('in-epilogue-text').value = '';
+        document.getElementById('in-epilogue-color').value = '#ff0055';
         document.getElementById('form-title').textContent = "새 캐릭터 사이트 생성 및 등록";
         document.getElementById('submit-btn-text').textContent = "실시간 서버에 등록하기";
         toggleSecretOptions();
@@ -1354,7 +1361,6 @@
 
         const existingChar = editingCharacterId !== null ? characterList.find(c => c.id === editingCharacterId) : null;
         const existingImg = existingChar ? existingChar.img : 'https://via.placeholder.com/300x380/000000/FFFFFF?text=No+Image';
-        const existingJumpscareImg = existingChar ? existingChar.jumpscareImg : '';
 
         const characterData = {
             id: editingCharacterId || 'char_' + Date.now(),
@@ -1364,10 +1370,11 @@
             color: document.getElementById('in-color').value,
             profileType: document.getElementById('in-profile-type').value,
             linkedPublicId: document.getElementById('in-linked-public-id').value,
+            epilogueText: document.getElementById('in-epilogue-text').value,
+            epilogueColor: document.getElementById('in-epilogue-color').value,
             spoilerOk: document.getElementById('in-spoiler-ok').value,
             spoilerMsg: document.getElementById('in-spoiler-msg').value,
             img: tempMainImg || existingImg,
-            jumpscareImg: tempJumpscareImg || existingJumpscareImg,
             bgm: document.getElementById('in-bgm').value,
             customFields: customFields,
             quote: document.getElementById('in-quote').value,
@@ -1411,6 +1418,8 @@
         document.getElementById('in-color').value = char.color || '#ff85a2';
         document.getElementById('in-profile-type').value = char.profileType || 'public';
         document.getElementById('in-linked-public-id').value = char.linkedPublicId || '';
+        document.getElementById('in-epilogue-text').value = char.epilogueText || '';
+        document.getElementById('in-epilogue-color').value = char.epilogueColor || '#ff0055';
         document.getElementById('in-spoiler-ok').value = char.spoilerOk || 'NO';
         document.getElementById('in-spoiler-msg').value = char.spoilerMsg || '';
         document.getElementById('in-name').value = char.name || '';
@@ -1534,7 +1543,7 @@
         }
     }
 
-    // 💀 공포 글리치 팝업 및 풀스크린 사진 연출 로직 (방문자 이름 직접 호출)
+    // 💀 공포 글리치 팝업 및 소설풍 타이핑 에필로그 연출 로직
     function startGlitchSequence(secretChar) {
         const uName = currentVisitorName;
         const errorMessages = [
@@ -1547,9 +1556,9 @@
             const container = document.getElementById('glitch-modal-container');
             if (step >= errorMessages.length) {
                 container.innerHTML = '';
-                // 모든 오류창이 끝나면, 등록된 풀스크린 공포 사진이 있는지 확인하고 전체화면으로 띄움
-                if (secretChar.jumpscareImg) {
-                    showFullscreenJumpscare(secretChar.jumpscareImg, secretChar.id);
+                // 에필로그 텍스트가 설정되어 있다면 소설풍 타이핑 연출 시작, 아니면 바로 비밀 프로필 진입
+                if (secretChar.epilogueText) {
+                    showEpilogueTyping(secretChar.epilogueText, secretChar.epilogueColor || '#ff0055', secretChar.id);
                 } else {
                     switchTab('view', secretChar.id);
                 }
@@ -1574,21 +1583,52 @@
         showGlitchPopup(0);
     }
 
-    // 🖼️ 화면을 꽉 채우는 공포 사진 풀스크린 연출
-    function showFullscreenJumpscare(imgUrl, targetSecretId) {
-        const container = document.getElementById('fullscreen-jumpscare-container');
+    // 📖 소설풍 에필로그 타이핑 효과 함수
+    function showEpilogueTyping(rawText, textColor, targetSecretId) {
+        const container = document.getElementById('epilogue-container');
+        const formattedText = rawText.replace(/{user}/g, currentVisitorName);
+
         container.innerHTML = `
-            <div class="fullscreen-jumpscare-overlay" onclick="closeJumpscare('${targetSecretId}')">
-                <img src="${imgUrl}" alt="Jumpscare Image">
-                <div class="fullscreen-jumpscare-text">[ 화면을 클릭하여 비밀 프로필로 진입합니다 ]</div>
+            <div class="epilogue-overlay" onclick="skipEpilogue('${targetSecretId}')">
+                <div class="epilogue-text-box" id="epilogue-typing-target" style="color: ${textColor};"></div>
+                <div class="epilogue-skip-hint">- 화면을 클릭하면 에필로그를 건너뛰고 입장합니다 -</div>
             </div>
         `;
+
+        const targetElem = document.getElementById('epilogue-typing-target');
+        let charIndex = 0;
+
+        function typeWriter() {
+            if (charIndex < formattedText.length) {
+                targetElem.textContent += formattedText.charAt(charIndex);
+                charIndex++;
+                activeTypingTimer = setTimeout(typeWriter, 45); // 타이핑 속도
+            } else {
+                activeTypingTimer = setTimeout(() => {
+                    closeEpilogue(targetSecretId);
+                }, 3500); // 문장이 모두 출력된 후 3.5초 대기 후 진입
+            }
+        }
+
+        typeWriter();
     }
 
-    window.closeJumpscare = function(targetSecretId) {
-        document.getElementById('fullscreen-jumpscare-container').innerHTML = '';
-        switchTab('view', targetSecretId);
+    window.skipEpilogue = function(targetSecretId) {
+        if (activeTypingTimer) {
+            clearTimeout(activeTypingTimer);
+            activeTypingTimer = null;
+        }
+        closeEpilogue(targetSecretId);
     };
+
+    function closeEpilogue(targetSecretId) {
+        if (activeTypingTimer) {
+            clearTimeout(activeTypingTimer);
+            activeTypingTimer = null;
+        }
+        document.getElementById('epilogue-container').innerHTML = '';
+        switchTab('view', targetSecretId);
+    }
 
     function goBackFromProfile() {
         const char = characterList.find(c => c.id === selectedCharacterId);
