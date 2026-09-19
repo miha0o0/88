@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X 위키 :: Glitch & Secret Wiki</title>
+    <title>X 위키 :: Nightmare & Secret Wiki</title>
     <!-- 파이어베이스 SDK 불러오기 -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -617,12 +617,12 @@
             text-align: left;
         }
 
-        /* 💥 무서운 오류 팝업창 스타일 */
+        /* 💀 공포 글리치 팝업창 스타일 */
         .glitch-modal-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.92);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -630,46 +630,84 @@
         }
 
         .glitch-modal-box {
-            background: #000000;
-            border: 2px solid #ff0000;
-            padding: 24px;
-            border-radius: 6px;
-            max-width: 420px;
+            background: #050000;
+            border: 3px solid #ff0000;
+            padding: 28px;
+            border-radius: 4px;
+            max-width: 460px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 0 25px rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 35px rgba(255, 0, 0, 0.8), inset 0 0 15px rgba(255, 0, 0, 0.5);
         }
 
         .glitch-modal-box h3 {
             color: #ff0000;
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            letter-spacing: 3px;
             font-family: monospace;
+            text-transform: uppercase;
+            text-shadow: 0 0 8px rgba(255,0,0,0.8);
         }
 
         .glitch-modal-box p {
-            font-size: 0.95rem;
-            color: #ff3333;
-            margin-bottom: 20px;
+            font-size: 1rem;
+            color: #ff4444;
+            margin-bottom: 22px;
             white-space: pre-line;
             font-family: monospace;
+            line-height: 1.5;
         }
 
         .glitch-btn {
             background: #ff0000;
             color: #ffffff;
             border: none;
-            padding: 8px 20px;
+            padding: 9px 24px;
             font-weight: bold;
-            font-size: 0.9rem;
-            border-radius: 4px;
+            font-size: 0.95rem;
+            border-radius: 2px;
             cursor: pointer;
             font-family: monospace;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            box-shadow: 0 0 10px rgba(255,0,0,0.8);
         }
         .glitch-btn:hover {
             background: #cc0000;
+        }
+
+        /* 🖼️ 풀스크린 스포일러/점프스케어 사진 오버레이 */
+        .fullscreen-jumpscare-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+            cursor: pointer;
+        }
+
+        .fullscreen-jumpscare-overlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: contrast(1.1) brightness(0.9);
+        }
+
+        .fullscreen-jumpscare-text {
+            position: absolute;
+            bottom: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #ff0000;
+            border: 1px solid #ff0000;
+            padding: 10px 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            pointer-events: none;
         }
 
         .modal-overlay {
@@ -850,7 +888,7 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label>프로필공개 타입 설정</label>
-                            <select id="in-profile-type">
+                            <select id="in-profile-type" onchange="toggleSecretOptions()">
                                 <option value="public">일반 공개 프로필 (로비 노출)</option>
                                 <option value="secret">비밀 프로필 (특정 경로로만 진입 가능)</option>
                             </select>
@@ -861,6 +899,15 @@
                                 <option value="">(연결 안 함)</option>
                             </select>
                         </div>
+                    </div>
+
+                    <!-- 🖼️ 비밀 프로필 전용 풀스크린 공포/점프스케어 사진 설정 -->
+                    <div class="form-group" id="jumpscare-img-group" style="display:none; background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
+                        <label style="color: #ff0055; margin-bottom: 4px;">💀 [비밀 진입용] 풀스크린 공포/점프스케어 사진 업로드</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="in-jumpscare-file" accept="image/*" onchange="previewJumpscareImage(event)">
+                        </div>
+                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 공개 프로필 사진을 누르고 오류창이 끝나기 전, 화면을 가득 채우며 나타날 공포의 사진입니다.</span>
                     </div>
 
                     <div class="form-grid">
@@ -929,8 +976,9 @@
     </div>
 </div>
 
-<!-- 💥 무서운 오류 팝업 렌더링 영역 -->
+<!-- 💀 공포 글리치 팝업 및 풀스크린 사진 렌더링 영역 -->
 <div id="glitch-modal-container"></div>
+<div id="fullscreen-jumpscare-container"></div>
 
 <!-- 모달 창: 스포일러 주의 -->
 <div class="modal-overlay" id="spoiler-modal" style="display:none;">
@@ -990,7 +1038,9 @@
     let selectedCharacterId = null;
     let editingCharacterId = null;
     let tempMainImg = null;
+    let tempJumpscareImg = null;
     let previousPublicCharacterId = null;
+    let currentVisitorName = "방문자"; // 방문자 식별용
 
     const ADMIN_PW = "0828";
     const defaultFields = ["본명", "출생", "성별", "신체", "소속", "MBTI", "가족 관계"];
@@ -1002,7 +1052,20 @@
         { title: "여담", content: "", spoiler: "NO", images: [] }
     ];
 
+    // 접속한 유저의 이름을 브라우저/로컬 환경에서 최대한 유추해냄 (심리 공포 연출용)
+    function detectVisitorName() {
+        let stored = localStorage.getItem('XWIKI_VISITOR_NAME');
+        if (!stored) {
+            // 무작위 방문자 번호나 브라우저 정보 기반 ID 부여
+            const randomId = Math.floor(1000 + Math.random() * 9000);
+            stored = `User_${randomId}`;
+            localStorage.setItem('XWIKI_VISITOR_NAME', stored);
+        }
+        currentVisitorName = stored;
+    }
+
     function loadSavedData() {
+        detectVisitorName();
         db.ref('characters').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -1032,6 +1095,16 @@
             }
         });
         select.value = currentVal;
+    }
+
+    function toggleSecretOptions() {
+        const type = document.getElementById('in-profile-type').value;
+        const jumpscareBox = document.getElementById('jumpscare-img-group');
+        if (type === 'secret') {
+            jumpscareBox.style.display = 'block';
+        } else {
+            jumpscareBox.style.display = 'none';
+        }
     }
 
     function saveDataToFirebase(charData) {
@@ -1093,6 +1166,7 @@
             tabBtnView.style.display = 'none';
             document.body.classList.remove('secret-mode');
             btns[btns.length - 1].classList.add('active');
+            toggleSecretOptions();
         }
     }
 
@@ -1200,6 +1274,15 @@
         }
     }
 
+    function previewJumpscareImage(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) { tempJumpscareImg = evt.target.result; };
+            reader.readAsDataURL(file);
+        }
+    }
+
     function previewSubImage(e, inputElem) {
         const file = e.target.files[0];
         if (file) {
@@ -1220,12 +1303,14 @@
 
         editingCharacterId = null;
         tempMainImg = null;
+        tempJumpscareImg = null;
         document.getElementById('in-color').value = '#ff85a2';
         document.getElementById('in-bgm').value = '';
         document.getElementById('in-profile-type').value = 'public';
         document.getElementById('in-linked-public-id').value = '';
         document.getElementById('form-title').textContent = "새 캐릭터 사이트 생성 및 등록";
         document.getElementById('submit-btn-text').textContent = "실시간 서버에 등록하기";
+        toggleSecretOptions();
     }
 
     function saveWiki(e) {
@@ -1267,7 +1352,9 @@
             }
         });
 
-        const existingImg = (editingCharacterId !== null) ? (characterList.find(c => c.id === editingCharacterId)?.img || '') : 'https://via.placeholder.com/300x380/000000/FFFFFF?text=No+Image';
+        const existingChar = editingCharacterId !== null ? characterList.find(c => c.id === editingCharacterId) : null;
+        const existingImg = existingChar ? existingChar.img : 'https://via.placeholder.com/300x380/000000/FFFFFF?text=No+Image';
+        const existingJumpscareImg = existingChar ? existingChar.jumpscareImg : '';
 
         const characterData = {
             id: editingCharacterId || 'char_' + Date.now(),
@@ -1280,6 +1367,7 @@
             spoilerOk: document.getElementById('in-spoiler-ok').value,
             spoilerMsg: document.getElementById('in-spoiler-msg').value,
             img: tempMainImg || existingImg,
+            jumpscareImg: tempJumpscareImg || existingJumpscareImg,
             bgm: document.getElementById('in-bgm').value,
             customFields: customFields,
             quote: document.getElementById('in-quote').value,
@@ -1330,6 +1418,8 @@
         document.getElementById('in-bgm').value = char.bgm || '';
         document.getElementById('in-quote').value = char.quote || '';
 
+        toggleSecretOptions();
+
         const customContainer = document.getElementById('custom-fields-container');
         customContainer.innerHTML = '';
         if (char.customFields) {
@@ -1349,7 +1439,6 @@
         const container = document.getElementById('lobby-list');
         container.innerHTML = '';
 
-        // 일반 방문자에게는 공개 프로필만 보이고, 관리자 로그인 상태면 비밀 프로필도 로비에 함께 표시되어 수정/삭제 가능
         const displayCharacters = isLoggedIn ? characterList : characterList.filter(c => !c.profileType || c.profileType === 'public');
 
         if (displayCharacters.length === 0) {
@@ -1440,30 +1529,37 @@
             const linkedSecret = characterList.find(c => c.profileType === 'secret' && c.linkedPublicId === char.id);
             if (linkedSecret) {
                 previousPublicCharacterId = selectedCharacterId;
-                startGlitchSequence(linkedSecret.id);
+                startGlitchSequence(linkedSecret);
             }
         }
     }
 
-    function startGlitchSequence(targetSecretId) {
+    // 💀 공포 글리치 팝업 및 풀스크린 사진 연출 로직 (방문자 이름 직접 호출)
+    function startGlitchSequence(secretChar) {
+        const uName = currentVisitorName;
         const errorMessages = [
-            "오류! 시스템 접근 코드가 비정상적입니다.",
-            "오류! 무단 침입자가 감지되었습니다. 연결을 차단합니다.",
-            "오류! 보안 격벽이 무너졌습니다. 숨겨진 기록실로 강제 이동합니다..."
+            `경고: ${uName} 님, 당신의 접속 기록이 추적되었습니다.`,
+            `오류! 이 영역에 들어오는 것은 허용되지 않습니다...`,
+            `시스템 무력화 중... 환영합니다, ${uName} 님.`
         ];
 
         function showGlitchPopup(step) {
             const container = document.getElementById('glitch-modal-container');
             if (step >= errorMessages.length) {
                 container.innerHTML = '';
-                switchTab('view', targetSecretId);
+                // 모든 오류창이 끝나면, 등록된 풀스크린 공포 사진이 있는지 확인하고 전체화면으로 띄움
+                if (secretChar.jumpscareImg) {
+                    showFullscreenJumpscare(secretChar.jumpscareImg, secretChar.id);
+                } else {
+                    switchTab('view', secretChar.id);
+                }
                 return;
             }
 
             container.innerHTML = `
                 <div class="glitch-modal-overlay">
                     <div class="glitch-modal-box">
-                        <h3>⚠️ 오류! SYSTEM_CRITICAL</h3>
+                        <h3>⚠️ SYSTEM_SECURITY_BREACH</h3>
                         <p>${errorMessages[step]}</p>
                         <button class="glitch-btn" onclick="nextGlitch(${step + 1})">확인</button>
                     </div>
@@ -1477,6 +1573,22 @@
 
         showGlitchPopup(0);
     }
+
+    // 🖼️ 화면을 꽉 채우는 공포 사진 풀스크린 연출
+    function showFullscreenJumpscare(imgUrl, targetSecretId) {
+        const container = document.getElementById('fullscreen-jumpscare-container');
+        container.innerHTML = `
+            <div class="fullscreen-jumpscare-overlay" onclick="closeJumpscare('${targetSecretId}')">
+                <img src="${imgUrl}" alt="Jumpscare Image">
+                <div class="fullscreen-jumpscare-text">[ 화면을 클릭하여 비밀 프로필로 진입합니다 ]</div>
+            </div>
+        `;
+    }
+
+    window.closeJumpscare = function(targetSecretId) {
+        document.getElementById('fullscreen-jumpscare-container').innerHTML = '';
+        switchTab('view', targetSecretId);
+    };
 
     function goBackFromProfile() {
         const char = characterList.find(c => c.id === selectedCharacterId);
