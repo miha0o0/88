@@ -343,6 +343,11 @@
             max-height: 360px;
             object-fit: cover;
             border-radius: 4px;
+            cursor: pointer; /* 사진 클릭 유도 */
+            transition: opacity 0.2s;
+        }
+        .infobox-img-td img:hover {
+            opacity: 0.9;
         }
 
         .infobox th {
@@ -462,31 +467,6 @@
 
         .spoiler-section-content {
             display: none;
-        }
-
-        /* 비밀 진입 링크 박스 */
-        .secret-portal-box {
-            margin-top: 25px;
-            background: var(--soft-pink-bg);
-            border: 1px dashed var(--accent-pink);
-            padding: 12px;
-            border-radius: 6px;
-            text-align: center;
-        }
-
-        .secret-portal-btn {
-            background: var(--accent-pink);
-            color: #fff;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 6px;
-        }
-        .secret-portal-btn:hover {
-            opacity: 0.85;
         }
 
         /* 폼 입력 디자인 */
@@ -800,12 +780,6 @@
                         </table>
 
                         <div id="dynamic-sections-view"></div>
-
-                        <!-- 비밀 프로필 연결 포털 영역 -->
-                        <div id="secret-portal-section" class="secret-portal-box" style="display:none;">
-                            <div style="font-size:0.82rem; font-weight:bold; color:var(--accent-pink);" id="portal-notice-title">🔒 비밀 기록실이 존재합니다</div>
-                            <button class="secret-portal-btn" id="portal-trigger-btn" onclick="startGlitchSequence()">비밀 기록 열기</button>
-                        </div>
                     </div>
 
                     <div>
@@ -816,7 +790,8 @@
                                 </tr>
                                 <tr>
                                     <td colspan="2" class="infobox-img-td">
-                                        <img id="out-img" src="https://via.placeholder.com/300x380/000000/FFFFFF?text=No+Image" alt="캐릭터 사진">
+                                        <!-- 프로필 사진 클릭 시 비밀 진입 또는 원본 복귀 실행 -->
+                                        <img id="out-img" src="https://via.placeholder.com/300x380/000000/FFFFFF?text=No+Image" alt="캐릭터 사진" onclick="handleProfileImageClick()">
                                     </td>
                                 </tr>
                                 <tbody id="custom-fields-tbody"></tbody>
@@ -1404,7 +1379,6 @@
 
         selectedCharacterId = id;
 
-        // 비밀 프로필인지 여부에 따라 다크/핫핑크 모드(secret-mode) 적용
         if (char.profileType === 'secret') {
             document.body.classList.add('secret-mode');
         } else {
@@ -1439,27 +1413,38 @@
         element.nextElementSibling.style.display = 'block';
     }
 
-    // 💥 무서운 오류 팝업창 연달아 띄우기 로직
-    function startGlitchSequence() {
+    // 💥 프로필 사진 클릭 시 동작 (비밀 진입 또는 원본 복귀)
+    function handleProfileImageClick() {
         const char = characterList.find(c => c.id === selectedCharacterId);
-        if (!char || !char.linkedPublicId) return;
+        if (!char) return;
 
-        previousPublicCharacterId = selectedCharacterId;
+        if (char.profileType === 'secret' && char.linkedPublicId) {
+            // 비밀 프로필인 경우 사진을 누르면 원본 공개 프로필로 안전하게 복귀
+            switchTab('view', char.linkedPublicId);
+        } else {
+            // 공개 프로필인 경우 연결된 비밀 프로필이 있는지 확인
+            const linkedSecret = characterList.find(c => c.profileType === 'secret' && c.linkedPublicId === char.id);
+            if (linkedSecret) {
+                previousPublicCharacterId = selectedCharacterId;
+                startGlitchSequence(linkedSecret.id);
+            }
+        }
+    }
 
+    // 무서운 오류 팝업창 연달아 띄우기
+    function startGlitchSequence(targetSecretId) {
         const errorMessages = [
             "오류! 시스템 접근 코드가 비정상적입니다.",
             "오류! 무단 침입자가 감지되었습니다. 연결을 차단합니다.",
             "오류! 보안 격벽이 무너졌습니다. 숨겨진 기록실로 강제 이동합니다..."
         ];
 
-        let currentStep = 0;
-
         function showGlitchPopup(step) {
             const container = document.getElementById('glitch-modal-container');
             if (step >= errorMessages.length) {
                 container.innerHTML = '';
-                // 모든 경고창을 확인하면 비밀 프로필로 이동
-                switchTab('view', char.linkedPublicId);
+                // 모든 창을 확인하면 비밀 프로필로 이동
+                switchTab('view', targetSecretId);
                 return;
             }
 
@@ -1482,7 +1467,10 @@
     }
 
     function goBackFromProfile() {
-        if (previousPublicCharacterId) {
+        const char = characterList.find(c => c.id === selectedCharacterId);
+        if (char && char.profileType === 'secret' && char.linkedPublicId) {
+            switchTab('view', char.linkedPublicId);
+        } else if (previousPublicCharacterId) {
             const backId = previousPublicCharacterId;
             previousPublicCharacterId = null;
             switchTab('view', backId);
@@ -1649,25 +1637,6 @@
             });
         }
 
-        // 포털 버튼 관리
-        const portalSection = document.getElementById('secret-portal-section');
-        if (char.profileType === 'secret' && char.linkedPublicId) {
-            portalSection.style.display = 'block';
-            document.getElementById('portal-notice-title').textContent = "🔒 이 비밀 프로필과 연결된 원본 공개 프로필";
-            document.getElementById('portal-trigger-btn').textContent = "원본 공개 프로필로 돌아가기";
-            document.getElementById('portal-trigger-btn').onclick = () => switchTab('view', char.linkedPublicId);
-        } else {
-            const linkedSecret = characterList.find(c => c.profileType === 'secret' && c.linkedPublicId === char.id);
-            if (linkedSecret) {
-                portalSection.style.display = 'block';
-                document.getElementById('portal-notice-title').textContent = "🔒 숨겨진 비밀 기록실이 감지되었습니다";
-                document.getElementById('portal-trigger-btn').textContent = "비밀 기록 열기 (시스템 오류 발생)";
-                document.getElementById('portal-trigger-btn').onclick = startGlitchSequence;
-            } else {
-                portalSection.style.display = 'none';
-            }
-        }
-
         const bgmBox = document.getElementById('bgm-box');
         const player = document.getElementById('youtube-player');
         const match = char.bgm ? char.bgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/) : null;
@@ -1703,4 +1672,4 @@
 </script>
 
 </body>
-</html>
+    </html>
