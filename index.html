@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X 위키 :: Realtime Personal Homepage</title>
+    <title>X 위키 :: Glitch & Secret Wiki</title>
     <!-- 파이어베이스 SDK 불러오기 -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -23,11 +23,28 @@
             --infobox-color: #ff85a2;
         }
 
+        /* 비밀 프로필 모드 (다크 & 핫핑크 테마) */
+        body.secret-mode {
+            --bg-color: #0b0709;
+            --card-bg: #140d12;
+            --header-bg: #1f1018;
+            --border-color: #ff0055;
+            --text-color: #fce8f0;
+            --text-sub: #b87a96;
+            --accent-pink: #ff0055;
+            --light-pink: #ff3377;
+            --soft-pink-bg: #1c0e15;
+            --badge-private: #ff0055;
+            --wiki-table-header: #26101c;
+            --infobox-color: #ff0055;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
 
         body {
@@ -46,7 +63,7 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
 
         .site-header {
@@ -73,14 +90,14 @@
         .nav-tabs {
             display: flex;
             gap: 8px;
-            background: #ffffff;
+            background: var(--card-bg);
             padding: 10px 20px;
             border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
         }
 
         .tab-btn {
-            background: #ffffff;
+            background: var(--card-bg);
             color: var(--text-sub);
             border: 1px solid var(--border-color);
             padding: 5px 14px;
@@ -98,6 +115,7 @@
 
         .content-container {
             padding: 20px;
+            background: var(--card-bg);
         }
 
         /* 로비 */
@@ -153,7 +171,7 @@
         .character-card .card-actions {
             display: flex;
             border-top: 1px solid var(--border-color);
-            background: #ffffff;
+            background: var(--card-bg);
         }
 
         .character-card .card-actions button {
@@ -179,7 +197,8 @@
         .spoiler-tag {
             display: inline-block;
             font-size: 0.65rem;
-            background: #ffdde6;
+            background: var(--soft-pink-bg);
+            border: 1px solid var(--accent-pink);
             color: var(--accent-pink);
             padding: 2px 5px;
             border-radius: 3px;
@@ -200,7 +219,7 @@
 
         .wiki-category .tag-item {
             color: var(--accent-pink);
-            background: #ffffff;
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 2px 6px;
             border-radius: 3px;
@@ -240,7 +259,7 @@
         }
 
         .action-btn {
-            background: #ffffff;
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--text-color);
             padding: 3px 8px;
@@ -253,6 +272,7 @@
         .action-btn.private {
             background: var(--badge-private);
             color: #ffffff;
+            border-color: var(--badge-private);
         }
 
         .action-btn.copy-code {
@@ -298,7 +318,7 @@
         .infobox {
             width: 100%;
             border-collapse: collapse;
-            background: #ffffff;
+            background: var(--card-bg);
             border: 2px solid var(--infobox-color);
             font-size: 0.85rem;
         }
@@ -337,7 +357,9 @@
         .infobox td {
             padding: 6px 8px;
             border: 1px solid var(--border-color);
-            background: #ffffff;
+            background: var(--card-bg);
+            color: var(--text-color);
+            white-space: pre-wrap;
         }
 
         .color-badge {
@@ -391,6 +413,12 @@
             margin: 20px 0 10px 0;
         }
 
+        .section-content-p {
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
         .quote-table {
             width: 100%;
             border-collapse: collapse;
@@ -436,6 +464,31 @@
             display: none;
         }
 
+        /* 비밀 진입 링크 박스 */
+        .secret-portal-box {
+            margin-top: 25px;
+            background: var(--soft-pink-bg);
+            border: 1px dashed var(--accent-pink);
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .secret-portal-btn {
+            background: var(--accent-pink);
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+        .secret-portal-btn:hover {
+            opacity: 0.85;
+        }
+
         /* 폼 입력 디자인 */
         .form-grid {
             display: grid;
@@ -461,7 +514,7 @@
         }
 
         .form-group input, .form-group textarea, .form-group select {
-            background: #ffffff;
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--text-color);
             padding: 7px 9px;
@@ -476,8 +529,9 @@
         }
 
         .form-group textarea {
-            min-height: 75px;
+            min-height: 85px;
             resize: vertical;
+            white-space: pre-wrap;
         }
 
         .file-input-wrapper {
@@ -511,7 +565,7 @@
             display: flex;
             gap: 6px;
             align-items: center;
-            background: #ffffff;
+            background: var(--card-bg);
             padding: 6px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
@@ -568,11 +622,66 @@
             text-align: left;
         }
 
+        /* 💥 무서운 오류 팝업창 스타일 (검은 배경 + 빨간 텍스트) */
+        .glitch-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .glitch-modal-box {
+            background: #000000;
+            border: 2px solid #ff0000;
+            padding: 24px;
+            border-radius: 6px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.5);
+        }
+
+        .glitch-modal-box h3 {
+            color: #ff0000;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            font-family: monospace;
+        }
+
+        .glitch-modal-box p {
+            font-size: 0.95rem;
+            color: #ff3333;
+            margin-bottom: 20px;
+            white-space: pre-line;
+            font-family: monospace;
+        }
+
+        .glitch-btn {
+            background: #ff0000;
+            color: #ffffff;
+            border: none;
+            padding: 8px 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        .glitch-btn:hover {
+            background: #cc0000;
+        }
+
         .modal-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(74, 59, 66, 0.4);
+            background: rgba(0, 0, 0, 0.6);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -580,14 +689,14 @@
         }
 
         .modal-box {
-            background: #ffffff;
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 22px;
             border-radius: 6px;
             max-width: 480px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
         .modal-box h3 {
@@ -609,6 +718,8 @@
             font-size: 0.75rem;
             padding: 8px;
             border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
             border-radius: 4px;
             margin-bottom: 12px;
             resize: vertical;
@@ -660,7 +771,7 @@
                 <div class="wiki-btn-group">
                     <span class="action-btn copy-code" onclick="openDataModal()">💾 프로필 저장/코드 텍스트 보기</span>
                     <span class="action-btn" id="visibility-btn" onclick="toggleVisibility()">공개</span>
-                    <button class="action-btn" onclick="switchTab('lobby')">목록으로</button>
+                    <button class="action-btn" onclick="goBackFromProfile()">목록으로</button>
                 </div>
             </div>
 
@@ -689,6 +800,12 @@
                         </table>
 
                         <div id="dynamic-sections-view"></div>
+
+                        <!-- 비밀 프로필 연결 포털 영역 -->
+                        <div id="secret-portal-section" class="secret-portal-box" style="display:none;">
+                            <div style="font-size:0.82rem; font-weight:bold; color:var(--accent-pink);" id="portal-notice-title">🔒 비밀 기록실이 존재합니다</div>
+                            <button class="secret-portal-btn" id="portal-trigger-btn" onclick="startGlitchSequence()">비밀 기록 열기</button>
+                        </div>
                     </div>
 
                     <div>
@@ -743,6 +860,22 @@
 
                     <div class="form-grid">
                         <div class="form-group">
+                            <label>프로필공개 타입 설정</label>
+                            <select id="in-profile-type">
+                                <option value="public">일반 공개 프로필 (로비 노출)</option>
+                                <option value="secret">비밀 프로필 (특정 경로로만 진입 가능)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>연결할 공개 프로필 선택 (비밀 프로필인 경우)</label>
+                            <select id="in-linked-public-id">
+                                <option value="">(연결 안 함)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
                             <label>전체 프로필 스포 방지 설정</label>
                             <select id="in-spoiler-ok">
                                 <option value="NO">스포 방지 NO (바로 열람)</option>
@@ -781,7 +914,7 @@
 
                     <div class="form-group">
                         <label style="margin-bottom: 5px;">
-                            <span>프로필 표 항목 (순서 변경 / 각 항목 스포 OK/NO 선택 / 추가·삭제)</span>
+                            <span>프로필 표 항목 (줄바꿈/엔터 가능)</span>
                             <button type="button" class="add-field-btn" onclick="addCustomField()">+ 항목 추가</button>
                         </label>
                         <div id="custom-fields-container"></div>
@@ -794,7 +927,7 @@
 
                     <div class="form-group">
                         <label style="margin-bottom: 5px;">
-                            <span>본문 섹션 (사진 여러 장 첨부 및 각각 개별 스포 설정 가능)</span>
+                            <span>본문 섹션 (엔터 사용 가능, 사진 개별 스포 가능)</span>
                             <button type="button" class="add-field-btn" onclick="addBodySection()">+ 섹션 추가</button>
                         </label>
                         <div id="body-sections-container"></div>
@@ -806,6 +939,9 @@
         </div>
     </div>
 </div>
+
+<!-- 💥 무서운 오류 팝업 렌더링 영역 -->
+<div id="glitch-modal-container"></div>
 
 <!-- 모달 창: 스포일러 주의 -->
 <div class="modal-overlay" id="spoiler-modal" style="display:none;">
@@ -823,7 +959,7 @@
 <div class="modal-overlay" id="data-export-modal" style="display:none;">
     <div class="modal-box">
         <h3>프로필 데이터 저장용 텍스트 창</h3>
-        <p>아래 텍스트 상자의 내용을 전체 선택(Ctrl+A)하여 복사(Ctrl+C)한 뒤 메모장에 저장해 두세요.<br>(사진, 정보, 스포일러 여부가 전부 들어있습니다)</p>
+        <p>아래 텍스트 상자의 내용을 복사하여 메모장에 저장해 두세요.</p>
         <textarea id="export-textarea" class="modal-textarea"></textarea>
         <div class="modal-btns">
             <button class="modal-btn" onclick="closeDataModal()">확인 및 닫기</button>
@@ -845,7 +981,6 @@
 </div>
 
 <script>
-    // 🔌 파이어베이스 설정 반영 완료
     const firebaseConfig = {
         apiKey: "AIzaSyAMPkWKqJb2pR-HYVUdjtSVPq0Dp9Rin1w",
         authDomain: "character-profile-38add.firebaseapp.com",
@@ -866,6 +1001,7 @@
     let selectedCharacterId = null;
     let editingCharacterId = null;
     let tempMainImg = null;
+    let previousPublicCharacterId = null;
 
     const ADMIN_PW = "0828";
     const defaultFields = ["본명", "출생", "성별", "신체", "소속", "MBTI", "가족 관계"];
@@ -877,7 +1013,6 @@
         { title: "여담", content: "", spoiler: "NO", images: [] }
     ];
 
-    // 파이어베이스 실시간 데이터 연동 및 동기화 감지
     function loadSavedData() {
         db.ref('characters').on('value', (snapshot) => {
             const data = snapshot.val();
@@ -886,11 +1021,28 @@
             } else {
                 characterList = [];
             }
+            updateLinkedPublicDropdown();
             checkUrlHash();
             if (document.getElementById('lobby-tab').style.display !== 'none') {
                 renderLobby();
             }
         });
+    }
+
+    function updateLinkedPublicDropdown() {
+        const select = document.getElementById('in-linked-public-id');
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">(연결 안 함)</option>';
+        
+        characterList.forEach(c => {
+            if (!c.profileType || c.profileType === 'public') {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = `[공개] ${c.name}`;
+                select.appendChild(opt);
+            }
+        });
+        select.value = currentVal;
     }
 
     function saveDataToFirebase(charData) {
@@ -934,6 +1086,7 @@
             editTab.style.display = 'none';
             tabBtnView.style.display = 'none';
             document.getElementById('tab-btn-lobby').classList.add('active');
+            document.body.classList.remove('secret-mode');
             renderLobby();
         } else if (tab === 'view' && charId !== null) {
             window.location.hash = `character=${charId}`;
@@ -949,6 +1102,7 @@
             viewTab.style.display = 'none';
             editTab.style.display = 'block';
             tabBtnView.style.display = 'none';
+            document.body.classList.remove('secret-mode');
             btns[btns.length - 1].classList.add('active');
         }
     }
@@ -989,7 +1143,7 @@
             <button type="button" class="move-btn" onclick="moveUp(this)">▲</button>
             <button type="button" class="move-btn" onclick="moveDown(this)">▼</button>
             <input type="text" class="field-label" placeholder="항목 이름" value="${label}">
-            <input type="text" class="field-value" placeholder="내용" value="${value}">
+            <input type="text" class="field-value" placeholder="내용 (줄바꿈 가능)" value="${value}">
             <select class="field-spoiler" style="padding:2px 4px; font-size:0.75rem;">
                 <option value="NO" ${spoiler === 'NO' ? 'selected' : ''}>스포 NO</option>
                 <option value="OK" ${spoiler === 'OK' ? 'selected' : ''}>스포 OK</option>
@@ -1015,7 +1169,7 @@
                 </select>
                 <button type="button" class="remove-field-btn" onclick="this.parentElement.parentElement.remove()">섹션 삭제</button>
             </div>
-            <textarea class="section-content-input" placeholder="섹션 본문 내용을 입력하세요">${content}</textarea>
+            <textarea class="section-content-input" placeholder="섹션 본문 내용을 입력하세요 (엔터로 줄바꿈 가능)">${content}</textarea>
             
             <div style="margin-top: 8px;">
                 <label style="font-size:0.78rem; color:var(--accent-pink); margin-bottom:4px; display:block;">📷 본문 사진 추가 (사진마다 스포 여부 개별 지정 가능)</label>
@@ -1079,6 +1233,8 @@
         tempMainImg = null;
         document.getElementById('in-color').value = '#ff85a2';
         document.getElementById('in-bgm').value = '';
+        document.getElementById('in-profile-type').value = 'public';
+        document.getElementById('in-linked-public-id').value = '';
         document.getElementById('form-title').textContent = "새 캐릭터 사이트 생성 및 등록";
         document.getElementById('submit-btn-text').textContent = "실시간 서버에 등록하기";
     }
@@ -1095,7 +1251,7 @@
         const customFields = [];
         customRows.forEach(row => {
             const label = row.querySelector('.field-label').value.trim();
-            const val = row.querySelector('.field-value').value.trim();
+            const val = row.querySelector('.field-value').value;
             const spoiler = row.querySelector('.field-spoiler').value;
             if (label !== "") customFields.push({ label: label, value: val || "-", spoiler: spoiler });
         });
@@ -1130,6 +1286,8 @@
             sub: document.getElementById('in-sub').value,
             tags: document.getElementById('in-tags').value,
             color: document.getElementById('in-color').value,
+            profileType: document.getElementById('in-profile-type').value,
+            linkedPublicId: document.getElementById('in-linked-public-id').value,
             spoilerOk: document.getElementById('in-spoiler-ok').value,
             spoilerMsg: document.getElementById('in-spoiler-msg').value,
             img: tempMainImg || existingImg,
@@ -1150,7 +1308,7 @@
         }
 
         const char = characterList.find(c => c.id === id);
-        if (confirm(`'${char ? char.name : ''}' 캐릭터 사이트를 정말 삭제하시겠습니까? (실시간으로 모두에게 반영됩니다)`)) {
+        if (confirm(`'${char ? char.name : ''}' 캐릭터 사이트를 정말 삭제하시겠습니까?`)) {
             db.ref('characters/' + id).remove().then(() => {
                 alert('삭제되었습니다.');
                 switchTab('lobby');
@@ -1174,6 +1332,8 @@
 
         document.getElementById('in-tags').value = char.tags || '';
         document.getElementById('in-color').value = char.color || '#ff85a2';
+        document.getElementById('in-profile-type').value = char.profileType || 'public';
+        document.getElementById('in-linked-public-id').value = char.linkedPublicId || '';
         document.getElementById('in-spoiler-ok').value = char.spoilerOk || 'NO';
         document.getElementById('in-spoiler-msg').value = char.spoilerMsg || '';
         document.getElementById('in-name').value = char.name || '';
@@ -1200,15 +1360,20 @@
         const container = document.getElementById('lobby-list');
         container.innerHTML = '';
 
-        if (characterList.length === 0) {
-            container.innerHTML = '<p style="color:var(--text-sub); grid-column: 1/-1; text-align:center; padding: 40px 0;">생성된 캐릭터 사이트가 없습니다. 새 캐릭터를 등록해 주세요.</p>';
+        const publicCharacters = characterList.filter(c => !c.profileType || c.profileType === 'public');
+
+        if (publicCharacters.length === 0) {
+            container.innerHTML = '<p style="color:var(--text-sub); grid-column: 1/-1; text-align:center; padding: 40px 0;">생성된 공개 캐릭터 사이트가 없습니다. 새 캐릭터를 등록해 주세요.</p>';
             return;
         }
 
-        characterList.forEach((char) => {
+        publicCharacters.forEach((char) => {
             const card = document.createElement('div');
             card.className = 'character-card';
-            card.onclick = () => switchTab('view', char.id);
+            card.onclick = () => {
+                previousPublicCharacterId = null;
+                switchTab('view', char.id);
+            };
 
             const actionBtns = isLoggedIn ? `
                 <div class="card-actions">
@@ -1239,6 +1404,13 @@
 
         selectedCharacterId = id;
 
+        // 비밀 프로필인지 여부에 따라 다크/핫핑크 모드(secret-mode) 적용
+        if (char.profileType === 'secret') {
+            document.body.classList.add('secret-mode');
+        } else {
+            document.body.classList.remove('secret-mode');
+        }
+
         if (char.spoilerOk === 'OK') {
             const msg = char.spoilerMsg || '해당 캐릭터 프로필에는 스포일러가 포함되어 있습니다.\n계속해서 프로필을 열람하시겠습니까?';
             document.getElementById('spoiler-modal-text').innerText = msg;
@@ -1254,13 +1426,69 @@
             const char = characterList.find(c => c.id === selectedCharacterId);
             if (char) showWikiDetails(char);
         } else {
-            switchTab('lobby');
+            if (previousPublicCharacterId) {
+                switchTab('view', previousPublicCharacterId);
+            } else {
+                switchTab('lobby');
+            }
         }
     }
 
     function revealSpoilerSection(element) {
         element.style.display = 'none';
         element.nextElementSibling.style.display = 'block';
+    }
+
+    // 💥 무서운 오류 팝업창 연달아 띄우기 로직
+    function startGlitchSequence() {
+        const char = characterList.find(c => c.id === selectedCharacterId);
+        if (!char || !char.linkedPublicId) return;
+
+        previousPublicCharacterId = selectedCharacterId;
+
+        const errorMessages = [
+            "오류! 시스템 접근 코드가 비정상적입니다.",
+            "오류! 무단 침입자가 감지되었습니다. 연결을 차단합니다.",
+            "오류! 보안 격벽이 무너졌습니다. 숨겨진 기록실로 강제 이동합니다..."
+        ];
+
+        let currentStep = 0;
+
+        function showGlitchPopup(step) {
+            const container = document.getElementById('glitch-modal-container');
+            if (step >= errorMessages.length) {
+                container.innerHTML = '';
+                // 모든 경고창을 확인하면 비밀 프로필로 이동
+                switchTab('view', char.linkedPublicId);
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="glitch-modal-overlay">
+                    <div class="glitch-modal-box">
+                        <h3>⚠️ 오류! SYSTEM_CRITICAL</h3>
+                        <p>${errorMessages[step]}</p>
+                        <button class="glitch-btn" onclick="nextGlitch(${step + 1})">확인</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.nextGlitch = function(nextStep) {
+            showGlitchPopup(nextStep);
+        };
+
+        showGlitchPopup(0);
+    }
+
+    function goBackFromProfile() {
+        if (previousPublicCharacterId) {
+            const backId = previousPublicCharacterId;
+            previousPublicCharacterId = null;
+            switchTab('view', backId);
+        } else {
+            switchTab('lobby');
+        }
     }
 
     function openDataModal() {
@@ -1375,7 +1603,9 @@
                 tocList.appendChild(li);
 
                 let innerHtml = '';
-                if (sec.content) innerHtml += `<p>${sec.content}</p>`;
+                if (sec.content) {
+                    innerHtml += `<div class="section-content-p">${sec.content}</div>`;
+                }
 
                 if (sec.images && sec.images.length > 0) {
                     sec.images.forEach(imgObj => {
@@ -1419,6 +1649,25 @@
             });
         }
 
+        // 포털 버튼 관리
+        const portalSection = document.getElementById('secret-portal-section');
+        if (char.profileType === 'secret' && char.linkedPublicId) {
+            portalSection.style.display = 'block';
+            document.getElementById('portal-notice-title').textContent = "🔒 이 비밀 프로필과 연결된 원본 공개 프로필";
+            document.getElementById('portal-trigger-btn').textContent = "원본 공개 프로필로 돌아가기";
+            document.getElementById('portal-trigger-btn').onclick = () => switchTab('view', char.linkedPublicId);
+        } else {
+            const linkedSecret = characterList.find(c => c.profileType === 'secret' && c.linkedPublicId === char.id);
+            if (linkedSecret) {
+                portalSection.style.display = 'block';
+                document.getElementById('portal-notice-title').textContent = "🔒 숨겨진 비밀 기록실이 감지되었습니다";
+                document.getElementById('portal-trigger-btn').textContent = "비밀 기록 열기 (시스템 오류 발생)";
+                document.getElementById('portal-trigger-btn').onclick = startGlitchSequence;
+            } else {
+                portalSection.style.display = 'none';
+            }
+        }
+
         const bgmBox = document.getElementById('bgm-box');
         const player = document.getElementById('youtube-player');
         const match = char.bgm ? char.bgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/) : null;
@@ -1449,7 +1698,6 @@
         }
     }
 
-    // 초기 실행 (실시간 서버 데이터 연동 시작)
     loadSavedData();
     initDefaultForm();
 </script>
