@@ -143,6 +143,10 @@
             border-color: var(--accent-pink);
         }
 
+        .character-card.secret-card {
+            border: 2px dashed #ff0055;
+        }
+
         .character-card img {
             width: 100%;
             height: 200px;
@@ -200,6 +204,17 @@
             background: var(--soft-pink-bg);
             border: 1px solid var(--accent-pink);
             color: var(--accent-pink);
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-top: 4px;
+            font-weight: bold;
+        }
+
+        .secret-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            background: #ff0055;
+            color: #ffffff;
             padding: 2px 5px;
             border-radius: 3px;
             margin-top: 4px;
@@ -343,7 +358,7 @@
             max-height: 360px;
             object-fit: cover;
             border-radius: 4px;
-            cursor: pointer; /* 사진 클릭 유도 */
+            cursor: pointer;
             transition: opacity 0.2s;
         }
         .infobox-img-td img:hover {
@@ -602,7 +617,7 @@
             text-align: left;
         }
 
-        /* 💥 무서운 오류 팝업창 스타일 (검은 배경 + 빨간 텍스트) */
+        /* 💥 무서운 오류 팝업창 스타일 */
         .glitch-modal-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -790,7 +805,6 @@
                                 </tr>
                                 <tr>
                                     <td colspan="2" class="infobox-img-td">
-                                        <!-- 프로필 사진 클릭 시 비밀 진입 또는 원본 복귀 실행 -->
                                         <img id="out-img" src="https://via.placeholder.com/300x380/000000/FFFFFF?text=No+Image" alt="캐릭터 사진" onclick="handleProfileImageClick()">
                                     </td>
                                 </tr>
@@ -1335,16 +1349,18 @@
         const container = document.getElementById('lobby-list');
         container.innerHTML = '';
 
-        const publicCharacters = characterList.filter(c => !c.profileType || c.profileType === 'public');
+        // 일반 방문자에게는 공개 프로필만 보이고, 관리자 로그인 상태면 비밀 프로필도 로비에 함께 표시되어 수정/삭제 가능
+        const displayCharacters = isLoggedIn ? characterList : characterList.filter(c => !c.profileType || c.profileType === 'public');
 
-        if (publicCharacters.length === 0) {
-            container.innerHTML = '<p style="color:var(--text-sub); grid-column: 1/-1; text-align:center; padding: 40px 0;">생성된 공개 캐릭터 사이트가 없습니다. 새 캐릭터를 등록해 주세요.</p>';
+        if (displayCharacters.length === 0) {
+            container.innerHTML = '<p style="color:var(--text-sub); grid-column: 1/-1; text-align:center; padding: 40px 0;">생성된 캐릭터 사이트가 없습니다. 새 캐릭터를 등록해 주세요.</p>';
             return;
         }
 
-        publicCharacters.forEach((char) => {
+        displayCharacters.forEach((char) => {
             const card = document.createElement('div');
-            card.className = 'character-card';
+            const isSecret = char.profileType === 'secret';
+            card.className = `character-card ${isSecret ? 'secret-card' : ''}`;
             card.onclick = () => {
                 previousPublicCharacterId = null;
                 switchTab('view', char.id);
@@ -1362,6 +1378,7 @@
                 <div class="card-info">
                     <div class="card-title">${char.name}</div>
                     <div class="card-sub">${char.sub || ''}</div>
+                    ${isSecret ? '<div class="secret-badge">🔒 비밀 프로필</div>' : ''}
                     ${char.spoilerOk === 'OK' ? '<div class="spoiler-tag">스포 방지 OK</div>' : ''}
                 </div>
                 ${actionBtns}
@@ -1413,16 +1430,13 @@
         element.nextElementSibling.style.display = 'block';
     }
 
-    // 💥 프로필 사진 클릭 시 동작 (비밀 진입 또는 원본 복귀)
     function handleProfileImageClick() {
         const char = characterList.find(c => c.id === selectedCharacterId);
         if (!char) return;
 
         if (char.profileType === 'secret' && char.linkedPublicId) {
-            // 비밀 프로필인 경우 사진을 누르면 원본 공개 프로필로 안전하게 복귀
             switchTab('view', char.linkedPublicId);
         } else {
-            // 공개 프로필인 경우 연결된 비밀 프로필이 있는지 확인
             const linkedSecret = characterList.find(c => c.profileType === 'secret' && c.linkedPublicId === char.id);
             if (linkedSecret) {
                 previousPublicCharacterId = selectedCharacterId;
@@ -1431,7 +1445,6 @@
         }
     }
 
-    // 무서운 오류 팝업창 연달아 띄우기
     function startGlitchSequence(targetSecretId) {
         const errorMessages = [
             "오류! 시스템 접근 코드가 비정상적입니다.",
@@ -1443,7 +1456,6 @@
             const container = document.getElementById('glitch-modal-container');
             if (step >= errorMessages.length) {
                 container.innerHTML = '';
-                // 모든 창을 확인하면 비밀 프로필로 이동
                 switchTab('view', targetSecretId);
                 return;
             }
