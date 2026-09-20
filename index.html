@@ -892,7 +892,7 @@
             </div>
 
             <div id="public-view">
-                <!-- 무드곡 및 가사 영역 -->
+                <!-- 무드곡 및 가사 영역 (공개 프로필 전용) -->
                 <div class="bgm-box" id="bgm-box" style="display:none;">
                     <div style="font-size:0.82rem; font-weight:bold; color:var(--accent-pink);">🎧 캐릭터 무드곡</div>
                     <div class="iframe-container" id="bgm-player-container">
@@ -1046,9 +1046,9 @@
                     </div>
 
                     <div class="form-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
-                        <label style="color: var(--accent-pink); margin-bottom: 4px;">🎧 캐릭터 무드곡 (유튜브 / 틱톡 음원 URL)</label>
-                        <input type="text" id="in-bgm" placeholder="https://www.youtube.com/watch?v=유튜브영상아이디">
-                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 비밀 프로필에서는 플레이어가 화면에 노출되지 않고 완전히 숨겨진 채 백그라운드 BGM으로 자동 재생됩니다.</span>
+                        <label style="color: var(--accent-pink); margin-bottom: 4px;">🎧 무드곡 / 시크릿 BGM URL (유튜브, 틱톡, 사운드클라우드 등)</label>
+                        <input type="text" id="in-bgm" placeholder="https://www.youtube.com/... 또는 사운드클라우드 링크 등">
+                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 비밀 프로필에서는 플레이어 없이 **사운드만 백그라운드에서 오토 플레이**됩니다. 비밀 프로필 수정 탭에서 언제든 변경할 수 있습니다!</span>
                     </div>
 
                     <div class="form-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
@@ -1996,27 +1996,41 @@
         hiddenAudioContainer.innerHTML = '';
 
         if (char.bgm && char.bgm.trim() !== '') {
-            if (char.lyrics && char.lyrics.trim() !== '') {
-                lyricsBox.style.display = 'block';
-                lyricsBox.textContent = char.lyrics;
-            } else {
-                lyricsBox.style.display = 'none';
-            }
-
-            const match = char.bgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-            
             if (char.profileType === 'secret') {
+                // 🔒 비밀 프로필: 화면에 플레이어 노출 일체 없음. 사운드만 백그라운드 자동 재생 (유튜브, 사운드클라우드, 틱톡 등 지원)
                 bgmBox.style.display = 'none';
-                if (match && match[2].length === 11) {
-                    hiddenAudioContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${match[2]}?autoplay=1" allow="autoplay" style="display:none;"></iframe>`;
+                lyricsBox.style.display = 'none';
+
+                let bgmUrl = char.bgm.trim();
+                const ytMatch = bgmUrl.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+                
+                if (ytMatch && ytMatch[2].length === 11) {
+                    hiddenAudioContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1" allow="autoplay" style="display:none; width:0; height:0;"></iframe>`;
+                } else if (bgmUrl.includes('soundcloud.com')) {
+                    // 사운드클라우드 공유 링크를 오디오 전용 임베드 플레이어로 자동 변환 후 높이 0으로 숨김 처리
+                    const scEncoded = encodeURIComponent(bgmUrl);
+                    hiddenAudioContainer.innerHTML = `<iframe src="https://w.soundcloud.com/player/?url=${scEncoded}&auto_play=true&show_artwork=false&show_comments=false&show_user=false&show_reposts=false" style="display:none; width:0; height:0;" allow="autoplay"></iframe>`;
                 } else {
-                    hiddenAudioContainer.innerHTML = `<iframe src="${char.bgm}" allow="autoplay" style="display:none;"></iframe>`;
+                    hiddenAudioContainer.innerHTML = `<iframe src="${bgmUrl}" allow="autoplay" style="display:none; width:0; height:0;"></iframe>`;
                 }
             } else {
+                // 🔓 일반 공개 프로필: 무드곡 플레이어 박스 정상 노출
                 bgmBox.style.display = 'block';
                 bgmPlayerContainer.style.display = 'block';
-                if (match && match[2].length === 11) {
-                    document.getElementById('youtube-player').src = `https://www.youtube.com/embed/${match[2]}?autoplay=1`;
+
+                if (char.lyrics && char.lyrics.trim() !== '') {
+                    lyricsBox.style.display = 'block';
+                    lyricsBox.textContent = char.lyrics;
+                } else {
+                    lyricsBox.style.display = 'none';
+                }
+
+                const ytMatch = char.bgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+                if (ytMatch && ytMatch[2].length === 11) {
+                    document.getElementById('youtube-player').src = `https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1`;
+                } else if (char.bgm.includes('soundcloud.com')) {
+                    const scEncoded = encodeURIComponent(char.bgm);
+                    bgmPlayerContainer.innerHTML = `<iframe src="https://w.soundcloud.com/player/?url=${scEncoded}&auto_play=true&visual=false" allow="autoplay" style="width:100%; height:120px; border:0;"></iframe>`;
                 } else {
                     document.getElementById('youtube-player').src = char.bgm;
                 }
