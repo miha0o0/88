@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X 위키 :: Epilogue & Secret Wiki</title>
+    <title>X 위키 :: Nightmare & Secret Wiki</title>
     <!-- 파이어베이스 SDK 불러오기 -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -82,9 +82,29 @@
             cursor: pointer;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .auth-status {
             font-size: 0.8rem;
             color: var(--text-sub);
+        }
+
+        .id-badge-btn {
+            background: var(--soft-pink-bg);
+            border: 1px solid var(--border-color);
+            color: var(--accent-pink);
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .id-badge-btn:hover {
+            border-color: var(--accent-pink);
         }
 
         .nav-tabs {
@@ -320,6 +340,20 @@
             top: 0; left: 0; width: 100%; height: 100%; border: 0;
         }
 
+        /* 🎵 무드곡 가사 상자 스타일 */
+        .lyrics-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            color: var(--text-color);
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
         .profile-grid {
             display: grid;
             grid-template-columns: 1fr 310px;
@@ -351,6 +385,8 @@
             text-align: center;
             background: var(--soft-pink-bg);
             padding: 8px;
+            position: relative;
+            overflow: hidden;
         }
 
         .infobox-img-td img {
@@ -359,10 +395,29 @@
             object-fit: cover;
             border-radius: 4px;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s, filter 0.3s;
         }
         .infobox-img-td img:hover {
             opacity: 0.9;
+        }
+
+        /* 🖤 프사 얼굴 검은색 가리기 오버레이 효과 */
+        .face-censor-overlay {
+            position: absolute;
+            top: 30%;
+            left: 35%;
+            width: 30%;
+            height: 35%;
+            background: #000000;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #000000;
+            pointer-events: none;
+            animation: pulse-censor 0.8s infinite alternate;
+        }
+
+        @keyframes pulse-censor {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
         }
 
         .infobox th {
@@ -676,8 +731,8 @@
             background: #cc0000;
         }
 
-        /* 📖 소설풍 에필로그 타이핑 화면 오버레이 */
-        .epilogue-overlay {
+        /* 📖 오프닝 & 에필로그 타이핑 화면 오프닝 오버레이 */
+        .opening-overlay, .epilogue-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
@@ -691,7 +746,7 @@
             cursor: pointer;
         }
 
-        .epilogue-text-box {
+        .opening-text-box, .epilogue-text-box {
             max-width: 700px;
             width: 100%;
             font-family: monospace;
@@ -702,7 +757,7 @@
             min-height: 180px;
         }
 
-        .epilogue-skip-hint {
+        .opening-skip-hint, .epilogue-skip-hint {
             position: absolute;
             bottom: 40px;
             color: #666;
@@ -783,8 +838,9 @@
 <div class="main-wrapper">
     <header class="site-header">
         <h1 onclick="switchTab('lobby')">X WIKI</h1>
-        <div class="auth-status" id="auth-status-text">
-            권한: 일반 방문자
+        <div class="header-right">
+            <button class="id-badge-btn" id="header-id-btn" onclick="openIdPrompt()">계정: 미설정</button>
+            <div class="auth-status" id="auth-status-text">권한: 일반 방문자</div>
         </div>
     </header>
 
@@ -822,11 +878,13 @@
             </div>
 
             <div id="public-view">
+                <!-- 무드곡 및 가사 영역 -->
                 <div class="bgm-box" id="bgm-box" style="display:none;">
-                    <div style="font-size:0.82rem; font-weight:bold; color:var(--accent-pink);">🎧 캐릭터 무드곡 재생</div>
-                    <div class="iframe-container">
+                    <div style="font-size:0.82rem; font-weight:bold; color:var(--accent-pink);">🎧 캐릭터 무드곡</div>
+                    <div class="iframe-container" id="bgm-player-container">
                         <iframe id="youtube-player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                     </div>
+                    <div class="lyrics-box" id="out-lyrics" style="display:none;"></div>
                 </div>
 
                 <div class="profile-grid">
@@ -912,13 +970,19 @@
                     <!-- 📖 비밀 진입 에필로그 텍스트 & 글자 색상 설정 옵션 -->
                     <div class="form-group" id="epilogue-options-group" style="display:none; background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
                         <label style="color: #ff0055; margin-bottom: 4px;">📖 [비밀 진입] 소설풍 에필로그 텍스트 연출 설정</label>
-                        <textarea id="in-epilogue-text" placeholder="예: 어둠 속에서 누군가 속삭인다... '거기 {user} 씨, 결국 여기까지 찾아왔군요.'"></textarea>
+                        <textarea id="in-epilogue-text" placeholder="예: 어둠 속에서 누군가 속삭인다... '{user} 님, 결국 여기까지 찾아왔군요.'"></textarea>
                         
                         <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
                             <label style="font-size:0.8rem; margin:0;">에필로그 글자 색상 선택:</label>
                             <input type="color" id="in-epilogue-color" value="#ff0055" style="width: 60px; height: 30px;">
                         </div>
-                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 텍스트 안에서 `{user}`를 적어두면 사이트에 접속한 사람의 ID(이름)로 자동 치환되어 출력됩니다.</span>
+                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 텍스트 안에서 `{user}`를 적어두면 방문자의 이메일 또는 트위터 아이디로 자동 치환됩니다.</span>
+                    </div>
+
+                    <!-- 🎬 입장 시 오프닝 타이핑 텍스트 설정 -->
+                    <div class="form-group" style="background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
+                        <label style="color: var(--accent-pink); margin-bottom: 4px;">🎬 [선택] 프로필 입장 시 오프닝 타이핑 텍스트</label>
+                        <textarea id="in-opening-text" placeholder="예: 페이지가 열리며 낡은 일기장이 펼쳐진다... (비워두면 바로 입장)"></textarea>
                     </div>
 
                     <div class="form-grid">
@@ -954,9 +1018,14 @@
                     </div>
 
                     <div class="form-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
-                        <label style="color: var(--accent-pink); margin-bottom: 4px;">🎧 캐릭터 무드곡 (유튜브 링크 URL)</label>
+                        <label style="color: var(--accent-pink); margin-bottom: 4px;">🎧 캐릭터 무드곡 (유튜브 / 틱톡 음원 URL)</label>
                         <input type="text" id="in-bgm" placeholder="https://www.youtube.com/watch?v=유튜브영상아이디">
-                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 유튜브 영상 주소를 입력하면 프로필 상단에 플레이어가 자동으로 생성됩니다.</span>
+                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 비밀 프로필에서는 플레이어가 자동으로 숨겨진 채 시크릿 BGM으로 재생됩니다.</span>
+                    </div>
+
+                    <div class="form-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
+                        <label style="color: var(--accent-pink); margin-bottom: 4px;">📜 무드곡 가사 입력</label>
+                        <textarea id="in-lyrics" placeholder="노래 가사를 입력하세요..."></textarea>
                     </div>
 
                     <div class="form-group">
@@ -987,9 +1056,28 @@
     </div>
 </div>
 
-<!-- 팝업 및 에필로그 타이핑 렌더링 영역 -->
+<!-- 팝업 및 연출 렌더링 영역 -->
 <div id="glitch-modal-container"></div>
+<div id="opening-container"></div>
 <div id="epilogue-container"></div>
+
+<!-- 비밀 BGM 백그라운드 재생용 숨겨진 오디오/프레임 영역 -->
+<div id="hidden-secret-audio-container" style="display:none;"></div>
+
+<!-- 모달 창: 이메일/트위터 아이디 입력 -->
+<div class="modal-overlay" id="id-prompt-modal" style="display:none;">
+    <div class="modal-box">
+        <h3>방문자 식별 설정</h3>
+        <p>본인 확인 및 에필로그 연출을 위해<br>이메일 또는 트위터 아이디를 입력해 주세요.</p>
+        <div class="form-group" style="text-align: left; margin-bottom: 15px;">
+            <input type="text" id="visitor-input-id" placeholder="예: @TwitterID 또는 user@gmail.com">
+        </div>
+        <div class="modal-btns">
+            <button class="modal-btn" onclick="saveVisitorId()">저장하기</button>
+            <button class="modal-btn cancel" onclick="closeIdPrompt()">취소</button>
+        </div>
+    </div>
+</div>
 
 <!-- 모달 창: 스포일러 주의 -->
 <div class="modal-overlay" id="spoiler-modal" style="display:none;">
@@ -1050,7 +1138,7 @@
     let editingCharacterId = null;
     let tempMainImg = null;
     let previousPublicCharacterId = null;
-    let currentVisitorName = "방문자";
+    let currentVisitorId = "";
     let activeTypingTimer = null;
 
     const ADMIN_PW = "0828";
@@ -1063,18 +1151,39 @@
         { title: "여담", content: "", spoiler: "NO", images: [] }
     ];
 
-    function detectVisitorName() {
-        let stored = localStorage.getItem('XWIKI_VISITOR_NAME');
+    function checkVisitorId() {
+        const stored = localStorage.getItem('XWIKI_VISITOR_ID');
         if (!stored) {
-            const randomId = Math.floor(1000 + Math.random() * 9000);
-            stored = `User_${randomId}`;
-            localStorage.setItem('XWIKI_VISITOR_NAME', stored);
+            openIdPrompt();
+        } else {
+            currentVisitorId = stored;
+            document.getElementById('header-id-btn').textContent = `계정: ${stored}`;
         }
-        currentVisitorName = stored;
+    }
+
+    function openIdPrompt() {
+        document.getElementById('visitor-input-id').value = currentVisitorId || '';
+        document.getElementById('id-prompt-modal').style.display = 'flex';
+    }
+
+    function closeIdPrompt() {
+        document.getElementById('id-prompt-modal').style.display = 'none';
+    }
+
+    function saveVisitorId() {
+        const val = document.getElementById('visitor-input-id').value.trim();
+        if (!val) {
+            alert('이메일 또는 트위터 아이디를 입력해 주세요.');
+            return;
+        }
+        currentVisitorId = val;
+        localStorage.setItem('XWIKI_VISITOR_ID', val);
+        document.getElementById('header-id-btn').textContent = `계정: ${val}`;
+        closeIdPrompt();
     }
 
     function loadSavedData() {
-        detectVisitorName();
+        checkVisitorId();
         db.ref('characters').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -1152,7 +1261,9 @@
             clearTimeout(activeTypingTimer);
             activeTypingTimer = null;
         }
+        document.getElementById('opening-container').innerHTML = '';
         document.getElementById('epilogue-container').innerHTML = '';
+        document.getElementById('hidden-secret-audio-container').innerHTML = '';
 
         btns.forEach(btn => btn.classList.remove('active'));
 
@@ -1311,10 +1422,12 @@
         tempMainImg = null;
         document.getElementById('in-color').value = '#ff85a2';
         document.getElementById('in-bgm').value = '';
+        document.getElementById('in-lyrics').value = '';
         document.getElementById('in-profile-type').value = 'public';
         document.getElementById('in-linked-public-id').value = '';
         document.getElementById('in-epilogue-text').value = '';
         document.getElementById('in-epilogue-color').value = '#ff0055';
+        document.getElementById('in-opening-text').value = '';
         document.getElementById('form-title').textContent = "새 캐릭터 사이트 생성 및 등록";
         document.getElementById('submit-btn-text').textContent = "실시간 서버에 등록하기";
         toggleSecretOptions();
@@ -1372,10 +1485,12 @@
             linkedPublicId: document.getElementById('in-linked-public-id').value,
             epilogueText: document.getElementById('in-epilogue-text').value,
             epilogueColor: document.getElementById('in-epilogue-color').value,
+            openingText: document.getElementById('in-opening-text').value,
             spoilerOk: document.getElementById('in-spoiler-ok').value,
             spoilerMsg: document.getElementById('in-spoiler-msg').value,
             img: tempMainImg || existingImg,
             bgm: document.getElementById('in-bgm').value,
+            lyrics: document.getElementById('in-lyrics').value,
             customFields: customFields,
             quote: document.getElementById('in-quote').value,
             bodySections: bodySections
@@ -1420,11 +1535,13 @@
         document.getElementById('in-linked-public-id').value = char.linkedPublicId || '';
         document.getElementById('in-epilogue-text').value = char.epilogueText || '';
         document.getElementById('in-epilogue-color').value = char.epilogueColor || '#ff0055';
+        document.getElementById('in-opening-text').value = char.openingText || '';
         document.getElementById('in-spoiler-ok').value = char.spoilerOk || 'NO';
         document.getElementById('in-spoiler-msg').value = char.spoilerMsg || '';
         document.getElementById('in-name').value = char.name || '';
         document.getElementById('in-sub').value = char.sub || '';
         document.getElementById('in-bgm').value = char.bgm || '';
+        document.getElementById('in-lyrics').value = char.lyrics || '';
         document.getElementById('in-quote').value = char.quote || '';
 
         toggleSecretOptions();
@@ -1500,6 +1617,17 @@
             document.body.classList.remove('secret-mode');
         }
 
+        // 입장 시 오프닝 타이핑 텍스트가 있다면 실행 후 위키 렌더링
+        if (char.openingText && char.openingText.trim() !== '') {
+            showOpeningTyping(char.openingText, () => {
+                proceedProfileLoad(char);
+            });
+        } else {
+            proceedProfileLoad(char);
+        }
+    }
+
+    function proceedProfileLoad(char) {
         if (char.spoilerOk === 'OK') {
             const msg = char.spoilerMsg || '해당 캐릭터 프로필에는 스포일러가 포함되어 있습니다.\n계속해서 프로필을 열람하시겠습니까?';
             document.getElementById('spoiler-modal-text').innerText = msg;
@@ -1507,6 +1635,53 @@
         } else {
             showWikiDetails(char);
         }
+    }
+
+    // 🎬 오프닝 타이핑 연출 함수
+    function showOpeningTyping(rawText, onComplete) {
+        const container = document.getElementById('opening-container');
+        const formattedText = rawText.replace(/{user}/g, currentVisitorId || "방문자");
+
+        container.innerHTML = `
+            <div class="opening-overlay" onclick="skipOpening()">
+                <div class="opening-text-box" id="opening-typing-target" style="color: var(--accent-pink);"></div>
+                <div class="opening-skip-hint">- 화면을 클릭하면 오프닝을 건너뜁니다 -</div>
+            </div>
+        `;
+
+        const targetElem = document.getElementById('opening-typing-target');
+        let charIndex = 0;
+
+        function typeWriter() {
+            if (charIndex < formattedText.length) {
+                targetElem.textContent += formattedText.charAt(charIndex);
+                charIndex++;
+                activeTypingTimer = setTimeout(typeWriter, 40);
+            } else {
+                activeTypingTimer = setTimeout(() => {
+                    closeOpening(onComplete);
+                }, 2500);
+            }
+        }
+
+        typeWriter();
+
+        window.skipOpening = function() {
+            if (activeTypingTimer) {
+                clearTimeout(activeTypingTimer);
+                activeTypingTimer = null;
+            }
+            closeOpening(onComplete);
+        };
+    }
+
+    function closeOpening(onComplete) {
+        if (activeTypingTimer) {
+            clearTimeout(activeTypingTimer);
+            activeTypingTimer = null;
+        }
+        document.getElementById('opening-container').innerHTML = '';
+        if (onComplete) onComplete();
     }
 
     function confirmSpoilerView(accept) {
@@ -1528,6 +1703,7 @@
         element.nextElementSibling.style.display = 'block';
     }
 
+    // 🖤 프사 얼굴 검은색 가리기 연출 후 비밀 진입
     function handleProfileImageClick() {
         const char = characterList.find(c => c.id === selectedCharacterId);
         if (!char) return;
@@ -1537,26 +1713,43 @@
         } else {
             const linkedSecret = characterList.find(c => c.profileType === 'secret' && c.linkedPublicId === char.id);
             if (linkedSecret) {
+                if (!currentVisitorId) {
+                    openIdPrompt();
+                    return;
+                }
+                
+                // 프사 얼굴 부근 검은색 가리기 오버레이 추가
+                const imgTd = document.querySelector('.infobox-img-td');
+                if (imgTd && !imgTd.querySelector('.face-censor-overlay')) {
+                    const censor = document.createElement('div');
+                    censor.className = 'face-censor-overlay';
+                    imgTd.appendChild(censor);
+                }
+
                 previousPublicCharacterId = selectedCharacterId;
-                startGlitchSequence(linkedSecret);
+                
+                // 1초간 검은색 가리기 연출을 보여준 뒤 오류 팝업으로 진입
+                setTimeout(() => {
+                    startGlitchSequence(linkedSecret);
+                }, 900);
             }
         }
     }
 
-    // 💀 공포 글리치 팝업 및 소설풍 타이핑 에필로그 연출 로직
+    // 💀 순환하는 로딩 문구와 함께 오류 팝업 출력
     function startGlitchSequence(secretChar) {
-        const uName = currentVisitorName;
+        const uId = currentVisitorId || "방문자";
         const errorMessages = [
-            `경고: ${uName} 님, 당신의 접속 기록이 추적되었습니다.`,
+            `경고: ${uId} 님, 당신의 접속 기록이 추적되었습니다.`,
+            `시스템 로딩 중... [데이터를 수집하고 있습니다]`,
             `오류! 이 영역에 들어오는 것은 허용되지 않습니다...`,
-            `시스템 무력화 중... 환영합니다, ${uName} 님.`
+            `보안망이 붕괴되었습니다. 환영합니다, ${uId} 님.`
         ];
 
         function showGlitchPopup(step) {
             const container = document.getElementById('glitch-modal-container');
             if (step >= errorMessages.length) {
                 container.innerHTML = '';
-                // 에필로그 텍스트가 설정되어 있다면 소설풍 타이핑 연출 시작, 아니면 바로 비밀 프로필 진입
                 if (secretChar.epilogueText) {
                     showEpilogueTyping(secretChar.epilogueText, secretChar.epilogueColor || '#ff0055', secretChar.id);
                 } else {
@@ -1586,7 +1779,7 @@
     // 📖 소설풍 에필로그 타이핑 효과 함수
     function showEpilogueTyping(rawText, textColor, targetSecretId) {
         const container = document.getElementById('epilogue-container');
-        const formattedText = rawText.replace(/{user}/g, currentVisitorName);
+        const formattedText = rawText.replace(/{user}/g, currentVisitorId || "방문자");
 
         container.innerHTML = `
             <div class="epilogue-overlay" onclick="skipEpilogue('${targetSecretId}')">
@@ -1602,11 +1795,11 @@
             if (charIndex < formattedText.length) {
                 targetElem.textContent += formattedText.charAt(charIndex);
                 charIndex++;
-                activeTypingTimer = setTimeout(typeWriter, 45); // 타이핑 속도
+                activeTypingTimer = setTimeout(typeWriter, 45);
             } else {
                 activeTypingTimer = setTimeout(() => {
                     closeEpilogue(targetSecretId);
-                }, 3500); // 문장이 모두 출력된 후 3.5초 대기 후 진입
+                }, 3500);
             }
         }
 
@@ -1801,12 +1994,45 @@
             });
         }
 
+        // 🎧 무드곡, 가사, 그리고 비밀 프로필 시크릿 BGM 처리 (플레이어 숨김 재생)
         const bgmBox = document.getElementById('bgm-box');
-        const player = document.getElementById('youtube-player');
-        const match = char.bgm ? char.bgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/) : null;
-        if (match && match[2].length === 11) {
-            player.src = `https://www.youtube.com/embed/${match[2]}?autoplay=1`;
+        const bgmPlayerContainer = document.getElementById('bgm-player-container');
+        const lyricsBox = document.getElementById('out-lyrics');
+        const hiddenAudioContainer = document.getElementById('hidden-secret-audio-container');
+        
+        hiddenAudioContainer.innerHTML = '';
+
+        if (char.bgm && char.bgm.trim() !== '') {
             bgmBox.style.display = 'block';
+
+            // 가사 렌더링
+            if (char.lyrics && char.lyrics.trim() !== '') {
+                lyricsBox.style.display = 'block';
+                lyricsBox.textContent = char.lyrics;
+            } else {
+                lyricsBox.style.display = 'none';
+            }
+
+            const match = char.bgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+            if (match && match[2].length === 11) {
+                if (char.profileType === 'secret') {
+                    // 비밀 프로필인 경우 화면에 플레이어를 숨기고 백그라운드 재생
+                    bgmPlayerContainer.style.display = 'none';
+                    hiddenAudioContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${match[2]}?autoplay=1" allow="autoplay" style="display:none;"></iframe>`;
+                } else {
+                    bgmPlayerContainer.style.display = 'block';
+                    document.getElementById('youtube-player').src = `https://www.youtube.com/embed/${match[2]}?autoplay=1`;
+                }
+            } else {
+                // 틱톡 및 기타 음원 링크인 경우
+                if (char.profileType === 'secret') {
+                    bgmPlayerContainer.style.display = 'none';
+                    hiddenAudioContainer.innerHTML = `<iframe src="${char.bgm}" allow="autoplay" style="display:none;"></iframe>`;
+                } else {
+                    bgmPlayerContainer.style.display = 'block';
+                    document.getElementById('youtube-player').src = char.bgm;
+                }
+            }
         } else {
             bgmBox.style.display = 'none';
         }
@@ -1836,4 +2062,4 @@
 </script>
 
 </body>
-    </html>
+                            </html>
