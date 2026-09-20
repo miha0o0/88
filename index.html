@@ -892,7 +892,7 @@
             </div>
 
             <div id="public-view">
-                <!-- 무드곡 및 가사 영역 (공개 프로필 전용) -->
+                <!-- 공개 프로필 전용 무드곡 및 가사 영역 -->
                 <div class="bgm-box" id="bgm-box" style="display:none;">
                     <div style="font-size:0.82rem; font-weight:bold; color:var(--accent-pink);">🎧 캐릭터 무드곡</div>
                     <div class="iframe-container" id="bgm-player-container">
@@ -981,19 +981,29 @@
                         </div>
                     </div>
 
-                    <!-- 📖 비밀 진입 에필로그 텍스트 & 색상 설정 -->
-                    <div class="form-group" id="epilogue-options-group" style="display:none; background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
-                        <label style="color: #ff0055; margin-bottom: 4px;">📖 [비밀 진입] 소설풍 에필로그 텍스트 연출 설정</label>
-                        <textarea id="in-epilogue-text" placeholder="예: 어둠 속에서 누군가 속삭인다... '결국 여기까지 찾아왔군요.'"></textarea>
+                    <!-- 🔒 [비밀 프로필 전용 설정 구역] -->
+                    <div class="form-group" id="secret-exclusive-group" style="display:none; background: #1c0e15; border: 2px dashed #ff0055; padding: 14px; border-radius: 6px; margin-bottom: 15px;">
+                        <label style="color: #ff0055; margin-bottom: 6px; font-size: 0.9rem;">🔒 [비밀 프로필 전용] 진입 음악 및 소설풍 연출 설정</label>
                         
-                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
-                            <label style="font-size:0.8rem; margin:0;">에필로그 글자 색상 선택:</label>
+                        <div style="margin-bottom: 10px;">
+                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">🎵 비밀 진입 시 자동 재생될 백그라운드 음악 URL (유튜브, 틱톡, 사운드클라우드 등)</label>
+                            <input type="text" id="in-secret-bgm" placeholder="https://www.youtube.com/watch?v=..." style="background:#140d12; color:#fce8f0; border-color:#ff0055;">
+                            <span style="font-size:0.7rem; color:#b87a96; margin-top:2px; display:block;">* 플레이어 화면 없이 오직 음원 사운드만 백그라운드에서 오토플레이됩니다.</span>
+                        </div>
+
+                        <div style="margin-bottom: 10px;">
+                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">📖 소설풍 에필로그 텍스트</label>
+                            <textarea id="in-epilogue-text" placeholder="예: 어둠 속에서 누군가 속삭인다... '결국 여기까지 찾아왔군요.'" style="background:#140d12; color:#fce8f0; border-color:#ff0055;"></textarea>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <label style="font-size:0.8rem; color:#fce8f0; margin:0;">에필로그 글자 색상 선택:</label>
                             <input type="color" id="in-epilogue-color" value="#ff0055" style="width: 60px; height: 30px;">
                         </div>
 
-                        <div style="margin-top: 10px;">
-                            <label style="font-size:0.8rem; margin-bottom:4px; display:block;">프사 얼굴 가리기 및 프로필 소멸 효과 선택:</label>
-                            <select id="in-disintegrate-fx" style="width:100%;">
+                        <div>
+                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:4px; display:block;">프사 얼굴 가리기 및 프로필 소멸 효과 선택:</label>
+                            <select id="in-disintegrate-fx" style="width:100%; background:#140d12; color:#fce8f0; border-color:#ff0055;">
                                 <option value="fire">🔥 불 (타오르며 소멸)</option>
                                 <option value="blackhole">🕳️ 블랙홀 / 허무 (가루가 되어 소멸)</option>
                                 <option value="purewhite">✨ 순백 (하얗게 채워지며 소멸)</option>
@@ -1002,7 +1012,7 @@
                         </div>
                     </div>
 
-                    <!-- 🎬 입장 시 오프닝 타이핑 텍스트 & 색상 설정 -->
+                    <!-- 🎬 입장 시 오프닝 타이핑 텍스트 설정 -->
                     <div class="form-group" style="background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
                         <label style="color: var(--accent-pink); margin-bottom: 4px;">🎬 [선택] 프로필 입장 시 오프닝 타이핑 텍스트</label>
                         <textarea id="in-opening-text" placeholder="예: 페이지가 열리며 낡은 일기장이 펼쳐진다... (비워두면 바로 입장)"></textarea>
@@ -1045,10 +1055,11 @@
                         </div>
                     </div>
 
-                    <div class="form-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
-                        <label style="color: var(--accent-pink); margin-bottom: 4px;">🎧 무드곡 / 시크릿 BGM URL (유튜브, 틱톡, 사운드클라우드 등)</label>
-                        <input type="text" id="in-bgm" placeholder="https://www.youtube.com/... 또는 사운드클라우드 링크 등">
-                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 비밀 프로필에서는 플레이어 없이 **사운드만 백그라운드에서 오토 플레이**됩니다. 비밀 프로필 수정 탭에서 언제든 변경할 수 있습니다!</span>
+                    <!-- 🔓 [공개 프로필 전용 설정 구역] -->
+                    <div class="form-group" id="public-exclusive-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
+                        <label style="color: var(--accent-pink); margin-bottom: 4px;">🎧 [공개 프로필 전용] 무드곡 링크 (유튜브, 틱톡, 사운드클라우드 등)</label>
+                        <input type="text" id="in-bgm" placeholder="https://www.youtube.com/watch?v=유튜브영상아이디">
+                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 공개 프로필 페이지 본문에 플레이어 박스와 함께 노출됩니다.</span>
                     </div>
 
                     <div class="form-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
@@ -1198,11 +1209,15 @@
 
     function toggleSecretOptions() {
         const type = document.getElementById('in-profile-type').value;
-        const epilogueBox = document.getElementById('epilogue-options-group');
+        const secretGroup = document.getElementById('secret-exclusive-group');
+        const publicGroup = document.getElementById('public-exclusive-group');
+
         if (type === 'secret') {
-            epilogueBox.style.display = 'block';
+            secretGroup.style.display = 'block';
+            publicGroup.style.display = 'none';
         } else {
-            epilogueBox.style.display = 'none';
+            secretGroup.style.display = 'none';
+            publicGroup.style.display = 'block';
         }
     }
 
@@ -1408,6 +1423,7 @@
         tempMainImg = null;
         document.getElementById('in-color').value = '#ff85a2';
         document.getElementById('in-bgm').value = '';
+        document.getElementById('in-secret-bgm').value = '';
         document.getElementById('in-lyrics').value = '';
         document.getElementById('in-profile-type').value = 'public';
         document.getElementById('in-linked-public-id').value = '';
@@ -1471,6 +1487,7 @@
             color: document.getElementById('in-color').value,
             profileType: document.getElementById('in-profile-type').value,
             linkedPublicId: document.getElementById('in-linked-public-id').value,
+            secretBgm: document.getElementById('in-secret-bgm').value,
             epilogueText: document.getElementById('in-epilogue-text').value,
             epilogueColor: document.getElementById('in-epilogue-color').value,
             disintegrateFx: document.getElementById('in-disintegrate-fx').value,
@@ -1523,6 +1540,7 @@
         document.getElementById('in-color').value = char.color || '#ff85a2';
         document.getElementById('in-profile-type').value = char.profileType || 'public';
         document.getElementById('in-linked-public-id').value = char.linkedPublicId || '';
+        document.getElementById('in-secret-bgm').value = char.secretBgm || '';
         document.getElementById('in-epilogue-text').value = char.epilogueText || '';
         document.getElementById('in-epilogue-color').value = char.epilogueColor || '#ff0055';
         document.getElementById('in-disintegrate-fx').value = char.disintegrateFx || 'fire';
@@ -1951,7 +1969,7 @@
                         if (imgObj.spoiler === 'OK') {
                             innerHtml += `
                                 <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)">
-                                    <span>⚠️ 스포일러 사진 보기</span>
+                                    ⚠️ 스포일러 사진 보기
                                 </div>
                                 <div class="spoiler-section-content">
                                     <img src="${imgObj.url}" class="section-image" alt="섹션 이미지">
@@ -1995,26 +2013,27 @@
         
         hiddenAudioContainer.innerHTML = '';
 
-        if (char.bgm && char.bgm.trim() !== '') {
-            if (char.profileType === 'secret') {
-                // 🔒 비밀 프로필: 화면에 플레이어 노출 일체 없음. 사운드만 백그라운드 자동 재생 (유튜브, 사운드클라우드, 틱톡 등 지원)
-                bgmBox.style.display = 'none';
-                lyricsBox.style.display = 'none';
+        if (char.profileType === 'secret') {
+            // 🔒 비밀 프로필: 공개 무드곡 숨김. 오직 비밀 진입 음악(secretBgm)만 백그라운드 재생
+            bgmBox.style.display = 'none';
+            lyricsBox.style.display = 'none';
 
-                let bgmUrl = char.bgm.trim();
-                const ytMatch = bgmUrl.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+            if (char.secretBgm && char.secretBgm.trim() !== '') {
+                let secretUrl = char.secretBgm.trim();
+                const ytMatch = secretUrl.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
                 
                 if (ytMatch && ytMatch[2].length === 11) {
                     hiddenAudioContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1" allow="autoplay" style="display:none; width:0; height:0;"></iframe>`;
-                } else if (bgmUrl.includes('soundcloud.com')) {
-                    // 사운드클라우드 공유 링크를 오디오 전용 임베드 플레이어로 자동 변환 후 높이 0으로 숨김 처리
-                    const scEncoded = encodeURIComponent(bgmUrl);
+                } else if (secretUrl.includes('soundcloud.com')) {
+                    const scEncoded = encodeURIComponent(secretUrl);
                     hiddenAudioContainer.innerHTML = `<iframe src="https://w.soundcloud.com/player/?url=${scEncoded}&auto_play=true&show_artwork=false&show_comments=false&show_user=false&show_reposts=false" style="display:none; width:0; height:0;" allow="autoplay"></iframe>`;
                 } else {
-                    hiddenAudioContainer.innerHTML = `<iframe src="${bgmUrl}" allow="autoplay" style="display:none; width:0; height:0;"></iframe>`;
+                    hiddenAudioContainer.innerHTML = `<iframe src="${secretUrl}" allow="autoplay" style="display:none; width:0; height:0;"></iframe>`;
                 }
-            } else {
-                // 🔓 일반 공개 프로필: 무드곡 플레이어 박스 정상 노출
+            }
+        } else {
+            // 🔓 공개 프로필: 공개 무드곡(bgm) 플레이어 박스 정상 노출
+            if (char.bgm && char.bgm.trim() !== '') {
                 bgmBox.style.display = 'block';
                 bgmPlayerContainer.style.display = 'block';
 
@@ -2034,9 +2053,9 @@
                 } else {
                     document.getElementById('youtube-player').src = char.bgm;
                 }
+            } else {
+                bgmBox.style.display = 'none';
             }
-        } else {
-            bgmBox.style.display = 'none';
         }
     }
 
