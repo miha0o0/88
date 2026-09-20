@@ -507,6 +507,59 @@
             display: none;
         }
 
+        /* 👥 인물 관계 및 호칭 전용 스타일 */
+        .rel-card {
+            background: var(--soft-pink-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .rel-title {
+            font-weight: bold;
+            color: var(--accent-pink);
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 4px;
+        }
+        .rel-sub-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 6px;
+            font-size: 0.85rem;
+        }
+        .rel-sub-title {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--text-sub);
+            margin-bottom: 2px;
+        }
+
+        .relation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+        .relation-table th {
+            background: var(--wiki-table-header);
+            color: var(--text-color);
+            padding: 6px 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .relation-table td {
+            padding: 6px 8px;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            text-align: center;
+        }
+
         /* 폼 입력 디자인 */
         .form-grid {
             display: grid;
@@ -1006,6 +1059,24 @@
                         <input type="text" id="in-quote" placeholder="한마디 문구를 입력하세요">
                     </div>
 
+                    <!-- 👥 인물 관계 및 호칭 편집 구역 -->
+                    <div class="form-group" style="background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
+                        <label style="margin-bottom: 6px; color:var(--accent-pink); font-size:0.9rem;">
+                            <span>👥 인물 관계 (예: 아카리 >>> 켄시)</span>
+                            <button type="button" class="add-field-btn" onclick="addRelationBox()">+ 관계 추가</button>
+                        </label>
+                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 8px; display:block;">* 내 캐릭터가 상대방을 바라보는 시선, 대사, 관계를 작성합니다. (과거와 현재가 달라진 경우 하단 칸 작성)</span>
+                        <div id="relations-container"></div>
+                    </div>
+
+                    <div class="form-group" style="background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
+                        <label style="margin-bottom: 6px; color:var(--accent-pink); font-size:0.9rem;">
+                            <span>🏷️ 호칭 정리 표 (내 캐릭터 ➔ 상대 캐릭터)</span>
+                            <button type="button" class="add-field-btn" onclick="addNicknameRow()">+ 호칭 추가</button>
+                        </label>
+                        <div id="nicknames-container"></div>
+                    </div>
+
                     <div class="form-group">
                         <label style="margin-bottom: 5px;">
                             <span>본문 섹션 (엔터 사용 가능, 사진 개별 스포 가능)</span>
@@ -1247,6 +1318,48 @@
         container.appendChild(row);
     }
 
+    function addRelationBox(target = "", quote = "", desc = "", currQuote = "", currDesc = "") {
+        const container = document.getElementById('relations-container');
+        const box = document.createElement('div');
+        box.className = 'dynamic-section-box rel-edit-box';
+        box.innerHTML = `
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <input type="text" class="rel-target" placeholder="상대방 이름 (예: 켄시)" value="${target}" style="font-weight:bold; flex:1; margin-right:6px;">
+                <button type="button" class="remove-field-btn" onclick="this.parentElement.parentElement.remove()">관계 삭제</button>
+            </div>
+            <div style="margin-bottom:6px;">
+                <label style="font-size:0.75rem; color:var(--text-sub);">[과거/기본] 짧은 대사</label>
+                <input type="text" class="rel-quote" placeholder="예: “ 너는 절대 내게서 못 벗어나. ”" value="${quote}">
+            </div>
+            <div style="margin-bottom:6px;">
+                <label style="font-size:0.75rem; color:var(--text-sub);">[과거/기본] 관계 설명</label>
+                <textarea class="rel-desc" placeholder="상대방을 향한 시선 및 관계 설명">${desc}</textarea>
+            </div>
+            <div style="margin-bottom:6px;">
+                <label style="font-size:0.75rem; color:var(--accent-pink);">[현재/변동 시선] 짧은 대사 (선택사항)</label>
+                <input type="text" class="rel-curr-quote" placeholder="예: “ ...결국 이렇게 다시 만나는군. ”" value="${currQuote}">
+            </div>
+            <div>
+                <label style="font-size:0.75rem; color:var(--accent-pink);">[현재/변동 시선] 관계 설명 (선택사항)</label>
+                <textarea class="rel-curr-desc" placeholder="관계가 달라졌을 때의 현재 상태 설명">${currDesc}</textarea>
+            </div>
+        `;
+        container.appendChild(box);
+    }
+
+    function addNicknameRow(target = "", nickname = "", note = "") {
+        const container = document.getElementById('nicknames-container');
+        const row = document.createElement('div');
+        row.className = 'dynamic-field-row';
+        row.innerHTML = `
+            <input type="text" class="nick-target" placeholder="상대 이름 (예: 켄시)" value="${target}">
+            <input type="text" class="nick-name" placeholder="부르는 호칭 (예: 켄시 녀석)" value="${nickname}">
+            <input type="text" class="nick-note" placeholder="생각 및 이유 (선택)" value="${note}">
+            <button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">-</button>
+        `;
+        container.appendChild(row);
+    }
+
     function addBodySection(title = "", content = "", spoiler = "NO", images = []) {
         const container = document.getElementById('body-sections-container');
         const box = document.createElement('div');
@@ -1320,6 +1433,9 @@
         document.getElementById('custom-fields-container').innerHTML = '';
         defaultFields.forEach(f => addCustomField(f, "", "NO"));
 
+        document.getElementById('relations-container').innerHTML = '';
+        document.getElementById('nicknames-container').innerHTML = '';
+
         document.getElementById('body-sections-container').innerHTML = '';
         defaultBodySections.forEach(s => addBodySection(s.title, s.content, s.spoiler, s.images));
 
@@ -1355,6 +1471,30 @@
             const val = row.querySelector('.field-value').value;
             const spoiler = row.querySelector('.field-spoiler').value;
             if (label !== "") customFields.push({ label: label, value: val || "-", spoiler: spoiler });
+        });
+
+        const relBoxes = document.querySelectorAll('.rel-edit-box');
+        const relations = [];
+        relBoxes.forEach(box => {
+            const target = box.querySelector('.rel-target').value.trim();
+            const quote = box.querySelector('.rel-quote').value;
+            const desc = box.querySelector('.rel-desc').value;
+            const currQuote = box.querySelector('.rel-curr-quote').value;
+            const currDesc = box.querySelector('.rel-curr-desc').value;
+            if (target !== "") {
+                relations.push({ target, quote, desc, currQuote, currDesc });
+            }
+        });
+
+        const nickRows = document.querySelectorAll('#nicknames-container .dynamic-field-row');
+        const nicknames = [];
+        nickRows.forEach(row => {
+            const target = row.querySelector('.nick-target').value.trim();
+            const name = row.querySelector('.nick-name').value.trim();
+            const note = row.querySelector('.nick-note').value;
+            if (target !== "" || name !== "") {
+                nicknames.push({ target, name, note });
+            }
         });
 
         const sectionBoxes = document.querySelectorAll('#body-sections-container .dynamic-section-box');
@@ -1401,6 +1541,8 @@
             bgm: document.getElementById('in-bgm').value,
             lyrics: document.getElementById('in-lyrics').value,
             customFields: customFields,
+            relations: relations,
+            nicknames: nicknames,
             quote: document.getElementById('in-quote').value,
             bodySections: bodySections
         };
@@ -1461,6 +1603,18 @@
         customContainer.innerHTML = '';
         if (char.customFields) {
             char.customFields.forEach(f => addCustomField(f.label, f.value, f.spoiler || "NO"));
+        }
+
+        const relContainer = document.getElementById('relations-container');
+        relContainer.innerHTML = '';
+        if (char.relations) {
+            char.relations.forEach(r => addRelationBox(r.target, r.quote, r.desc, r.currQuote, r.currDesc));
+        }
+
+        const nickContainer = document.getElementById('nicknames-container');
+        nickContainer.innerHTML = '';
+        if (char.nicknames) {
+            char.nicknames.forEach(n => addNicknameRow(n.target, n.name, n.note));
         }
 
         const bodyContainer = document.getElementById('body-sections-container');
@@ -1654,7 +1808,6 @@
                 charIndex++;
                 activeTypingTimer = setTimeout(typeWriter, 35);
             } else {
-                // 타이핑 완료 후 2초 뒤에 비밀 프로필로 자동 입장
                 activeTypingTimer = setTimeout(() => {
                     finishEpilogue(targetSecretId);
                 }, 2000);
@@ -1760,8 +1913,77 @@
         tocList.innerHTML = '';
         sectionsView.innerHTML = '';
 
-        if (char.bodySections && char.bodySections.length > 0) {
-            char.bodySections.forEach((sec, idx) => {
+        // 인물 관계 및 호칭을 '여담' 섹션 바로 앞에 자동 삽입하기 위한 가상 섹션 구성
+        let dynamicSectionsWithRel = [];
+        if (char.bodySections) {
+            dynamicSectionsWithRel = [...char.bodySections];
+        }
+
+        // 인물 관계/호칭 데이터가 존재할 경우 목차 및 본문에 삽입
+        let hasRelationsData = (char.relations && char.relations.length > 0) || (char.nicknames && char.nicknames.length > 0);
+        
+        if (hasRelationsData) {
+            let relSectionIndex = dynamicSectionsWithRel.findIndex(s => s.title.includes('여담'));
+            if (relSectionIndex === -1) relSectionIndex = dynamicSectionsWithRel.length;
+
+            let extraHtml = '';
+            
+            if (char.relations && char.relations.length > 0) {
+                extraHtml += `<div class="section-header">인물 관계</div>`;
+                char.relations.forEach(r => {
+                    extraHtml += `
+                        <div class="rel-card">
+                            <div class="rel-title">${char.name} >>> ${r.target}</div>
+                            ${r.quote ? `<div style="font-style:italic; color:var(--accent-pink); font-weight:bold; margin-bottom:4px;">“ ${r.quote} ”</div>` : ''}
+                            ${r.desc ? `<div class="section-content-p" style="font-size:0.9rem; margin-bottom:6px;">${r.desc}</div>` : ''}
+                            ${(r.currQuote || r.currDesc) ? `
+                                <div class="rel-sub-box">
+                                    <div class="rel-sub-title">🔄 현재 변화된 시선 및 관계</div>
+                                    ${r.currQuote ? `<div style="font-style:italic; color:var(--accent-pink); font-weight:bold; margin-bottom:2px;">“ ${r.currQuote} ”</div>` : ''}
+                                    ${r.currDesc ? `<div>${r.currDesc}</div>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+            }
+
+            if (char.nicknames && char.nicknames.length > 0) {
+                extraHtml += `<div class="section-header">호칭 정리</div>`;
+                extraHtml += `
+                    <table class="relation-table">
+                        <thead>
+                            <tr>
+                                <th>대상</th>
+                                <th>부르는 호칭</th>
+                                <th>생각 및 이유</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                char.nicknames.forEach(n => {
+                    extraHtml += `
+                        <tr>
+                            <td><b>${n.target}</b></td>
+                            <td>${n.name}</td>
+                            <td style="text-align:left;">${n.note || '-'}</td>
+                        </tr>
+                    `;
+                });
+                extraHtml += `</tbody></table>`;
+            }
+
+            // 여담 섹션 바로 앞에 인물관계/호칭 HTML을 품은 가상 섹션 추가
+            dynamicSectionsWithRel.splice(relSectionIndex, 0, {
+                title: "인물 관계 및 호칭",
+                isCustomInjected: true,
+                customHtml: extraHtml,
+                spoiler: "NO"
+            });
+        }
+
+        if (dynamicSectionsWithRel.length > 0) {
+            dynamicSectionsWithRel.forEach((sec, idx) => {
                 const secId = `sec-dyn-${idx + 1}`;
                 
                 const li = document.createElement('li');
@@ -1769,25 +1991,29 @@
                 tocList.appendChild(li);
 
                 let innerHtml = '';
-                if (sec.content) {
-                    innerHtml += `<div class="section-content-p">${sec.content}</div>`;
-                }
+                if (sec.isCustomInjected) {
+                    innerHtml = sec.customHtml;
+                } else {
+                    if (sec.content) {
+                        innerHtml += `<div class="section-content-p">${sec.content}</div>`;
+                    }
 
-                if (sec.images && sec.images.length > 0) {
-                    sec.images.forEach(imgObj => {
-                        if (imgObj.spoiler === 'OK') {
-                            innerHtml += `
-                                <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)">
-                                    <span>⚠️ 스포일러 사진 보기</span>
-                                </div>
-                                <div class="spoiler-section-content">
-                                    <img src="${imgObj.url}" class="section-image" alt="섹션 이미지">
-                                </div>
-                            `;
-                        } else {
-                            innerHtml += `<img src="${imgObj.url}" class="section-image" alt="섹션 이미지">`;
-                        }
-                    });
+                    if (sec.images && sec.images.length > 0) {
+                        sec.images.forEach(imgObj => {
+                            if (imgObj.spoiler === 'OK') {
+                                innerHtml += `
+                                    <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)">
+                                        <span>⚠️ 스포일러 사진 보기</span>
+                                    </div>
+                                    <div class="spoiler-section-content">
+                                        <img src="${imgObj.url}" class="section-image" alt="섹션 이미지">
+                                    </div>
+                                `;
+                            } else {
+                                innerHtml += `<img src="${imgObj.url}" class="section-image" alt="섹션 이미지">`;
+                            }
+                        });
+                    }
                 }
 
                 if (!innerHtml) innerHtml = '<p>내용이 없습니다.</p>';
@@ -1913,4 +2139,4 @@
 </script>
 
 </body>
-</html>
+    </html>
