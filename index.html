@@ -700,7 +700,7 @@
             background: #cc0000;
         }
 
-        /* 📖 완전한 검은 화면 전체 오버레이 에필로그 스타일 */
+        /* 📖 박스 없는 순수 검은 화면 에필로그 스타일 */
         .epilogue-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -722,11 +722,10 @@
 
         .epilogue-text-box {
             font-family: monospace;
-            font-size: 1.2rem;
-            line-height: 2.2;
+            font-size: 1.25rem;
+            line-height: 2.3;
             white-space: pre-wrap;
             min-height: 150px;
-            margin-bottom: 30px;
         }
 
         .modal-overlay {
@@ -940,7 +939,7 @@
                         </div>
 
                         <div style="margin-bottom: 10px;">
-                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">📖 검은 화면 소설풍 에필로그 텍스트 (타이핑 연출)</label>
+                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">📖 박스/버튼 없는 순수 검은 화면 에필로그 텍스트 (타이핑 후 자동 입장)</label>
                             <textarea id="in-epilogue-text" placeholder="예: 어둠 속에서 누군가 속삭인다... '결국 여기까지 찾아왔군요.'" style="background:#140d12; color:#fce8f0; border-color:#ff0055;"></textarea>
                         </div>
                         
@@ -1642,13 +1641,11 @@
             <div class="epilogue-overlay">
                 <div class="epilogue-content-wrapper">
                     <div class="epilogue-text-box" id="epilogue-typing-target" style="color: ${textColor};"></div>
-                    <button class="glitch-btn" id="epilogue-action-btn" onclick="finishEpilogue('${targetSecretId}')" style="display:none;">입장하기</button>
                 </div>
             </div>
         `;
 
         const targetElem = document.getElementById('epilogue-typing-target');
-        const actionBtn = document.getElementById('epilogue-action-btn');
         let charIndex = 0;
 
         function typeWriter() {
@@ -1657,7 +1654,10 @@
                 charIndex++;
                 activeTypingTimer = setTimeout(typeWriter, 35);
             } else {
-                if (actionBtn) actionBtn.style.display = 'inline-block';
+                // 타이핑 완료 후 2초 뒤에 비밀 프로필로 자동 입장
+                activeTypingTimer = setTimeout(() => {
+                    finishEpilogue(targetSecretId);
+                }, 2000);
             }
         }
 
