@@ -700,39 +700,33 @@
             background: #cc0000;
         }
 
-        /* 📖 에필로그 타이핑 오버레이 스타일 (타이핑 연출 + 사용자 직접 넘김) */
+        /* 📖 완전한 검은 화면 전체 오버레이 에필로그 스타일 */
         .epilogue-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.95);
+            background: #000000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9998;
-            padding: 30px;
+            padding: 40px;
         }
 
-        .epilogue-box {
-            background: #0c0609;
-            border: 2px solid #ff0055;
-            padding: 30px;
-            border-radius: 6px;
-            max-width: 650px;
-            width: 90%;
-            box-shadow: 0 0 25px rgba(255, 0, 0, 0.4);
-            text-align: center;
+        .epilogue-content-wrapper {
+            max-width: 700px;
+            width: 100%;
+            text-align: left;
         }
 
         .epilogue-text-box {
             font-family: monospace;
-            font-size: 1.15rem;
-            line-height: 2;
+            font-size: 1.2rem;
+            line-height: 2.2;
             white-space: pre-wrap;
-            text-align: left;
-            min-height: 140px;
-            margin-bottom: 20px;
+            min-height: 150px;
+            margin-bottom: 30px;
         }
 
         .modal-overlay {
@@ -946,7 +940,7 @@
                         </div>
 
                         <div style="margin-bottom: 10px;">
-                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">📖 소설풍 에필로그 텍스트 (타이핑 연출)</label>
+                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">📖 검은 화면 소설풍 에필로그 텍스트 (타이핑 연출)</label>
                             <textarea id="in-epilogue-text" placeholder="예: 어둠 속에서 누군가 속삭인다... '결국 여기까지 찾아왔군요.'" style="background:#140d12; color:#fce8f0; border-color:#ff0055;"></textarea>
                         </div>
                         
@@ -1646,7 +1640,7 @@
 
         container.innerHTML = `
             <div class="epilogue-overlay">
-                <div class="epilogue-box">
+                <div class="epilogue-content-wrapper">
                     <div class="epilogue-text-box" id="epilogue-typing-target" style="color: ${textColor};"></div>
                     <button class="glitch-btn" id="epilogue-action-btn" onclick="finishEpilogue('${targetSecretId}')" style="display:none;">입장하기</button>
                 </div>
