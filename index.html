@@ -892,7 +892,7 @@
             </div>
 
             <div id="public-view">
-                <!-- 무드곡 및 가사 영역 (공개 프로필일 때만 표시, 비밀 프로필은 자동 숨김 후 시크릿 BGM 재생) -->
+                <!-- 무드곡 및 가사 영역 -->
                 <div class="bgm-box" id="bgm-box" style="display:none;">
                     <div style="font-size:0.82rem; font-weight:bold; color:var(--accent-pink);">🎧 캐릭터 무드곡</div>
                     <div class="iframe-container" id="bgm-player-container">
@@ -981,7 +981,7 @@
                         </div>
                     </div>
 
-                    <!-- 📖 비밀 진입 에필로그 텍스트 & 글자 색상 설정 옵션 -->
+                    <!-- 📖 비밀 진입 에필로그 텍스트 & 색상 설정 -->
                     <div class="form-group" id="epilogue-options-group" style="display:none; background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
                         <label style="color: #ff0055; margin-bottom: 4px;">📖 [비밀 진입] 소설풍 에필로그 텍스트 연출 설정</label>
                         <textarea id="in-epilogue-text" placeholder="예: 어둠 속에서 누군가 속삭인다... '결국 여기까지 찾아왔군요.'"></textarea>
@@ -1002,10 +1002,15 @@
                         </div>
                     </div>
 
-                    <!-- 🎬 입장 시 오프닝 타이핑 텍스트 설정 -->
+                    <!-- 🎬 입장 시 오프닝 타이핑 텍스트 & 색상 설정 -->
                     <div class="form-group" style="background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
                         <label style="color: var(--accent-pink); margin-bottom: 4px;">🎬 [선택] 프로필 입장 시 오프닝 타이핑 텍스트</label>
                         <textarea id="in-opening-text" placeholder="예: 페이지가 열리며 낡은 일기장이 펼쳐진다... (비워두면 바로 입장)"></textarea>
+                        
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                            <label style="font-size:0.8rem; margin:0;">오프닝 텍스트 글자 색상 선택:</label>
+                            <input type="color" id="in-opening-color" value="#ff85a2" style="width: 60px; height: 30px;">
+                        </div>
                     </div>
 
                     <div class="form-grid">
@@ -1410,6 +1415,7 @@
         document.getElementById('in-epilogue-color').value = '#ff0055';
         document.getElementById('in-disintegrate-fx').value = 'fire';
         document.getElementById('in-opening-text').value = '';
+        document.getElementById('in-opening-color').value = '#ff85a2';
         document.getElementById('form-title').textContent = "새 캐릭터 사이트 생성 및 등록";
         document.getElementById('submit-btn-text').textContent = "실시간 서버에 등록하기";
         toggleSecretOptions();
@@ -1469,6 +1475,7 @@
             epilogueColor: document.getElementById('in-epilogue-color').value,
             disintegrateFx: document.getElementById('in-disintegrate-fx').value,
             openingText: document.getElementById('in-opening-text').value,
+            openingColor: document.getElementById('in-opening-color').value,
             spoilerOk: document.getElementById('in-spoiler-ok').value,
             spoilerMsg: document.getElementById('in-spoiler-msg').value,
             img: tempMainImg || existingImg,
@@ -1520,6 +1527,7 @@
         document.getElementById('in-epilogue-color').value = char.epilogueColor || '#ff0055';
         document.getElementById('in-disintegrate-fx').value = char.disintegrateFx || 'fire';
         document.getElementById('in-opening-text').value = char.openingText || '';
+        document.getElementById('in-opening-color').value = char.openingColor || '#ff85a2';
         document.getElementById('in-spoiler-ok').value = char.spoilerOk || 'NO';
         document.getElementById('in-spoiler-msg').value = char.spoilerMsg || '';
         document.getElementById('in-name').value = char.name || '';
@@ -1602,7 +1610,7 @@
         }
 
         if (char.openingText && char.openingText.trim() !== '') {
-            showOpeningTyping(char.openingText, () => {
+            showOpeningTyping(char.openingText, char.openingColor || '#ff85a2', () => {
                 proceedProfileLoad(char);
             });
         } else {
@@ -1620,12 +1628,12 @@
         }
     }
 
-    function showOpeningTyping(rawText, onComplete) {
+    function showOpeningTyping(rawText, textColor, onComplete) {
         const container = document.getElementById('opening-container');
 
         container.innerHTML = `
             <div class="opening-overlay" onclick="skipOpening()">
-                <div class="opening-text-box" id="opening-typing-target" style="color: var(--accent-pink);"></div>
+                <div class="opening-text-box" id="opening-typing-target" style="color: ${textColor};"></div>
                 <div class="opening-skip-hint">- 화면을 클릭하면 오프닝을 건너뜁니다 -</div>
             </div>
         `;
@@ -1684,7 +1692,6 @@
         element.nextElementSibling.style.display = 'block';
     }
 
-    // 🖤 프사 얼굴 가리기 및 선택한 소멸 효과 실행 후 비밀 진입
     function handleProfileImageClick() {
         const char = characterList.find(c => c.id === selectedCharacterId);
         if (!char) return;
@@ -1698,14 +1705,12 @@
                 const imgElem = document.getElementById('out-img');
 
                 if (imgTd && imgElem) {
-                    // 얼굴 가리기 오버레이 생성
                     if (!imgTd.querySelector('.face-censor-overlay')) {
                         const censor = document.createElement('div');
                         censor.className = 'face-censor-overlay';
                         imgTd.appendChild(censor);
                     }
 
-                    // 선택된 소멸 효과 클래스 부여
                     const fxType = linkedSecret.disintegrateFx || 'fire';
                     if (fxType === 'fire') imgElem.classList.add('disintegrate-fire');
                     else if (fxType === 'blackhole') imgElem.classList.add('disintegrate-blackhole');
@@ -1722,7 +1727,6 @@
         }
     }
 
-    // 💀 음산한 로딩 문구들이 순차적으로 돌아가는(로테이션) 오류 팝업창
     function startGlitchSequence(secretChar) {
         const loadingTexts = [
             `시스템 로딩 중... [보안 데이터를 분석하고 있습니다]`,
@@ -1744,7 +1748,6 @@
             </div>
         `;
 
-        // 1.8초마다 로딩 문구 순환 변경
         loadingRotationTimer = setInterval(() => {
             textIdx = (textIdx + 1) % loadingTexts.length;
             const textElem = document.getElementById('glitch-rotating-text');
@@ -1985,7 +1988,6 @@
             });
         }
 
-        // 🎧 무드곡, 가사, 그리고 비밀 프로필 시크릿 BGM 처리 (플레이어 숨김 재생)
         const bgmBox = document.getElementById('bgm-box');
         const bgmPlayerContainer = document.getElementById('bgm-player-container');
         const lyricsBox = document.getElementById('out-lyrics');
@@ -1994,7 +1996,6 @@
         hiddenAudioContainer.innerHTML = '';
 
         if (char.bgm && char.bgm.trim() !== '') {
-            // 가사 렌더링
             if (char.lyrics && char.lyrics.trim() !== '') {
                 lyricsBox.style.display = 'block';
                 lyricsBox.textContent = char.lyrics;
@@ -2005,7 +2006,6 @@
             const match = char.bgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
             
             if (char.profileType === 'secret') {
-                // 🔒 비밀 프로필인 경우: 화면의 무드곡 박스와 플레이어를 완전히 숨기고 백그라운드에서 자동 재생
                 bgmBox.style.display = 'none';
                 if (match && match[2].length === 11) {
                     hiddenAudioContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${match[2]}?autoplay=1" allow="autoplay" style="display:none;"></iframe>`;
@@ -2013,7 +2013,6 @@
                     hiddenAudioContainer.innerHTML = `<iframe src="${char.bgm}" allow="autoplay" style="display:none;"></iframe>`;
                 }
             } else {
-                // 🔓 일반 공개 프로필인 경우: 화면에 무드곡 플레이어 박스 노출
                 bgmBox.style.display = 'block';
                 bgmPlayerContainer.style.display = 'block';
                 if (match && match[2].length === 11) {
