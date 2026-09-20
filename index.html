@@ -892,7 +892,7 @@
             </div>
 
             <div id="public-view">
-                <!-- 무드곡 및 가사 영역 -->
+                <!-- 무드곡 및 가사 영역 (공개 프로필일 때만 표시, 비밀 프로필은 자동 숨김 후 시크릿 BGM 재생) -->
                 <div class="bgm-box" id="bgm-box" style="display:none;">
                     <div style="font-size:0.82rem; font-weight:bold; color:var(--accent-pink);">🎧 캐릭터 무드곡</div>
                     <div class="iframe-container" id="bgm-player-container">
@@ -1043,7 +1043,7 @@
                     <div class="form-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
                         <label style="color: var(--accent-pink); margin-bottom: 4px;">🎧 캐릭터 무드곡 (유튜브 / 틱톡 음원 URL)</label>
                         <input type="text" id="in-bgm" placeholder="https://www.youtube.com/watch?v=유튜브영상아이디">
-                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 비밀 프로필에서는 플레이어가 완전히 숨겨진 채 백그라운드 BGM으로 자동 재생됩니다.</span>
+                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 비밀 프로필에서는 플레이어가 화면에 노출되지 않고 완전히 숨겨진 채 백그라운드 BGM으로 자동 재생됩니다.</span>
                     </div>
 
                     <div class="form-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
@@ -1994,8 +1994,7 @@
         hiddenAudioContainer.innerHTML = '';
 
         if (char.bgm && char.bgm.trim() !== '') {
-            bgmBox.style.display = 'block';
-
+            // 가사 렌더링
             if (char.lyrics && char.lyrics.trim() !== '') {
                 lyricsBox.style.display = 'block';
                 lyricsBox.textContent = char.lyrics;
@@ -2004,20 +2003,22 @@
             }
 
             const match = char.bgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-            if (match && match[2].length === 11) {
-                if (char.profileType === 'secret') {
-                    bgmPlayerContainer.style.display = 'none';
+            
+            if (char.profileType === 'secret') {
+                // 🔒 비밀 프로필인 경우: 화면의 무드곡 박스와 플레이어를 완전히 숨기고 백그라운드에서 자동 재생
+                bgmBox.style.display = 'none';
+                if (match && match[2].length === 11) {
                     hiddenAudioContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${match[2]}?autoplay=1" allow="autoplay" style="display:none;"></iframe>`;
                 } else {
-                    bgmPlayerContainer.style.display = 'block';
-                    document.getElementById('youtube-player').src = `https://www.youtube.com/embed/${match[2]}?autoplay=1`;
+                    hiddenAudioContainer.innerHTML = `<iframe src="${char.bgm}" allow="autoplay" style="display:none;"></iframe>`;
                 }
             } else {
-                if (char.profileType === 'secret') {
-                    bgmPlayerContainer.style.display = 'none';
-                    hiddenAudioContainer.innerHTML = `<iframe src="${char.bgm}" allow="autoplay" style="display:none;"></iframe>`;
+                // 🔓 일반 공개 프로필인 경우: 화면에 무드곡 플레이어 박스 노출
+                bgmBox.style.display = 'block';
+                bgmPlayerContainer.style.display = 'block';
+                if (match && match[2].length === 11) {
+                    document.getElementById('youtube-player').src = `https://www.youtube.com/embed/${match[2]}?autoplay=1`;
                 } else {
-                    bgmPlayerContainer.style.display = 'block';
                     document.getElementById('youtube-player').src = char.bgm;
                 }
             }
