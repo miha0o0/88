@@ -700,13 +700,14 @@
             background: #cc0000;
         }
 
-        /* 📖 에필로그 대화창 스타일 */
+        /* 📖 에필로그 타이핑 오버레이 스타일 (타이핑 연출 + 사용자 직접 넘김) */
         .epilogue-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.92);
+            background: rgba(0, 0, 0, 0.95);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9998;
@@ -718,7 +719,7 @@
             border: 2px solid #ff0055;
             padding: 30px;
             border-radius: 6px;
-            max-width: 600px;
+            max-width: 650px;
             width: 90%;
             box-shadow: 0 0 25px rgba(255, 0, 0, 0.4);
             text-align: center;
@@ -730,7 +731,7 @@
             line-height: 2;
             white-space: pre-wrap;
             text-align: left;
-            min-height: 120px;
+            min-height: 140px;
             margin-bottom: 20px;
         }
 
@@ -945,7 +946,7 @@
                         </div>
 
                         <div style="margin-bottom: 10px;">
-                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">📖 소설풍 에필로그 텍스트 (사용자가 직접 버튼을 눌러 넘김)</label>
+                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">📖 소설풍 에필로그 텍스트 (타이핑 연출)</label>
                             <textarea id="in-epilogue-text" placeholder="예: 어둠 속에서 누군가 속삭인다... '결국 여기까지 찾아왔군요.'" style="background:#140d12; color:#fce8f0; border-color:#ff0055;"></textarea>
                         </div>
                         
@@ -1068,6 +1069,7 @@
     let editingCharacterId = null;
     let tempMainImg = null;
     let previousPublicCharacterId = null;
+    let activeTypingTimer = null;
     let loadingRotationTimer = null;
 
     const ADMIN_PW = "0828";
@@ -1161,6 +1163,10 @@
         const tabBtnView = document.getElementById('tab-btn-view');
         const btns = document.querySelectorAll('.nav-tabs .tab-btn');
 
+        if (activeTypingTimer) {
+            clearTimeout(activeTypingTimer);
+            activeTypingTimer = null;
+        }
         if (loadingRotationTimer) {
             clearInterval(loadingRotationTimer);
             loadingRotationTimer = null;
@@ -1566,7 +1572,6 @@
         if (!char) return;
 
         if (char.profileType === 'secret' && char.linkedPublicId) {
-            // 🛑 비밀 프로필 사진을 누를 때: 얼굴 가리기 효과를 제거(초기화)하고 연결된 공개 프로필로 이동
             const imgTd = document.querySelector('.infobox-img-td');
             if (imgTd) {
                 const censor = imgTd.querySelector('.face-censor-overlay');
@@ -1628,7 +1633,7 @@
                 document.getElementById('glitch-modal-container').innerHTML = '';
                 const sChar = characterList.find(c => c.id === targetId);
                 if (sChar && sChar.epilogueText) {
-                    showEpilogueBox(sChar.epilogueText, sChar.epilogueColor || '#ff0055', sChar.id);
+                    showEpilogueTyping(sChar.epilogueText, sChar.epilogueColor || '#ff0055', sChar.id);
                 } else {
                     switchTab('view', targetId);
                 }
@@ -1636,20 +1641,40 @@
         };
     }
 
-    function showEpilogueBox(rawText, textColor, targetSecretId) {
+    function showEpilogueTyping(rawText, textColor, targetSecretId) {
         const container = document.getElementById('epilogue-container');
 
         container.innerHTML = `
             <div class="epilogue-overlay">
                 <div class="epilogue-box">
-                    <div class="epilogue-text-box" style="color: ${textColor};">${rawText}</div>
-                    <button class="glitch-btn" onclick="finishEpilogue('${targetSecretId}')">입장하기</button>
+                    <div class="epilogue-text-box" id="epilogue-typing-target" style="color: ${textColor};"></div>
+                    <button class="glitch-btn" id="epilogue-action-btn" onclick="finishEpilogue('${targetSecretId}')" style="display:none;">입장하기</button>
                 </div>
             </div>
         `;
+
+        const targetElem = document.getElementById('epilogue-typing-target');
+        const actionBtn = document.getElementById('epilogue-action-btn');
+        let charIndex = 0;
+
+        function typeWriter() {
+            if (charIndex < rawText.length) {
+                targetElem.textContent += rawText.charAt(charIndex);
+                charIndex++;
+                activeTypingTimer = setTimeout(typeWriter, 35);
+            } else {
+                if (actionBtn) actionBtn.style.display = 'inline-block';
+            }
+        }
+
+        typeWriter();
     }
 
     window.finishEpilogue = function(targetSecretId) {
+        if (activeTypingTimer) {
+            clearTimeout(activeTypingTimer);
+            activeTypingTimer = null;
+        }
         document.getElementById('epilogue-container').innerHTML = '';
         switchTab('view', targetSecretId);
     };
@@ -1657,7 +1682,6 @@
     function goBackFromProfile() {
         const char = characterList.find(c => c.id === selectedCharacterId);
         
-        // 🛑 목록으로 갈 때도 얼굴 가리기 효과 초기화
         const imgTd = document.querySelector('.infobox-img-td');
         if (imgTd) {
             const censor = imgTd.querySelector('.face-censor-overlay');
@@ -1683,7 +1707,6 @@
         const infoboxColor = char.color || '#ff85a2';
         document.documentElement.style.setProperty('--infobox-color', infoboxColor);
 
-        // 🛑 프로필 페이지가 새로 렌더링될 때 이전 페이지에 남아있던 얼굴 가리기 오버레이 제거 (초기화)
         const imgTdElem = document.querySelector('.infobox-img-td');
         if (imgTdElem) {
             const existingCensor = imgTdElem.querySelector('.face-censor-overlay');
@@ -1896,4 +1919,4 @@
 </script>
 
 </body>
-    </html>⁹
+</html>
