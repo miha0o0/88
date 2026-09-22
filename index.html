@@ -23,7 +23,6 @@
             --infobox-color: #ff85a2;
         }
 
-        /* 비밀 프로필 모드 (다크 & 핫핑크 테마) */
         body.secret-mode {
             --bg-color: #0b0709;
             --card-bg: #140d12;
@@ -376,7 +375,6 @@
             display: block;
         }
 
-        /* 🖤 프사 얼굴 검은 네모 가리기 오버레이 효과 */
         .face-censor-overlay {
             position: absolute;
             top: 32%;
@@ -507,7 +505,6 @@
             display: none;
         }
 
-        /* 👥 인물 관계 좌우 배치 스타일 */
         .rel-card {
             background: var(--soft-pink-bg);
             border: 1px solid var(--border-color);
@@ -670,13 +667,8 @@
             font-weight: bold;
         }
 
-        .move-btn {
-            background: var(--light-pink);
-        }
-
-        .remove-field-btn {
-            background: #e57373;
-        }
+        .move-btn { background: var(--light-pink); }
+        .remove-field-btn { background: #e57373; }
 
         .submit-btn, .login-btn, .modal-btn {
             background: var(--accent-pink);
@@ -689,9 +681,7 @@
             cursor: pointer;
         }
 
-        .submit-btn, .login-btn {
-            width: 100%;
-        }
+        .submit-btn, .login-btn { width: 100%; }
 
         .private-notice, .login-required-notice {
             text-align: center;
@@ -709,7 +699,34 @@
             text-align: left;
         }
 
-        /* 💀 공포 글리치 팝업창 스타일 */
+        /* 🌸 '나의 세계' (개인 홈) 스타일 */
+        .my-world-container {
+            border-radius: 8px;
+            padding: 40px 30px;
+            min-height: 500px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+        }
+
+        .my-world-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed rgba(0,0,0,0.1);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .my-world-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .my-world-grid { grid-template-columns: 1fr; }
+        }
+
+        /* 공포 글리치 팝업 */
         .glitch-modal-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -739,7 +756,6 @@
             letter-spacing: 3px;
             font-family: monospace;
             text-transform: uppercase;
-            text-shadow: 0 0 8px rgba(255,0,0,0.8);
         }
 
         .glitch-modal-box p {
@@ -763,13 +779,9 @@
             cursor: pointer;
             font-family: monospace;
             letter-spacing: 2px;
-            box-shadow: 0 0 10px rgba(255,0,0,0.8);
-        }
-        .glitch-btn:hover {
-            background: #cc0000;
         }
 
-        /* 📖 박스 없는 순수 검은 화면 에필로그 스타일 */
+        /* 에필로그 스타일 */
         .epilogue-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -819,42 +831,10 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
-        .modal-box h3 {
-            color: var(--accent-pink);
-            margin-bottom: 8px;
-        }
-
-        .modal-box p {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 12px;
-            white-space: pre-line;
-        }
-
-        .modal-textarea {
-            width: 100%;
-            height: 180px;
-            font-family: monospace;
-            font-size: 0.75rem;
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-color);
-            border-radius: 4px;
-            margin-bottom: 12px;
-            resize: vertical;
-        }
-
-        .modal-btns {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .modal-btn.cancel {
-            background: var(--text-sub);
-            color: #fff;
-        }
+        .modal-box h3 { color: var(--accent-pink); margin-bottom: 8px; }
+        .modal-box p { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 12px; white-space: pre-line; }
+        .modal-btns { display: flex; justify-content: center; gap: 8px; }
+        .modal-btn.cancel { background: var(--text-sub); color: #fff; }
     </style>
 </head>
 <body>
@@ -863,12 +843,13 @@
     <header class="site-header">
         <h1 onclick="switchTab('lobby')">X WIKI</h1>
         <div class="header-right">
-            <div class="auth-status" id="auth-status-text">권한: 일반 방문자</div>
+            <div class="auth-status" id="auth-status-text">로그인 필요</div>
         </div>
     </header>
 
     <div class="nav-tabs">
         <button class="tab-btn active" id="tab-btn-lobby" onclick="switchTab('lobby')">로비 (목록)</button>
+        <button class="tab-btn" id="tab-btn-myworld" onclick="switchTab('myworld')">나의 세계</button>
         <button class="tab-btn" id="tab-btn-view" onclick="switchTab('view')" style="display:none;">프로필 페이지</button>
         <button class="tab-btn" id="tab-btn-edit" onclick="switchTab('edit')">프로필 작성 및 등록</button>
     </div>
@@ -878,6 +859,52 @@
         <div id="lobby-tab">
             <h2 style="margin-bottom: 10px; color:var(--text-color); font-size: 1.3rem;">실시간 캐릭터 목록</h2>
             <div class="lobby-grid" id="lobby-list"></div>
+        </div>
+
+        <!-- 🌸 1.5. '나의 세계' (개인 홈페이지 탭) -->
+        <div id="myworld-tab" style="display:none;">
+            <div id="myworld-login-check" class="login-required-notice">
+                <h2>나의 세계 입장</h2>
+                <p style="margin-bottom: 15px;">나만의 개인 홈페이지를 만들고 꾸미려면 로그인 또는 회원가입을 해주세요.</p>
+                <div class="login-box">
+                    <div class="form-group">
+                        <label>아이디</label>
+                        <input type="text" id="user-id-input" placeholder="아이디 입력">
+                    </div>
+                    <div class="form-group">
+                        <label>비밀번호</label>
+                        <input type="password" id="user-pw-input" placeholder="비밀번호 입력">
+                    </div>
+                    <button class="login-btn" onclick="handleUserLogin()" style="margin-bottom:6px;">로그인</button>
+                    <button class="action-btn" onclick="handleUserRegister()" style="width:100%; padding:8px; background:var(--light-pink); color:#fff; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">계정 만들기 (회원가입)</button>
+                </div>
+            </div>
+
+            <div id="myworld-content-box" style="display:none;">
+                <div class="my-world-container" id="my-world-custom-theme-box">
+                    <div class="my-world-header">
+                        <div>
+                            <h2 id="mw-display-title" style="font-size: 1.8rem; margin-bottom: 4px;">나의 세계</h2>
+                            <p id="mw-display-sub" style="font-size: 0.9rem; opacity: 0.8;">개인 홈페이지에 오신 것을 환영합니다.</p>
+                        </div>
+                        <button class="action-btn" onclick="toggleMyWorldEditModal()" style="padding: 6px 12px; font-weight:bold;">⚙️ 내 홈페이지 꾸미기</button>
+                    </div>
+
+                    <div class="my-world-grid">
+                        <div style="background:rgba(255,255,255,0.7); backdrop-filter:blur(5px); padding:15px; border-radius:6px; border:1px solid rgba(0,0,0,0.1);">
+                            <img id="mw-display-profile-img" src="https://via.placeholder.com/240x240/000000/FFFFFF?text=Profile" style="width:100%; height:220px; object-fit:cover; border-radius:4px; margin-bottom:10px;" alt="프로필">
+                            <h3 id="mw-display-name" style="font-size:1.1rem; margin-bottom:4px;">유저 이름</h3>
+                            <p id="mw-display-bio" style="font-size:0.82rem; white-space:pre-wrap; opacity:0.85;">자기소개가 없습니다.</p>
+                            <hr style="margin:12px 0; border:0; border-top:1px solid rgba(0,0,0,0.1);">
+                            <button class="action-btn" onclick="handleUserLogout()" style="width:100%; background:#e57373; color:#fff; border:none; padding:6px;">로그아웃</button>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.7); backdrop-filter:blur(5px); padding:20px; border-radius:6px; border:1px solid rgba(0,0,0,0.1);">
+                            <h3 style="margin-bottom:10px; font-size:1.1rem; border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:6px;">📌 방명록 / 메인 피드</h3>
+                            <div id="mw-display-content" style="font-size:0.9rem; white-space:pre-wrap; line-height:1.7;">여기에 개인 일상, 링크, 혹은 자유로운 글을 적어보세요!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 2. 세부 프로필 보기 화면 -->
@@ -900,7 +927,6 @@
             </div>
 
             <div id="public-view">
-                <!-- 무드곡 및 가사 영역 -->
                 <div class="bgm-box" id="bgm-box" style="display:none;">
                     <div style="font-size:0.82rem; font-weight:bold; color:var(--accent-pink);">🎧 캐릭터 무드곡</div>
                     <div class="iframe-container" id="bgm-player-container">
@@ -946,14 +972,7 @@
         <div id="edit-tab" style="display:none;">
             <div id="login-required" class="login-required-notice">
                 <h2>로그인이 필요합니다</h2>
-                <p style="margin-bottom: 15px;">프로필 작성 및 수정은 관리자 로그인 후 이용할 수 있습니다.</p>
-                <div class="login-box">
-                    <div class="form-group">
-                        <label>비밀번호 입력</label>
-                        <input type="password" id="admin-password" placeholder="비밀번호를 입력하세요">
-                    </div>
-                    <button class="login-btn" onclick="checkLogin()">로그인</button>
-                </div>
+                <p style="margin-bottom: 15px;">프로필을 작성하고 등록하려면 먼저 로그인해 주세요.</p>
             </div>
 
             <div id="edit-form-container" style="display:none;">
@@ -990,15 +1009,10 @@
 
                     <!-- 🔒 [비밀 프로필 전용 설정 구역] -->
                     <div class="form-group" id="secret-exclusive-group" style="display:none; background: #1c0e15; border: 2px dashed #ff0055; padding: 14px; border-radius: 6px; margin-bottom: 15px;">
-                        <label style="color: #ff0055; margin-bottom: 6px; font-size: 0.9rem;">🔒 [비밀 프로필 전용] 연출 및 음악 설정</label>
+                        <label style="color: #ff0055; margin-bottom: 6px; font-size: 0.9rem;">🔒 [비밀 프로필 전용] 연출 설정</label>
                         
                         <div style="margin-bottom: 10px;">
-                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">🎵 비밀 진입 시 백그라운드 재생 음악 URL (플레이어 숨김)</label>
-                            <input type="text" id="in-secret-bgm" placeholder="https://www.youtube.com/watch?v=..." style="background:#140d12; color:#fce8f0; border-color:#ff0055;">
-                        </div>
-
-                        <div style="margin-bottom: 10px;">
-                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">🎧 비밀 프로필 본문 무드곡 링크 (유튜브, 틱톡, 싸클 등 - 플레이어 노출)</label>
+                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">🎧 비밀 프로필 본문 무드곡 링크 (유튜브, 틱톡, 싸클 등)</label>
                             <input type="text" id="in-secret-page-bgm" placeholder="https://www.youtube.com/watch?v=..." style="background:#140d12; color:#fce8f0; border-color:#ff0055;">
                         </div>
 
@@ -1008,8 +1022,8 @@
                         </div>
 
                         <div style="margin-bottom: 10px;">
-                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">📖 박스/버튼 없는 순수 검은 화면 에필로그 텍스트 (타이핑 후 자동 입장)</label>
-                            <textarea id="in-epilogue-text" placeholder="예: 어둠 속에서 누군가 속삭인다... '결국 여기까지 찾아왔군요.'" style="background:#140d12; color:#fce8f0; border-color:#ff0055;"></textarea>
+                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">📖 박스/버튼 없는 순수 검은 화면 에필로그 텍스트</label>
+                            <textarea id="in-epilogue-text" placeholder="예: 어둠 속에서 누군가 속삭인다..." style="background:#140d12; color:#fce8f0; border-color:#ff0055;"></textarea>
                         </div>
                         
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
@@ -1035,7 +1049,7 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label>캐릭터 이름 (고유 주소 생성)</label>
-                            <input type="text" id="in-name" placeholder="이름을 입력하세요 (예: 루아)" required>
+                            <input type="text" id="in-name" placeholder="이름을 입력하세요" required>
                         </div>
                         <div class="form-group">
                             <label>소제목/영문이름</label>
@@ -1052,9 +1066,8 @@
 
                     <!-- 🔓 [공개 프로필 전용 설정 구역] -->
                     <div class="form-group" id="public-exclusive-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
-                        <label style="color: var(--accent-pink); margin-bottom: 4px;">🎧 [공개 프로필 전용] 무드곡 링크 (유튜브, 틱톡, 사운드클라우드 등)</label>
-                        <input type="text" id="in-bgm" placeholder="https://www.youtube.com/watch?v=유튜브영상아이디">
-                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 공개 프로필 페이지 본문에 플레이어 박스와 함께 노출됩니다.</span>
+                        <label style="color: var(--accent-pink); margin-bottom: 4px;">🎧 [공개 프로필 전용] 무드곡 링크</label>
+                        <input type="text" id="in-bgm" placeholder="https://www.youtube.com/watch?v=...">
                     </div>
 
                     <div class="form-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;" id="public-lyrics-group">
@@ -1075,19 +1088,18 @@
                         <input type="text" id="in-quote" placeholder="한마디 문구를 입력하세요">
                     </div>
 
-                    <!-- 👥 인물 관계 및 호칭 편집 구역 -->
+                    <!-- 인물 관계 -->
                     <div class="form-group" style="background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
                         <label style="margin-bottom: 6px; color:var(--accent-pink); font-size:0.9rem;">
                             <span>👥 인물 관계 (과거 ➔ 현재 비교)</span>
                             <button type="button" class="add-field-btn" onclick="addRelationBox()">+ 관계 추가</button>
                         </label>
-                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 8px; display:block;">* 과거(기본) 인상과 현재 변화된 인상(선택사항)을 작성합니다.</span>
                         <div id="relations-container"></div>
                     </div>
 
                     <div class="form-group" style="background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
                         <label style="margin-bottom: 6px; color:var(--accent-pink); font-size:0.9rem;">
-                            <span>🏷️ 호칭 정리 표 (내 캐릭터 ➔ 상대 캐릭터)</span>
+                            <span>🏷️ 호칭 정리 표</span>
                             <button type="button" class="add-field-btn" onclick="addNicknameRow()">+ 호칭 추가</button>
                         </label>
                         <div id="nicknames-container"></div>
@@ -1095,7 +1107,7 @@
 
                     <div class="form-group">
                         <label style="margin-bottom: 5px;">
-                            <span>본문 섹션 (번호 수정 가능, 사진 개별 스포 가능)</span>
+                            <span>본문 섹션 (번호 수정 가능)</span>
                             <button type="button" class="add-field-btn" onclick="addBodySection()">+ 섹션 추가</button>
                         </label>
                         <div id="body-sections-container"></div>
@@ -1108,11 +1120,30 @@
     </div>
 </div>
 
+<!-- ⚙️ '나의 세계' 꾸미기 모달 -->
+<div class="modal-overlay" id="myworld-edit-modal" style="display:none;">
+    <div class="modal-box" style="max-width:520px; text-align:left;">
+        <h3 style="text-align:center; margin-bottom:12px;">나의 세계 꾸미기</h3>
+        <div class="form-group"><label>페이지 타이틀</label><input type="text" id="mw-edit-title" placeholder="나의 세계"></div>
+        <div class="form-group"><label>소제목/상태 메시지</label><input type="text" id="mw-edit-sub" placeholder="상태메시지"></div>
+        <div class="form-group"><label>프로필 사진 URL 또는 업로드</label><input type="text" id="mw-edit-img" placeholder="https://..."></div>
+        <div class="form-group"><label>자기소개</label><textarea id="mw-edit-bio" placeholder="자기소개..."></textarea></div>
+        <div class="form-group"><label>메인 본문 / 방명록 내용</label><textarea id="mw-edit-content" style="min-height:120px;" placeholder="내용..."></textarea></div>
+        
+        <div class="form-grid">
+            <div class="form-group"><label>배경 색상</label><input type="color" id="mw-edit-bg-color" value="#ffffff"></div>
+            <div class="form-group"><label>글자 색상</label><input type="color" id="mw-edit-text-color" value="#4a3b42"></div>
+        </div>
+        <div class="modal-btns" style="margin-top:15px;">
+            <button class="modal-btn" onclick="saveMyWorldChanges()">저장하기</button>
+            <button class="modal-btn cancel" onclick="toggleMyWorldEditModal()">취소</button>
+        </div>
+    </div>
+</div>
+
 <!-- 팝업 및 연출 렌더링 영역 -->
 <div id="glitch-modal-container"></div>
 <div id="epilogue-container"></div>
-
-<!-- 비밀 BGM 백그라운드 재생용 숨겨진 오디오/프레임 영역 -->
 <div id="hidden-secret-audio-container" style="display:none;"></div>
 
 <!-- 모달 창: 스포일러 주의 -->
@@ -1143,16 +1174,14 @@
     const db = firebase.database();
 
     let isPublic = true;
-    let isLoggedIn = false;
+    let currentUser = null; // 현재 로그인한 사용자 정보 { uid, username }
     let characterList = [];
     let selectedCharacterId = null;
     let editingCharacterId = null;
     let tempMainImg = null;
-    let previousPublicCharacterId = null;
+    let profileHistoryStack = []; // 정확한 뒤로가기 스택 기록
     let activeTypingTimer = null;
-    let loadingRotationTimer = null;
 
-    const ADMIN_PW = "0828";
     const defaultFields = ["본명", "출생", "성별", "신체", "소속", "MBTI", "가족 관계"];
     const defaultBodySections = [
         { num: "1", title: "개요", content: "", spoiler: "NO", images: [] },
@@ -1174,6 +1203,155 @@
             checkUrlHash();
             if (document.getElementById('lobby-tab').style.display !== 'none') {
                 renderLobby();
+            }
+        });
+    }
+
+    // 👤 회원가입 및 로그인 처리 시스템
+    function handleUserRegister() {
+        const id = document.getElementById('user-id-input').value.trim();
+        const pw = document.getElementById('user-pw-input').value.trim();
+        if (!id || !pw) {
+            alert('아이디와 비밀번호를 모두 입력해주세요.');
+            return;
+        }
+
+        db.ref('users/' + id).once('value', (snapshot) => {
+            if (snapshot.exists()) {
+                alert('이미 존재하는 아이디입니다.');
+            } else {
+                const newUser = {
+                    username: id,
+                    password: pw,
+                    world: {
+                        title: `${id}의 세계`,
+                        sub: "개인 홈페이지입니다.",
+                        img: "https://via.placeholder.com/240x240/ff85a2/FFFFFF?text=My+World",
+                        bio: "환영합니다!",
+                        content: "여기에 자신만의 글을 작성해보세요.",
+                        bgColor: "#fff5f8",
+                        textColor: "#4a3b42"
+                    }
+                };
+                db.ref('users/' + id).set(newUser, (err) => {
+                    if (err) {
+                        alert('회원가입 실패: ' + err.message);
+                    } else {
+                        alert('계정이 생성되었습니다! 로그인해주세요.');
+                    }
+                });
+            }
+        });
+    }
+
+    function handleUserLogin() {
+        const id = document.getElementById('user-id-input').value.trim();
+        const pw = document.getElementById('user-pw-input').value.trim();
+        if (!id || !pw) {
+            alert('아이디와 비밀번호를 입력해주세요.');
+            return;
+        }
+
+        db.ref('users/' + id).once('value', (snapshot) => {
+            const userData = snapshot.val();
+            if (!userData || userData.password !== pw) {
+                alert('아이디 또는 비밀번호가 일치하지 않습니다.');
+            } else {
+                currentUser = { uid: id, ...userData };
+                alert(`${id}님 환영합니다!`);
+                updateAuthUI();
+                renderMyWorld();
+            }
+        });
+    }
+
+    function handleUserLogout() {
+        currentUser = null;
+        updateAuthUI();
+        switchTab('myworld');
+    }
+
+    function updateAuthUI() {
+        const authText = document.getElementById('auth-status-text');
+        const loginCheck = document.getElementById('myworld-login-check');
+        const mwContent = document.getElementById('myworld-content-box');
+        const loginRequiredEdit = document.getElementById('login-required');
+        const editForm = document.getElementById('edit-form-container');
+
+        if (currentUser) {
+            authText.textContent = `계정: ${currentUser.uid} (로그인됨)`;
+            loginCheck.style.display = 'none';
+            mwContent.style.display = 'block';
+            loginRequiredEdit.style.display = 'none';
+            editForm.style.display = 'block';
+        } else {
+            authText.textContent = '로그인 필요';
+            loginCheck.style.display = 'block';
+            mwContent.style.display = 'none';
+            loginRequiredEdit.style.display = 'block';
+            editForm.style.display = 'none';
+        }
+    }
+
+    // 🌸 '나의 세계' 개인 스타일 및 커스텀 렌더링
+    function renderMyWorld() {
+        if (!currentUser) return;
+        db.ref('users/' + currentUser.uid).once('value', (snap) => {
+            const data = snap.val();
+            if (data && data.world) {
+                currentUser.world = data.world;
+                const w = data.world;
+                document.getElementById('mw-display-title').textContent = w.title || '나의 세계';
+                document.getElementById('mw-display-sub').textContent = w.sub || '';
+                document.getElementById('mw-display-profile-img').src = w.img || 'https://via.placeholder.com/240x240/000000/FFFFFF?text=Profile';
+                document.getElementById('mw-display-name').textContent = currentUser.uid;
+                document.getElementById('mw-display-bio').textContent = w.bio || '';
+                document.getElementById('mw-display-content').textContent = w.content || '';
+
+                const themeBox = document.getElementById('my-world-custom-theme-box');
+                themeBox.style.backgroundColor = w.bgColor || '#fff5f8';
+                themeBox.style.color = w.textColor || '#4a3b42';
+            }
+        });
+    }
+
+    function toggleMyWorldEditModal() {
+        const modal = document.getElementById('myworld-edit-modal');
+        if (modal.style.display === 'flex') {
+            modal.style.display = 'none';
+        } else {
+            if (currentUser && currentUser.world) {
+                const w = currentUser.world;
+                document.getElementById('mw-edit-title').value = w.title || '';
+                document.getElementById('mw-edit-sub').value = w.sub || '';
+                document.getElementById('mw-edit-img').value = w.img || '';
+                document.getElementById('mw-edit-bio').value = w.bio || '';
+                document.getElementById('mw-edit-content').value = w.content || '';
+                document.getElementById('mw-edit-bg-color').value = w.bgColor || '#ffffff';
+                document.getElementById('mw-edit-text-color').value = w.textColor || '#4a3b42';
+            }
+            modal.style.display = 'flex';
+        }
+    }
+
+    function saveMyWorldChanges() {
+        if (!currentUser) return;
+        const updatedWorld = {
+            title: document.getElementById('mw-edit-title').value,
+            sub: document.getElementById('mw-edit-sub').value,
+            img: document.getElementById('mw-edit-img').value,
+            bio: document.getElementById('mw-edit-bio').value,
+            content: document.getElementById('mw-edit-content').value,
+            bgColor: document.getElementById('mw-edit-bg-color').value,
+            textColor: document.getElementById('mw-edit-text-color').value
+        };
+
+        db.ref('users/' + currentUser.uid + '/world').set(updatedWorld, (err) => {
+            if (!err) {
+                currentUser.world = updatedWorld;
+                toggleMyWorldEditModal();
+                renderMyWorld();
+                alert('개인 홈페이지 설정이 저장되었습니다!');
             }
         });
     }
@@ -1222,22 +1400,9 @@
         });
     }
 
-    function checkLogin() {
-        const pwInput = document.getElementById('admin-password').value;
-        if (pwInput === ADMIN_PW) {
-            isLoggedIn = true;
-            document.getElementById('login-required').style.display = 'none';
-            document.getElementById('edit-form-container').style.display = 'block';
-            document.getElementById('auth-status-text').textContent = '권한: 관리자 (수정/삭제 가능)';
-            alert('로그인되었습니다.');
-            renderLobby();
-        } else {
-            alert('비밀번호가 일치하지 않습니다.');
-        }
-    }
-
     function switchTab(tab, charId = null) {
         const lobbyTab = document.getElementById('lobby-tab');
+        const myworldTab = document.getElementById('myworld-tab');
         const viewTab = document.getElementById('view-tab');
         const editTab = document.getElementById('edit-tab');
         const tabBtnView = document.getElementById('tab-btn-view');
@@ -1247,10 +1412,6 @@
             clearTimeout(activeTypingTimer);
             activeTypingTimer = null;
         }
-        if (loadingRotationTimer) {
-            clearInterval(loadingRotationTimer);
-            loadingRotationTimer = null;
-        }
         document.getElementById('epilogue-container').innerHTML = '';
         document.getElementById('glitch-modal-container').innerHTML = '';
         document.getElementById('hidden-secret-audio-container').innerHTML = '';
@@ -1259,29 +1420,33 @@
 
         btns.forEach(btn => btn.classList.remove('active'));
 
+        lobbyTab.style.display = 'none';
+        myworldTab.style.display = 'none';
+        viewTab.style.display = 'none';
+        editTab.style.display = 'none';
+        tabBtnView.style.display = 'none';
+
         if (tab === 'lobby') {
             window.location.hash = '';
             lobbyTab.style.display = 'block';
-            viewTab.style.display = 'none';
-            editTab.style.display = 'none';
-            tabBtnView.style.display = 'none';
             document.getElementById('tab-btn-lobby').classList.add('active');
             document.body.classList.remove('secret-mode');
             renderLobby();
+        } else if (tab === 'myworld') {
+            window.location.hash = 'myworld';
+            myworldTab.style.display = 'block';
+            document.getElementById('tab-btn-myworld').classList.add('active');
+            document.body.classList.remove('secret-mode');
+            if (currentUser) renderMyWorld();
         } else if (tab === 'view' && charId !== null) {
             window.location.hash = `character=${charId}`;
-            lobbyTab.style.display = 'none';
             viewTab.style.display = 'block';
-            editTab.style.display = 'none';
             tabBtnView.style.display = 'block';
             tabBtnView.classList.add('active');
             renderCharacterProfile(charId);
         } else if (tab === 'edit') {
             window.location.hash = 'edit';
-            lobbyTab.style.display = 'none';
-            viewTab.style.display = 'none';
             editTab.style.display = 'block';
-            tabBtnView.style.display = 'none';
             document.body.classList.remove('secret-mode');
             btns[btns.length - 1].classList.add('active');
             toggleSecretOptions();
@@ -1297,6 +1462,9 @@
                 switchTab('view', charId);
                 return;
             }
+        } else if (hash === '#myworld') {
+            switchTab('myworld');
+            return;
         } else if (hash === '#edit') {
             switchTab('edit');
             return;
@@ -1324,7 +1492,7 @@
             <button type="button" class="move-btn" onclick="moveUp(this)">▲</button>
             <button type="button" class="move-btn" onclick="moveDown(this)">▼</button>
             <input type="text" class="field-label" placeholder="항목 이름" value="${label}">
-            <input type="text" class="field-value" placeholder="내용 (줄바꿈 가능)" value="${value}">
+            <input type="text" class="field-value" placeholder="내용" value="${value}">
             <select class="field-spoiler" style="padding:2px 4px; font-size:0.75rem;">
                 <option value="NO" ${spoiler === 'NO' ? 'selected' : ''}>스포 NO</option>
                 <option value="OK" ${spoiler === 'OK' ? 'selected' : ''}>스포 OK</option>
@@ -1340,19 +1508,19 @@
         box.className = 'dynamic-section-box rel-edit-box';
         box.innerHTML = `
             <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                <input type="text" class="rel-target" placeholder="상대방 이름 (예: 켄시)" value="${target}" style="font-weight:bold; flex:1; margin-right:6px;">
+                <input type="text" class="rel-target" placeholder="상대방 이름" value="${target}" style="font-weight:bold; flex:1; margin-right:6px;">
                 <button type="button" class="remove-field-btn" onclick="this.parentElement.parentElement.remove()">관계 삭제</button>
             </div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
                 <div style="background:var(--card-bg); padding:8px; border:1px solid var(--border-color); border-radius:4px;">
-                    <label style="font-size:0.72rem; color:var(--text-sub); display:block; margin-bottom:4px;">[과거/기본] 인상</label>
+                    <label style="font-size:0.72rem; color:var(--text-sub); display:block; margin-bottom:4px;">[과거/기본]</label>
                     <input type="text" class="rel-quote" placeholder="짧은 대사" value="${quote}" style="margin-bottom:6px;">
                     <textarea class="rel-desc" placeholder="관계 설명">${desc}</textarea>
                 </div>
                 <div style="background:var(--card-bg); padding:8px; border:1px solid var(--border-color); border-radius:4px;">
-                    <label style="font-size:0.72rem; color:var(--accent-pink); display:block; margin-bottom:4px;">[현재] 변동된 인상 (선택)</label>
+                    <label style="font-size:0.72rem; color:var(--accent-pink); display:block; margin-bottom:4px;">[현재/변동]</label>
                     <input type="text" class="rel-curr-quote" placeholder="변동된 대사" value="${currQuote}" style="margin-bottom:6px;">
-                    <textarea class="rel-curr-desc" placeholder="변동된 관계 설명">${currDesc}</textarea>
+                    <textarea class="rel-curr-desc" placeholder="변동된 설명">${currDesc}</textarea>
                 </div>
             </div>
         `;
@@ -1364,8 +1532,8 @@
         const row = document.createElement('div');
         row.className = 'dynamic-field-row';
         row.innerHTML = `
-            <input type="text" class="nick-target" placeholder="상대 이름 (예: 켄시)" value="${target}">
-            <input type="text" class="nick-name" placeholder="부르는 호칭 (예: 켄시 녀석)" value="${nickname}">
+            <input type="text" class="nick-target" placeholder="상대 이름" value="${target}">
+            <input type="text" class="nick-name" placeholder="부르는 호칭" value="${nickname}">
             <button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">-</button>
         `;
         container.appendChild(row);
@@ -1380,18 +1548,17 @@
             <div class="dynamic-field-row">
                 <button type="button" class="move-btn" onclick="moveUp(this.parentElement)">▲</button>
                 <button type="button" class="move-btn" onclick="moveDown(this.parentElement)">▼</button>
-                <input type="text" class="section-num-input" placeholder="번호 (예: 1)" value="${num}" style="max-width: 60px; text-align: center; font-weight: bold;">
-                <input type="text" class="section-title-input" placeholder="섹션 제목 (예: 개요)" value="${title}" required style="flex: 2;">
+                <input type="text" class="section-num-input" placeholder="번호" value="${num}" style="max-width: 60px; text-align: center; font-weight: bold;">
+                <input type="text" class="section-title-input" placeholder="섹션 제목" value="${title}" required style="flex: 2;">
                 <select class="section-spoiler-input" style="flex: 1;">
                     <option value="NO" ${spoiler === 'NO' ? 'selected' : ''}>전체 스포 NO</option>
                     <option value="OK" ${spoiler === 'OK' ? 'selected' : ''}>전체 스포 OK</option>
                 </select>
-                <button type="button" class="remove-field-btn" onclick="this.parentElement.parentElement.remove()">섹션 삭제</button>
+                <button type="button" class="remove-field-btn" onclick="this.parentElement.parentElement.remove()">삭제</button>
             </div>
-            <textarea class="section-content-input" placeholder="섹션 본문 내용을 입력하세요 (엔터로 줄바꿈 가능)">${content}</textarea>
-            
+            <textarea class="section-content-input" placeholder="내용을 입력하세요">${content}</textarea>
             <div style="margin-top: 8px;">
-                <label style="font-size:0.78rem; color:var(--accent-pink); margin-bottom:4px; display:block;">📷 본문 사진 추가 (사진마다 스포 여부 개별 지정 가능)</label>
+                <label style="font-size:0.78rem; color:var(--accent-pink); margin-bottom:4px; display:block;">📷 본문 사진 추가</label>
                 <div class="section-images-list"></div>
                 <button type="button" class="add-field-btn" style="margin-top:6px;" onclick="addSectionImageRow(this.previousElementSibling)">+ 사진 추가</button>
             </div>
@@ -1400,9 +1567,7 @@
 
         const imgListContainer = box.querySelector('.section-images-list');
         if (images && images.length > 0) {
-            images.forEach(imgObj => {
-                addSectionImageRow(imgListContainer, imgObj.url, imgObj.spoiler);
-            });
+            images.forEach(imgObj => addSectionImageRow(imgListContainer, imgObj.url, imgObj.spoiler));
         }
     }
 
@@ -1425,7 +1590,7 @@
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(evt) { tempMainImg = evt.target.result; };
+            reader.onload = (evt) => { tempMainImg = evt.target.result; };
             reader.readAsDataURL(file);
         }
     }
@@ -1434,44 +1599,14 @@
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(evt) {
-                inputElem.nextElementSibling.value = evt.target.result;
-            };
+            reader.onload = (evt) => { inputElem.nextElementSibling.value = evt.target.result; };
             reader.readAsDataURL(file);
         }
     }
 
-    function initDefaultForm() {
-        document.getElementById('custom-fields-container').innerHTML = '';
-        defaultFields.forEach(f => addCustomField(f, "", "NO"));
-
-        document.getElementById('relations-container').innerHTML = '';
-        document.getElementById('nicknames-container').innerHTML = '';
-
-        document.getElementById('body-sections-container').innerHTML = '';
-        defaultBodySections.forEach(s => addBodySection(s.num, s.title, s.content, s.spoiler, s.images));
-
-        editingCharacterId = null;
-        tempMainImg = null;
-        document.getElementById('in-color').value = '#ff85a2';
-        document.getElementById('in-bgm').value = '';
-        document.getElementById('in-secret-bgm').value = '';
-        document.getElementById('in-secret-page-bgm').value = '';
-        document.getElementById('in-secret-lyrics').value = '';
-        document.getElementById('in-lyrics').value = '';
-        document.getElementById('in-profile-type').value = 'public';
-        document.getElementById('in-linked-public-id').value = '';
-        document.getElementById('in-epilogue-text').value = '';
-        document.getElementById('in-epilogue-color').value = '#ff0055';
-        document.getElementById('form-title').textContent = "새 캐릭터 사이트 생성 및 등록";
-        document.getElementById('submit-btn-text').textContent = "실시간 서버에 등록하기";
-        toggleSecretOptions();
-    }
-
     function saveWiki(e) {
         e.preventDefault();
-
-        if (!isLoggedIn) {
+        if (!currentUser) {
             alert('로그인이 필요한 기능입니다.');
             return;
         }
@@ -1482,7 +1617,7 @@
             const label = row.querySelector('.field-label').value.trim();
             const val = row.querySelector('.field-value').value;
             const spoiler = row.querySelector('.field-spoiler').value;
-            if (label !== "") customFields.push({ label: label, value: val || "-", spoiler: spoiler });
+            if (label !== "") customFields.push({ label, value: val || "-", spoiler });
         });
 
         const relBoxes = document.querySelectorAll('.rel-edit-box');
@@ -1493,9 +1628,7 @@
             const desc = box.querySelector('.rel-desc').value;
             const currQuote = box.querySelector('.rel-curr-quote').value;
             const currDesc = box.querySelector('.rel-curr-desc').value;
-            if (target !== "") {
-                relations.push({ target, quote, desc, currQuote, currDesc });
-            }
+            if (target !== "") relations.push({ target, quote, desc, currQuote, currDesc });
         });
 
         const nickRows = document.querySelectorAll('#nicknames-container .dynamic-field-row');
@@ -1503,9 +1636,7 @@
         nickRows.forEach(row => {
             const target = row.querySelector('.nick-target').value.trim();
             const name = row.querySelector('.nick-name').value.trim();
-            if (target !== "" || name !== "") {
-                nicknames.push({ target, name });
-            }
+            if (target !== "" || name !== "") nicknames.push({ target, name });
         });
 
         const sectionBoxes = document.querySelectorAll('#body-sections-container .dynamic-section-box');
@@ -1521,14 +1652,10 @@
             imgRows.forEach(iRow => {
                 const url = iRow.querySelector('.sub-img-data').value;
                 const imgSpoiler = iRow.querySelector('.sub-img-spoiler').value;
-                if (url) {
-                    images.push({ url: url, spoiler: imgSpoiler });
-                }
+                if (url) images.push({ url, spoiler: imgSpoiler });
             });
 
-            if (title !== "") {
-                bodySections.push({ num: num, title: title, content: content, spoiler: spoiler, images: images });
-            }
+            if (title !== "") bodySections.push({ num, title, content, spoiler, images });
         });
 
         const existingChar = editingCharacterId !== null ? characterList.find(c => c.id === editingCharacterId) : null;
@@ -1536,13 +1663,13 @@
 
         const characterData = {
             id: editingCharacterId || 'char_' + Date.now(),
+            author: currentUser.uid,
             name: document.getElementById('in-name').value,
             sub: document.getElementById('in-sub').value,
             tags: document.getElementById('in-tags').value,
             color: document.getElementById('in-color').value,
             profileType: document.getElementById('in-profile-type').value,
             linkedPublicId: document.getElementById('in-linked-public-id').value,
-            secretBgm: document.getElementById('in-secret-bgm').value,
             secretPageBgm: document.getElementById('in-secret-page-bgm').value,
             secretLyrics: document.getElementById('in-secret-lyrics').value,
             epilogueText: document.getElementById('in-epilogue-text').value,
@@ -1552,11 +1679,11 @@
             img: tempMainImg || existingImg,
             bgm: document.getElementById('in-bgm').value,
             lyrics: document.getElementById('in-lyrics').value,
-            customFields: customFields,
-            relations: relations,
-            nicknames: nicknames,
+            customFields,
+            relations,
+            nicknames,
             quote: document.getElementById('in-quote').value,
-            bodySections: bodySections
+            bodySections
         };
 
         saveDataToFirebase(characterData);
@@ -1564,11 +1691,10 @@
 
     function deleteCharacter(id, event) {
         event.stopPropagation();
-        if (!isLoggedIn) {
-            alert('삭제 권한이 없습니다.');
+        if (!currentUser) {
+            alert('로그인이 필요합니다.');
             return;
         }
-
         const char = characterList.find(c => c.id === id);
         if (confirm(`'${char ? char.name : ''}' 캐릭터 사이트를 정말 삭제하시겠습니까?`)) {
             db.ref('characters/' + id).remove().then(() => {
@@ -1580,23 +1706,21 @@
 
     function editCharacter(id, event) {
         event.stopPropagation();
-        if (!isLoggedIn) {
-            alert('수정 권한이 없습니다.');
+        if (!currentUser) {
+            alert('로그인이 필요합니다.');
             return;
         }
-
         editingCharacterId = id;
         const char = characterList.find(c => c.id === id);
         if (!char) return;
 
-        document.getElementById('form-title').textContent = `'${char.name}' 캐릭터 사이트 수정`;
-        document.getElementById('submit-btn-text').textContent = "수정사항 실시간 반영하기";
+        document.getElementById('form-title').textContent = `'${char.name}' 캐릭터 수정`;
+        document.getElementById('submit-btn-text').textContent = "수정사항 반영하기";
 
         document.getElementById('in-tags').value = char.tags || '';
         document.getElementById('in-color').value = char.color || '#ff85a2';
         document.getElementById('in-profile-type').value = char.profileType || 'public';
         document.getElementById('in-linked-public-id').value = char.linkedPublicId || '';
-        document.getElementById('in-secret-bgm').value = char.secretBgm || '';
         document.getElementById('in-secret-page-bgm').value = char.secretPageBgm || '';
         document.getElementById('in-secret-lyrics').value = char.secretLyrics || '';
         document.getElementById('in-epilogue-text').value = char.epilogueText || '';
@@ -1611,29 +1735,17 @@
 
         toggleSecretOptions();
 
-        const customContainer = document.getElementById('custom-fields-container');
-        customContainer.innerHTML = '';
-        if (char.customFields) {
-            char.customFields.forEach(f => addCustomField(f.label, f.value, f.spoiler || "NO"));
-        }
+        document.getElementById('custom-fields-container').innerHTML = '';
+        if (char.customFields) char.customFields.forEach(f => addCustomField(f.label, f.value, f.spoiler || "NO"));
 
-        const relContainer = document.getElementById('relations-container');
-        relContainer.innerHTML = '';
-        if (char.relations) {
-            char.relations.forEach(r => addRelationBox(r.target, r.quote, r.desc, r.currQuote, r.currDesc));
-        }
+        document.getElementById('relations-container').innerHTML = '';
+        if (char.relations) char.relations.forEach(r => addRelationBox(r.target, r.quote, r.desc, r.currQuote, r.currDesc));
 
-        const nickContainer = document.getElementById('nicknames-container');
-        nickContainer.innerHTML = '';
-        if (char.nicknames) {
-            char.nicknames.forEach(n => addNicknameRow(n.target, n.name));
-        }
+        document.getElementById('nicknames-container').innerHTML = '';
+        if (char.nicknames) char.nicknames.forEach(n => addNicknameRow(n.target, n.name));
 
-        const bodyContainer = document.getElementById('body-sections-container');
-        bodyContainer.innerHTML = '';
-        if (char.bodySections) {
-            char.bodySections.forEach(s => addBodySection(s.num || "1", s.title, s.content, s.spoiler, s.images));
-        }
+        document.getElementById('body-sections-container').innerHTML = '';
+        if (char.bodySections) char.bodySections.forEach(s => addBodySection(s.num || "1", s.title, s.content, s.spoiler, s.images));
 
         switchTab('edit');
     }
@@ -1642,10 +1754,10 @@
         const container = document.getElementById('lobby-list');
         container.innerHTML = '';
 
-        const displayCharacters = isLoggedIn ? characterList : characterList.filter(c => !c.profileType || c.profileType === 'public');
+        const displayCharacters = characterList.filter(c => !c.profileType || c.profileType === 'public');
 
         if (displayCharacters.length === 0) {
-            container.innerHTML = '<p style="color:var(--text-sub); grid-column: 1/-1; text-align:center; padding: 40px 0;">생성된 캐릭터 사이트가 없습니다. 새 캐릭터를 등록해 주세요.</p>';
+            container.innerHTML = '<p style="color:var(--text-sub); grid-column: 1/-1; text-align:center; padding: 40px 0;">등록된 캐릭터가 없습니다.</p>';
             return;
         }
 
@@ -1654,11 +1766,11 @@
             const isSecret = char.profileType === 'secret';
             card.className = `character-card ${isSecret ? 'secret-card' : ''}`;
             card.onclick = () => {
-                previousPublicCharacterId = null;
+                profileHistoryStack = []; // 로비 진입 시 스택 초기화 후 새로 시작
                 switchTab('view', char.id);
             };
 
-            const actionBtns = isLoggedIn ? `
+            const actionBtns = (currentUser && currentUser.uid === char.author) ? `
                 <div class="card-actions">
                     <button onclick="editCharacter('${char.id}', event)">수정</button>
                     <button onclick="deleteCharacter('${char.id}', event)">삭제</button>
@@ -1671,7 +1783,6 @@
                     <div class="card-title">${char.name}</div>
                     <div class="card-sub">${char.sub || ''}</div>
                     ${isSecret ? '<div class="secret-badge">🔒 비밀 프로필</div>' : ''}
-                    ${char.spoilerOk === 'OK' ? '<div class="spoiler-tag">스포 방지 OK</div>' : ''}
                 </div>
                 ${actionBtns}
             `;
@@ -1687,7 +1798,6 @@
         }
 
         selectedCharacterId = id;
-
         if (char.profileType === 'secret') {
             document.body.classList.add('secret-mode');
         } else {
@@ -1699,7 +1809,7 @@
 
     function proceedProfileLoad(char) {
         if (char.spoilerOk === 'OK') {
-            const msg = char.spoilerMsg || '해당 캐릭터 프로필에는 스포일러가 포함되어 있습니다.\n계속해서 프로필을 열람하시겠습니까?';
+            const msg = char.spoilerMsg || '해당 프로필에는 스포일러가 포함되어 있습니다.';
             document.getElementById('spoiler-modal-text').innerText = msg;
             document.getElementById('spoiler-modal').style.display = 'flex';
         } else {
@@ -1713,11 +1823,7 @@
             const char = characterList.find(c => c.id === selectedCharacterId);
             if (char) showWikiDetails(char);
         } else {
-            if (previousPublicCharacterId) {
-                switchTab('view', previousPublicCharacterId);
-            } else {
-                switchTab('lobby');
-            }
+            goBackFromProfile();
         }
     }
 
@@ -1731,30 +1837,21 @@
         if (!char) return;
 
         if (char.profileType === 'secret' && char.linkedPublicId) {
-            const imgTd = document.querySelector('.infobox-img-td');
-            if (imgTd) {
-                const censor = imgTd.querySelector('.face-censor-overlay');
-                if (censor) censor.remove();
-            }
+            // 비밀 프로필에서 공개 프로필로 이동할 때 현재 프로필 ID를 스택에 누적
+            profileHistoryStack.push(selectedCharacterId);
             switchTab('view', char.linkedPublicId);
         } else {
             const linkedSecret = characterList.find(c => c.profileType === 'secret' && c.linkedPublicId === char.id);
             if (linkedSecret) {
                 const imgTd = document.querySelector('.infobox-img-td');
-                if (imgTd) {
-                    if (!imgTd.querySelector('.face-censor-overlay')) {
-                        const censor = document.createElement('div');
-                        censor.className = 'face-censor-overlay';
-                        imgTd.appendChild(censor);
-                    }
+                if (imgTd && !imgTd.querySelector('.face-censor-overlay')) {
+                    const censor = document.createElement('div');
+                    censor.className = 'face-censor-overlay';
+                    imgTd.appendChild(censor);
                 }
 
-                const ytPlayer = document.getElementById('youtube-player');
-                if (ytPlayer) ytPlayer.src = '';
-                const bgmBox = document.getElementById('bgm-box');
-                if (bgmBox) bgmBox.style.display = 'none';
-
-                previousPublicCharacterId = selectedCharacterId;
+                // 공개 프로필에서 비밀 프로필로 이동할 때 현재 ID를 스택에 누적
+                profileHistoryStack.push(selectedCharacterId);
                 
                 setTimeout(() => {
                     startGlitchSequence(linkedSecret);
@@ -1765,10 +1862,10 @@
 
     function startGlitchSequence(secretChar) {
         const loadingTexts = [
-            `시스템 로딩 중... [보안 데이터를 분석하고 있습니다]`,
+            `시스템 로딩 중... [보안 데이터 분석 중]`,
             `경고: 외부 접근자의 신호가 감지되었습니다.`,
             `오류! 이 영역에 도달하는 것은 허용되지 않습니다...`,
-            `방화벽이 무너지고 있습니다. 곧 연결됩니다.`
+            `방화벽이 무너지고 있습니다. 연결합니다.`
         ];
         
         let textIdx = 0;
@@ -1802,7 +1899,6 @@
 
     function showEpilogueTyping(rawText, textColor, targetSecretId) {
         const container = document.getElementById('epilogue-container');
-
         container.innerHTML = `
             <div class="epilogue-overlay">
                 <div class="epilogue-content-wrapper">
@@ -1825,7 +1921,6 @@
                 }, 2000);
             }
         }
-
         typeWriter();
     }
 
@@ -1839,24 +1934,19 @@
     };
 
     function goBackFromProfile() {
-        const char = characterList.find(c => c.id === selectedCharacterId);
-        
         const imgTd = document.querySelector('.infobox-img-td');
         if (imgTd) {
             const censor = imgTd.querySelector('.face-censor-overlay');
             if (censor) censor.remove();
         }
 
-        document.getElementById('hidden-secret-audio-container').innerHTML = '';
         const ytPlayer = document.getElementById('youtube-player');
         if (ytPlayer) ytPlayer.src = '';
 
-        if (char && char.profileType === 'secret' && char.linkedPublicId) {
-            switchTab('view', char.linkedPublicId);
-        } else if (previousPublicCharacterId) {
-            const backId = previousPublicCharacterId;
-            previousPublicCharacterId = null;
-            switchTab('view', backId);
+        // 스택에 이전 프로필이 남아있다면 그때 연 프로필(바로 직전 프로필)로 정확히 이동
+        if (profileHistoryStack.length > 0) {
+            const prevId = profileHistoryStack.pop();
+            switchTab('view', prevId);
         } else {
             switchTab('lobby');
         }
@@ -1865,12 +1955,6 @@
     function showWikiDetails(char) {
         const infoboxColor = char.color || '#ff85a2';
         document.documentElement.style.setProperty('--infobox-color', infoboxColor);
-
-        const imgTdElem = document.querySelector('.infobox-img-td');
-        if (imgTdElem) {
-            const existingCensor = imgTdElem.querySelector('.face-censor-overlay');
-            if (existingCensor) existingCensor.remove();
-        }
 
         const tagsContainer = document.getElementById('out-tags');
         tagsContainer.innerHTML = '';
@@ -1903,16 +1987,12 @@
             char.customFields.forEach(f => {
                 const tr = document.createElement('tr');
                 let cellContent = f.value;
-
                 if (f.spoiler === 'OK') {
                     cellContent = `
-                        <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)">
-                            <span>⚠️ 스포일러 보기</span>
-                        </div>
+                        <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)"><span>⚠️ 스포일러 보기</span></div>
                         <div class="spoiler-section-content">${f.value}</div>
                     `;
                 }
-
                 tr.innerHTML = `<th>${f.label}</th><td>${cellContent}</td>`;
                 tbody.appendChild(tr);
             });
@@ -1925,11 +2005,7 @@
         tocList.innerHTML = '';
         sectionsView.innerHTML = '';
 
-        let dynamicSectionsWithRel = [];
-        if (char.bodySections) {
-            dynamicSectionsWithRel = [...char.bodySections];
-        }
-
+        let dynamicSectionsWithRel = char.bodySections ? [...char.bodySections] : [];
         let hasRelationsData = (char.relations && char.relations.length > 0) || (char.nicknames && char.nicknames.length > 0);
         
         if (hasRelationsData) {
@@ -1937,12 +2013,10 @@
             if (relSectionIndex === -1) relSectionIndex = dynamicSectionsWithRel.length;
 
             let extraHtml = '';
-            
             if (char.relations && char.relations.length > 0) {
                 extraHtml += `<div class="section-header">인물 관계</div>`;
                 char.relations.forEach(r => {
                     let hasCurr = (r.currQuote && r.currQuote.trim() !== '') || (r.currDesc && r.currDesc.trim() !== '');
-                    
                     if (hasCurr) {
                         extraHtml += `
                             <div class="rel-card">
@@ -1981,22 +2055,10 @@
                 extraHtml += `<div class="section-header">호칭 정리</div>`;
                 extraHtml += `
                     <table class="relation-table">
-                        <thead>
-                            <tr>
-                                <th style="width:50%;">대상</th>
-                                <th style="width:50%;">부르는 호칭</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th style="width:50%;">대상</th><th style="width:50%;">호칭</th></tr></thead>
                         <tbody>
                 `;
-                char.nicknames.forEach(n => {
-                    extraHtml += `
-                        <tr>
-                            <td><b>${n.target}</b></td>
-                            <td>${n.name}</td>
-                        </tr>
-                    `;
-                });
+                char.nicknames.forEach(n => { extraHtml += `<tr><td><b>${n.target}</b></td><td>${n.name}</td></tr>`; });
                 extraHtml += `</tbody></table>`;
             }
 
@@ -2022,23 +2084,16 @@
                 if (sec.isCustomInjected) {
                     innerHtml = sec.customHtml;
                 } else {
-                    if (sec.content) {
-                        innerHtml += `<div class="section-content-p">${sec.content}</div>`;
-                    }
-
+                    if (sec.content) innerHtml += `<div class="section-content-p">${sec.content}</div>`;
                     if (sec.images && sec.images.length > 0) {
                         sec.images.forEach(imgObj => {
                             if (imgObj.spoiler === 'OK') {
                                 innerHtml += `
-                                    <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)">
-                                        <span>⚠️ 스포일러 사진 보기</span>
-                                    </div>
-                                    <div class="spoiler-section-content">
-                                        <img src="${imgObj.url}" class="section-image" alt="섹션 이미지">
-                                    </div>
+                                    <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)"><span>⚠️ 스포일러 사진 보기</span></div>
+                                    <div class="spoiler-section-content"><img src="${imgObj.url}" class="section-image" alt="이미지"></div>
                                 `;
                             } else {
-                                innerHtml += `<img src="${imgObj.url}" class="section-image" alt="섹션 이미지">`;
+                                innerHtml += `<img src="${imgObj.url}" class="section-image" alt="이미지">`;
                             }
                         });
                     }
@@ -2046,17 +2101,10 @@
 
                 if (!innerHtml) innerHtml = '<p>내용이 없습니다.</p>';
 
-                let fullSectionHtml = `
-                    <div class="section-header" id="${secId}">
-                        ${sectionNumLabel}${sec.title}
-                    </div>
-                `;
-
+                let fullSectionHtml = `<div class="section-header" id="${secId}">${sectionNumLabel}${sec.title}</div>`;
                 if (sec.spoiler === 'OK') {
                     fullSectionHtml += `
-                        <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)">
-                            <span>⚠️ 클릭 시 '${sec.title}' 전체 스포일러 내용을 확인합니다.</span>
-                        </div>
+                        <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)"><span>⚠️ 클릭 시 전체 스포일러 내용을 확인합니다.</span></div>
                         <div class="spoiler-section-content">${innerHtml}</div>
                     `;
                 } else {
@@ -2072,74 +2120,31 @@
         const bgmBox = document.getElementById('bgm-box');
         const bgmPlayerContainer = document.getElementById('bgm-player-container');
         const lyricsBox = document.getElementById('out-lyrics');
-        const hiddenAudioContainer = document.getElementById('hidden-secret-audio-container');
-        
-        hiddenAudioContainer.innerHTML = '';
         const ytPlayer = document.getElementById('youtube-player');
         if (ytPlayer) ytPlayer.src = '';
 
-        if (char.profileType === 'secret') {
-            if (char.secretBgm && char.secretBgm.trim() !== '') {
-                let secretUrl = char.secretBgm.trim();
-                const ytMatch = secretUrl.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-                
-                if (ytMatch && ytMatch[2].length === 11) {
-                    hiddenAudioContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1" allow="autoplay" style="display:none; width:0; height:0;"></iframe>`;
-                } else if (secretUrl.includes('soundcloud.com')) {
-                    const scEncoded = encodeURIComponent(secretUrl);
-                    hiddenAudioContainer.innerHTML = `<iframe src="https://w.soundcloud.com/player/?url=${scEncoded}&auto_play=true&show_artwork=false&show_comments=false&show_user=false&show_reposts=false" style="display:none; width:0; height:0;" allow="autoplay"></iframe>`;
-                } else {
-                    hiddenAudioContainer.innerHTML = `<iframe src="${secretUrl}" allow="autoplay" style="display:none; width:0; height:0;"></iframe>`;
-                }
+        const targetBgm = char.profileType === 'secret' ? char.secretPageBgm : char.bgm;
+        const targetLyrics = char.profileType === 'secret' ? char.secretLyrics : char.lyrics;
+
+        if (targetBgm && targetBgm.trim() !== '') {
+            bgmBox.style.display = 'block';
+            bgmPlayerContainer.style.display = 'block';
+
+            if (targetLyrics && targetLyrics.trim() !== '') {
+                lyricsBox.style.display = 'block';
+                lyricsBox.textContent = targetLyrics;
+            } else {
+                lyricsBox.style.display = 'none';
             }
 
-            if (char.secretPageBgm && char.secretPageBgm.trim() !== '') {
-                bgmBox.style.display = 'block';
-                bgmPlayerContainer.style.display = 'block';
-
-                if (char.secretLyrics && char.secretLyrics.trim() !== '') {
-                    lyricsBox.style.display = 'block';
-                    lyricsBox.textContent = char.secretLyrics;
-                } else {
-                    lyricsBox.style.display = 'none';
-                }
-
-                const ytMatch = char.secretPageBgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-                if (ytMatch && ytMatch[2].length === 11) {
-                    ytPlayer.src = `https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1`;
-                } else if (char.secretPageBgm.includes('soundcloud.com')) {
-                    const scEncoded = encodeURIComponent(char.secretPageBgm);
-                    bgmPlayerContainer.innerHTML = `<iframe src="https://w.soundcloud.com/player/?url=${scEncoded}&auto_play=true&visual=false" allow="autoplay" style="width:100%; height:120px; border:0;"></iframe>`;
-                } else {
-                    ytPlayer.src = char.secretPageBgm;
-                }
+            const ytMatch = targetBgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+            if (ytMatch && ytMatch[2].length === 11) {
+                ytPlayer.src = `https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1`;
             } else {
-                bgmBox.style.display = 'none';
+                ytPlayer.src = targetBgm;
             }
         } else {
-            if (char.bgm && char.bgm.trim() !== '') {
-                bgmBox.style.display = 'block';
-                bgmPlayerContainer.style.display = 'block';
-
-                if (char.lyrics && char.lyrics.trim() !== '') {
-                    lyricsBox.style.display = 'block';
-                    lyricsBox.textContent = char.lyrics;
-                } else {
-                    lyricsBox.style.display = 'none';
-                }
-
-                const ytMatch = char.bgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-                if (ytMatch && ytMatch[2].length === 11) {
-                    ytPlayer.src = `https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1`;
-                } else if (char.bgm.includes('soundcloud.com')) {
-                    const scEncoded = encodeURIComponent(char.bgm);
-                    bgmPlayerContainer.innerHTML = `<iframe src="https://w.soundcloud.com/player/?url=${scEncoded}&auto_play=true&visual=false" allow="autoplay" style="width:100%; height:120px; border:0;"></iframe>`;
-                } else {
-                    ytPlayer.src = char.bgm;
-                }
-            } else {
-                bgmBox.style.display = 'none';
-            }
+            bgmBox.style.display = 'none';
         }
     }
 
@@ -2163,7 +2168,6 @@
     }
 
     loadSavedData();
-    initDefaultForm();
 </script>
 
 </body>
