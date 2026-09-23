@@ -3,2168 +3,479 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X 위키 :: Nightmare & Secret Wiki</title>
-    <!-- 파이어베이스 SDK 불러오기 -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <title id="page-title">도서관 - 우주 공간 커뮤니티</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Pretendard -->
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pinkbg: '#fff5f7',
+                        pinkcard: '#ffffff',
+                        pinkborder: '#ffccd5',
+                        pinkaccent: '#ff5c8a',
+                        pinkaccenthover: '#ff3366',
+                        pinkmuted: '#ffa3b5',
+                        pinktext: '#4a3b40',
+                        pinksoft: '#fff0f3'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         :root {
-            --bg-color: #fcf8fa;
-            --card-bg: #ffffff;
-            --header-bg: #fff0f5;
-            --border-color: #f4c2d7;
-            --text-color: #4a3b42;
-            --text-sub: #9e7b8c;
-            --accent-pink: #ff85a2;
-            --light-pink: #ffb3c6;
-            --soft-pink-bg: #fff5f8;
-            --badge-private: #d81b60;
-            --wiki-table-header: #ffeef4;
-            --infobox-color: #ff85a2;
+            --bg-color: #fff5f7;
+            --text-color: #4a3b40;
         }
-
-        /* 비밀 프로필 모드 (다크 & 핫핑크 테마) */
-        body.secret-mode {
-            --bg-color: #0b0709;
-            --card-bg: #140d12;
-            --header-bg: #1f1018;
-            --border-color: #ff0055;
-            --text-color: #fce8f0;
-            --text-sub: #b87a96;
-            --accent-pink: #ff0055;
-            --light-pink: #ff3377;
-            --soft-pink-bg: #1c0e15;
-            --badge-private: #ff0055;
-            --wiki-table-header: #26101c;
-            --infobox-color: #ff0055;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
-
         body {
+            font-family: 'Pretendard', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            line-height: 1.6;
-            padding: 20px 10px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .main-wrapper {
-            width: 100%;
-            max-width: 960px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .site-header {
-            background: var(--header-bg);
-            padding: 18px 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .site-header h1 {
-            font-size: 1.5rem;
-            color: var(--accent-pink);
-            letter-spacing: 1px;
-            cursor: pointer;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .auth-status {
-            font-size: 0.8rem;
-            color: var(--text-sub);
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 8px;
-            background: var(--card-bg);
-            padding: 10px 20px;
-            border-bottom: 1px solid var(--border-color);
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            background: var(--card-bg);
-            color: var(--text-sub);
-            border: 1px solid var(--border-color);
-            padding: 5px 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: bold;
-        }
-
-        .tab-btn.active {
-            background: var(--accent-pink);
-            color: #ffffff;
-            border-color: var(--accent-pink);
-        }
-
-        .content-container {
-            padding: 20px;
-            background: var(--card-bg);
-        }
-
-        /* 로비 */
-        .lobby-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .character-card {
-            background: var(--soft-pink-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            overflow: hidden;
-            transition: transform 0.2s, border-color 0.2s;
-            text-align: center;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background 0.3s ease;
             position: relative;
-            display: flex;
-            flex-direction: column;
+            min-height: 100vh;
         }
-
-        .character-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--accent-pink);
-        }
-
-        .character-card.secret-card {
-            border: 2px dashed #ff0055;
-        }
-
-        .character-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background: #fff;
-            cursor: pointer;
-        }
-
-        .character-card .card-info {
-            padding: 10px;
-            cursor: pointer;
-            flex-grow: 1;
-        }
-
-        .character-card .card-title {
-            font-size: 1rem;
-            font-weight: bold;
-            color: var(--text-color);
-        }
-
-        .character-card .card-sub {
-            font-size: 0.75rem;
-            color: var(--text-sub);
-        }
-
-        .character-card .card-actions {
-            display: flex;
-            border-top: 1px solid var(--border-color);
-            background: var(--card-bg);
-        }
-
-        .character-card .card-actions button {
-            flex: 1;
-            padding: 5px;
-            border: none;
-            background: transparent;
-            font-size: 0.75rem;
-            font-weight: bold;
-            cursor: pointer;
-            color: var(--text-sub);
-        }
-
-        .character-card .card-actions button:first-child {
-            border-right: 1px solid var(--border-color);
-        }
-
-        .character-card .card-actions button:hover {
-            color: var(--accent-pink);
-            background: var(--soft-pink-bg);
-        }
-
-        .spoiler-tag {
-            display: inline-block;
-            font-size: 0.65rem;
-            background: var(--soft-pink-bg);
-            border: 1px solid var(--accent-pink);
-            color: var(--accent-pink);
-            padding: 2px 5px;
-            border-radius: 3px;
-            margin-top: 4px;
-            font-weight: bold;
-        }
-
-        .secret-badge {
-            display: inline-block;
-            font-size: 0.65rem;
-            background: #ff0055;
-            color: #ffffff;
-            padding: 2px 5px;
-            border-radius: 3px;
-            margin-top: 4px;
-            font-weight: bold;
-        }
-
-        /* 위키 본문 */
-        .wiki-category {
-            background: var(--soft-pink-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 6px 12px;
-            font-size: 0.8rem;
-            color: var(--text-sub);
-            margin-bottom: 12px;
-        }
-
-        .wiki-category .tag-item {
-            color: var(--accent-pink);
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 2px 6px;
-            border-radius: 3px;
-            margin-left: 4px;
-            font-weight: bold;
-        }
-
-        .wiki-title-area {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            border-bottom: 2px solid var(--accent-pink);
-            padding-bottom: 6px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .wiki-title-area h2 {
-            font-size: 1.8rem;
-            color: var(--text-color);
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-        }
-
-        .wiki-title-area .sub-title {
-            font-size: 0.9rem;
-            color: var(--text-sub);
-            font-weight: normal;
-        }
-
-        .wiki-btn-group {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 3px 8px;
-            font-size: 0.75rem;
-            border-radius: 3px;
-            cursor: pointer;
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #ffe6eb; }
+        ::-webkit-scrollbar-thumb { background: #ffb3c6; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff5c8a; }
+        .sticker-item {
+            position: absolute;
+            cursor: move;
             user-select: none;
+            touch-action: none;
+            z-index: 40;
         }
-
-        .action-btn.private {
-            background: var(--badge-private);
-            color: #ffffff;
-            border-color: var(--badge-private);
-        }
-
-        .bgm-box {
-            background: var(--soft-pink-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 15px;
-        }
-
-        .iframe-container {
-            position: relative;
-            width: 100%;
-            height: 0;
-            padding-bottom: 56.25%;
-            margin-top: 6px;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .iframe-container iframe {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%; border: 0;
-        }
-
-        .lyrics-box {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 10px;
-            margin-top: 8px;
-            font-size: 0.85rem;
-            white-space: pre-wrap;
-            color: var(--text-color);
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        .profile-grid {
-            display: grid;
-            grid-template-columns: 1fr 310px;
-            gap: 18px;
-        }
-
-        @media (max-width: 768px) {
-            .profile-grid { grid-template-columns: 1fr; }
-        }
-
-        .infobox {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--card-bg);
-            border: 2px solid var(--infobox-color);
-            font-size: 0.85rem;
-        }
-
-        .infobox-title {
-            background: var(--infobox-color);
-            color: #ffffff;
-            font-size: 1rem;
-            font-weight: bold;
-            text-align: center;
-            padding: 8px;
-        }
-
-        .infobox-img-td {
-            text-align: center;
-            background: var(--soft-pink-bg);
-            padding: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .infobox-img-td img {
-            width: 100%;
-            max-height: 360px;
-            object-fit: cover;
-            border-radius: 4px;
-            cursor: pointer;
-            display: block;
-        }
-
-        /* 🖤 프사 얼굴 검은 네모 가리기 오버레이 효과 */
-        .face-censor-overlay {
-            position: absolute;
-            top: 32%;
-            left: 32%;
-            width: 36%;
-            height: 32%;
-            background: #000000;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .infobox th {
-            background: var(--wiki-table-header);
-            color: var(--text-color);
-            width: 32%;
-            padding: 6px 8px;
-            border: 1px solid var(--border-color);
-            text-align: center;
-        }
-
-        .infobox td {
-            padding: 6px 8px;
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-color);
-            white-space: pre-wrap;
-        }
-
-        .color-badge {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            vertical-align: middle;
-            margin-right: 6px;
-            border: 1px solid #ccc;
-        }
-
-        .toc-box {
-            background: var(--soft-pink-bg);
-            border: 1px solid var(--border-color);
-            display: inline-block;
-            min-width: 220px;
-            padding: 10px 14px;
-            margin-bottom: 18px;
-            border-radius: 4px;
-        }
-
-        .toc-title {
-            font-weight: bold;
-            font-size: 0.88rem;
-            color: var(--accent-pink);
-            margin-bottom: 4px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 3px;
-        }
-
-        .toc-list {
-            list-style: none;
-            font-size: 0.85rem;
-        }
-
-        .toc-list a {
-            color: var(--text-sub);
-            text-decoration: none;
-        }
-
-        .toc-list a:hover {
-            color: var(--accent-pink);
-        }
-
-        .section-header {
-            font-size: 1.2rem;
-            color: var(--text-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 3px;
-            margin: 20px 0 10px 0;
-        }
-
-        .section-content-p {
-            white-space: pre-wrap;
-            margin-bottom: 10px;
-            color: var(--text-color);
-        }
-
-        .quote-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 8px 0 14px 0;
-            border: 1px solid var(--border-color);
-            background: var(--soft-pink-bg);
-        }
-
-        .quote-table td {
-            padding: 10px 14px;
-            text-align: center;
-            font-style: italic;
-            color: var(--accent-pink);
-            font-weight: bold;
-        }
-
-        .section-image {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin: 8px 0;
-            border: 1px solid var(--border-color);
-        }
-
-        .spoiler-section-blur {
-            background: var(--soft-pink-bg);
-            border: 1px dashed var(--accent-pink);
-            padding: 6px 10px;
-            border-radius: 4px;
-            text-align: center;
-            cursor: pointer;
-            margin: 6px 0;
-        }
-
-        .spoiler-section-blur span {
-            color: var(--accent-pink);
-            font-weight: bold;
-            font-size: 0.8rem;
-        }
-
-        .spoiler-section-content {
-            display: none;
-        }
-
-        /* 👥 인물 관계 좌우 배치 스타일 */
-        .rel-card {
-            background: var(--soft-pink-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-        .rel-title {
-            font-weight: bold;
-            color: var(--accent-pink);
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-            border-bottom: 1px dashed var(--border-color);
-            padding-bottom: 4px;
-            text-align: center;
-        }
-        .rel-flex-container {
-            display: flex;
-            align-items: stretch;
-            gap: 8px;
-        }
-        .rel-box-side {
-            flex: 1;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-        .rel-arrow-center {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--accent-pink);
-            padding: 0 4px;
-        }
-        .rel-side-label {
-            font-size: 0.72rem;
-            font-weight: bold;
-            color: var(--text-sub);
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }
-
-        .relation-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-            font-size: 0.85rem;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-        }
-        .relation-table th {
-            background: var(--wiki-table-header);
-            color: var(--text-color);
-            padding: 6px 8px;
-            border: 1px solid var(--border-color);
-            text-align: center;
-        }
-        .relation-table td {
-            padding: 6px 8px;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            text-align: center;
-        }
-
-        /* 폼 입력 디자인 */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            margin-bottom: 10px;
-        }
-
-        .form-group label {
-            font-size: 0.82rem;
-            font-weight: bold;
-            color: var(--text-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .form-group input, .form-group textarea, .form-group select {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 7px 9px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-
-        .form-group input[type="color"] {
-            height: 38px;
-            padding: 2px 4px;
-            cursor: pointer;
-        }
-
-        .form-group textarea {
-            min-height: 85px;
-            resize: vertical;
-            white-space: pre-wrap;
-        }
-
-        .file-input-wrapper {
-            background: var(--soft-pink-bg);
-            border: 1px dashed var(--border-color);
-            padding: 10px;
-            text-align: center;
-            border-radius: 4px;
-        }
-
-        .dynamic-field-row {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 6px;
-            align-items: center;
-        }
-
-        .dynamic-field-row input {
-            flex: 1;
-        }
-
-        .dynamic-section-box {
-            border: 1px solid var(--border-color);
-            background: var(--soft-pink-bg);
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-        }
-
-        .sub-img-row {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            background: var(--card-bg);
-            padding: 6px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            margin-top: 6px;
-        }
-
-        .move-btn, .add-field-btn, .remove-field-btn {
-            background: var(--accent-pink);
-            color: #fff;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-
-        .move-btn {
-            background: var(--light-pink);
-        }
-
-        .remove-field-btn {
-            background: #e57373;
-        }
-
-        .submit-btn, .login-btn, .modal-btn {
-            background: var(--accent-pink);
-            color: #ffffff;
-            border: none;
-            padding: 9px 14px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .submit-btn, .login-btn {
-            width: 100%;
-        }
-
-        .private-notice, .login-required-notice {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-sub);
-        }
-
-        .login-box {
-            max-width: 320px;
-            margin: 0 auto;
-            background: var(--soft-pink-bg);
-            border: 1px solid var(--border-color);
-            padding: 18px;
-            border-radius: 6px;
-            text-align: left;
-        }
-
-        /* 💀 공포 글리치 팝업창 스타일 */
-        .glitch-modal-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.92);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .glitch-modal-box {
-            background: #050000;
-            border: 3px solid #ff0000;
-            padding: 28px;
-            border-radius: 4px;
-            max-width: 460px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 0 35px rgba(255, 0, 0, 0.8), inset 0 0 15px rgba(255, 0, 0, 0.5);
-        }
-
-        .glitch-modal-box h3 {
-            color: #ff0000;
-            font-size: 1.5rem;
-            margin-bottom: 12px;
-            letter-spacing: 3px;
-            font-family: monospace;
-            text-transform: uppercase;
-            text-shadow: 0 0 8px rgba(255,0,0,0.8);
-        }
-
-        .glitch-modal-box p {
-            font-size: 1rem;
-            color: #ff4444;
-            margin-bottom: 22px;
-            white-space: pre-line;
-            font-family: monospace;
-            line-height: 1.5;
-            min-height: 3.5rem;
-        }
-
-        .glitch-btn {
-            background: #ff0000;
-            color: #ffffff;
-            border: none;
-            padding: 9px 24px;
-            font-weight: bold;
-            font-size: 0.95rem;
-            border-radius: 2px;
-            cursor: pointer;
-            font-family: monospace;
-            letter-spacing: 2px;
-            box-shadow: 0 0 10px rgba(255,0,0,0.8);
-        }
-        .glitch-btn:hover {
-            background: #cc0000;
-        }
-
-        /* 📖 박스 없는 순수 검은 화면 에필로그 스타일 */
-        .epilogue-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: #000000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9998;
-            padding: 40px;
-        }
-
-        .epilogue-content-wrapper {
-            max-width: 700px;
-            width: 100%;
-            text-align: left;
-        }
-
-        .epilogue-text-box {
-            font-family: monospace;
-            font-size: 1.25rem;
-            line-height: 2.3;
-            white-space: pre-wrap;
-            min-height: 150px;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-box {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 22px;
-            border-radius: 6px;
-            max-width: 480px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-
-        .modal-box h3 {
-            color: var(--accent-pink);
-            margin-bottom: 8px;
-        }
-
-        .modal-box p {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 12px;
-            white-space: pre-line;
-        }
-
-        .modal-textarea {
-            width: 100%;
-            height: 180px;
-            font-family: monospace;
-            font-size: 0.75rem;
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-color);
-            border-radius: 4px;
-            margin-bottom: 12px;
-            resize: vertical;
-        }
-
-        .modal-btns {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .modal-btn.cancel {
-            background: var(--text-sub);
-            color: #fff;
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body>
+<body id="main-body" class="min-h-screen flex flex-col justify-between p-3 sm:p-6 overflow-x-hidden">
 
-<div class="main-wrapper">
-    <header class="site-header">
-        <h1 onclick="switchTab('lobby')">X WIKI</h1>
-        <div class="header-right">
-            <div class="auth-status" id="auth-status-text">권한: 일반 방문자</div>
+    <!-- 로그인 / 회원가입 인증 레이어 -->
+    <div id="auth-container" class="fixed inset-0 bg-[#0f0c29]/90 backdrop-blur-md flex justify-center items-center z-50">
+        <div class="bg-white/10 p-8 rounded-3xl backdrop-blur-md text-center w-80 shadow-2xl border border-white/20 text-white">
+            <h2 class="text-xl font-bold mb-2 text-pink-300">📖 도서관 입장</h2>
+            <p class="text-xs text-pink-200 mb-6">아이디를 입력해 도서관에 접속하세요.</p>
+            <input type="text" id="username-input" placeholder="아이디" class="w-full px-4 py-3 mb-3 rounded-2xl bg-white/20 border border-white/30 text-white placeholder-pink-200 text-xs focus:outline-none">
+            <input type="password" id="password-input" placeholder="비밀번호" class="w-full px-4 py-3 mb-4 rounded-2xl bg-white/20 border border-white/30 text-white placeholder-pink-200 text-xs focus:outline-none">
+            <button onclick="handleLogin()" class="w-full py-3 bg-pinkaccent text-white rounded-2xl font-bold text-xs shadow-md hover:bg-pinkaccenthover transition mb-2">로그인</button>
+            <button onclick="handleRegister()" class="w-full py-3 bg-white/20 text-white rounded-2xl font-bold text-xs shadow-md hover:bg-white/35 transition">회원가입</button>
+        </div>
+    </div>
+
+    <!-- 스티커 레이어 -->
+    <div id="sticker-layer" class="absolute inset-0 pointer-events-none overflow-hidden z-30"></div>
+
+    <!-- 상단 도서관 네비게이션 바 -->
+    <header class="w-full max-w-6xl mx-auto flex items-center justify-between mb-4 px-3 relative z-50">
+        <div class="flex items-center space-x-2 font-bold text-xs sm:text-sm">
+            <span class="bg-pinkcard border border-pinkborder px-3.5 py-1.5 rounded-full text-xs text-pinkaccent shadow-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-book-open"></i> <span id="site-name-text">도서관 (Library)</span>
+            </span>
+            <span id="user-role-badge" class="text-[11px] bg-pinksoft px-2.5 py-1 rounded-full border border-pinkborder text-pinktext font-semibold"></span>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-medium">
+            <button onclick="openStickerModal()" class="bg-pinkcard hover:bg-pinksoft border border-pinkborder px-3.5 py-1.5 rounded-full text-pinktext shadow-sm transition flex items-center gap-1.5 font-semibold">
+                <i class="fa-solid fa-note-sticky text-[11px] text-pinkaccent"></i> 스티커 (<span id="sticker-count">0</span>)
+            </button>
+            <button onclick="openSettingsModal()" class="bg-pinkcard hover:bg-pinksoft border border-pinkborder px-3.5 py-1.5 rounded-full text-pinktext shadow-sm transition flex items-center gap-1.5 font-semibold">
+                <i class="fa-solid fa-gear text-[11px] text-pinkaccent"></i> 설정
+            </button>
+            <button onclick="handleLogout()" class="bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-full text-red-500 shadow-sm transition font-semibold">
+                로그아웃
+            </button>
         </div>
     </header>
 
-    <div class="nav-tabs">
-        <button class="tab-btn active" id="tab-btn-lobby" onclick="switchTab('lobby')">로비 (목록)</button>
-        <button class="tab-btn" id="tab-btn-view" onclick="switchTab('view')" style="display:none;">프로필 페이지</button>
-        <button class="tab-btn" id="tab-btn-edit" onclick="switchTab('edit')">프로필 작성 및 등록</button>
-    </div>
-
-    <div class="content-container">
-        <!-- 1. 로비 화면 -->
-        <div id="lobby-tab">
-            <h2 style="margin-bottom: 10px; color:var(--text-color); font-size: 1.3rem;">실시간 캐릭터 목록</h2>
-            <div class="lobby-grid" id="lobby-list"></div>
-        </div>
-
-        <!-- 2. 세부 프로필 보기 화면 -->
-        <div id="view-tab" style="display:none;">
-            <div class="wiki-category">
-                분류 : <span id="out-tags"><span class="tag-item">자캐</span></span>
-            </div>
-
-            <div class="wiki-title-area">
-                <h2><span id="out-name">캐릭터 이름</span> <span class="sub-title" id="out-sub"></span></h2>
-                <div class="wiki-btn-group">
-                    <span class="action-btn" id="visibility-btn" onclick="toggleVisibility()">공개</span>
-                    <button class="action-btn" onclick="goBackFromProfile()">목록으로</button>
-                </div>
-            </div>
-
-            <div id="private-view" class="private-notice" style="display:none;">
-                <h2>비공개 프로필입니다.</h2>
-                <p>소유자가 비공개 설정으로 지정하여 열람할 수 없습니다.</p>
-            </div>
-
-            <div id="public-view">
-                <!-- 무드곡 및 가사 영역 -->
-                <div class="bgm-box" id="bgm-box" style="display:none;">
-                    <div style="font-size:0.82rem; font-weight:bold; color:var(--accent-pink);">🎧 캐릭터 무드곡</div>
-                    <div class="iframe-container" id="bgm-player-container">
-                        <iframe id="youtube-player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                    </div>
-                    <div class="lyrics-box" id="out-lyrics" style="display:none;"></div>
-                </div>
-
-                <div class="profile-grid">
-                    <div>
-                        <div class="toc-box">
-                            <div class="toc-title">목차</div>
-                            <ul class="toc-list" id="out-toc-list"></ul>
-                        </div>
-
-                        <table class="quote-table">
-                            <tr><td id="out-quote">“ 대표 한마디 문구 ”</td></tr>
-                        </table>
-
-                        <div id="dynamic-sections-view"></div>
-                    </div>
-
-                    <div>
-                        <div id="wrapper-infobox">
-                            <table class="infobox" id="infobox-table">
-                                <tr>
-                                    <th colspan="2" class="infobox-title" id="out-card-title">캐릭터 이름</th>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" class="infobox-img-td">
-                                        <img id="out-img" src="https://via.placeholder.com/300x380/000000/FFFFFF?text=No+Image" alt="캐릭터 사진" onclick="handleProfileImageClick()">
-                                    </td>
-                                </tr>
-                                <tbody id="custom-fields-tbody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. 프로필 작성/등록 화면 -->
-        <div id="edit-tab" style="display:none;">
-            <div id="login-required" class="login-required-notice">
-                <h2>로그인이 필요합니다</h2>
-                <p style="margin-bottom: 15px;">프로필 작성 및 수정은 관리자 로그인 후 이용할 수 있습니다.</p>
-                <div class="login-box">
-                    <div class="form-group">
-                        <label>비밀번호 입력</label>
-                        <input type="password" id="admin-password" placeholder="비밀번호를 입력하세요">
-                    </div>
-                    <button class="login-btn" onclick="checkLogin()">로그인</button>
-                </div>
-            </div>
-
-            <div id="edit-form-container" style="display:none;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                    <h2 style="color:var(--text-color); font-size:1.2rem;" id="form-title">새 캐릭터 사이트 생성 및 등록</h2>
-                </div>
-                <form onsubmit="saveWiki(event)">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>태그 지정 (쉼표로 구분)</label>
-                            <input type="text" id="in-tags" placeholder="예: 세계관A, 학생">
-                        </div>
-                        <div class="form-group">
-                            <label>프로필 네모 박스 대표색 설정</label>
-                            <input type="color" id="in-color" value="#ff85a2">
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>프로필공개 타입 설정</label>
-                            <select id="in-profile-type" onchange="toggleSecretOptions()">
-                                <option value="public">일반 공개 프로필 (로비 노출)</option>
-                                <option value="secret">비밀 프로필 (특정 경로로만 진입 가능)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>연결할 공개 프로필 선택 (비밀 프로필인 경우)</label>
-                            <select id="in-linked-public-id">
-                                <option value="">(연결 안 함)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- 🔒 [비밀 프로필 전용 설정 구역] -->
-                    <div class="form-group" id="secret-exclusive-group" style="display:none; background: #1c0e15; border: 2px dashed #ff0055; padding: 14px; border-radius: 6px; margin-bottom: 15px;">
-                        <label style="color: #ff0055; margin-bottom: 6px; font-size: 0.9rem;">🔒 [비밀 프로필 전용] 연출 및 음악 설정</label>
-                        
-                        <div style="margin-bottom: 10px;">
-                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">🎵 비밀 진입 시 백그라운드 재생 음악 URL (플레이어 숨김)</label>
-                            <input type="text" id="in-secret-bgm" placeholder="https://www.youtube.com/watch?v=..." style="background:#140d12; color:#fce8f0; border-color:#ff0055;">
-                        </div>
-
-                        <div style="margin-bottom: 10px;">
-                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">🎧 비밀 프로필 본문 무드곡 링크 (유튜브, 틱톡, 싸클 등 - 플레이어 노출)</label>
-                            <input type="text" id="in-secret-page-bgm" placeholder="https://www.youtube.com/watch?v=..." style="background:#140d12; color:#fce8f0; border-color:#ff0055;">
-                        </div>
-
-                        <div style="margin-bottom: 10px;">
-                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">📜 비밀 프로필 본문 무드곡 가사 입력</label>
-                            <textarea id="in-secret-lyrics" placeholder="비밀 프로필 노래 가사를 입력하세요..." style="background:#140d12; color:#fce8f0; border-color:#ff0055; min-height:70px;"></textarea>
-                        </div>
-
-                        <div style="margin-bottom: 10px;">
-                            <label style="font-size:0.8rem; color:#fce8f0; margin-bottom:3px; display:block;">📖 박스/버튼 없는 순수 검은 화면 에필로그 텍스트 (타이핑 후 자동 입장)</label>
-                            <textarea id="in-epilogue-text" placeholder="예: 어둠 속에서 누군가 속삭인다... '결국 여기까지 찾아왔군요.'" style="background:#140d12; color:#fce8f0; border-color:#ff0055;"></textarea>
-                        </div>
-                        
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <label style="font-size:0.8rem; color:#fce8f0; margin:0;">에필로그 글자 색상 선택:</label>
-                            <input type="color" id="in-epilogue-color" value="#ff0055" style="width: 60px; height: 30px;">
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>전체 프로필 스포 방지 설정</label>
-                            <select id="in-spoiler-ok">
-                                <option value="NO">스포 방지 NO (바로 열람)</option>
-                                <option value="OK">스포 방지 OK (진입 시 경고 창)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>스포 방지 창 안내 문구</label>
-                            <input type="text" id="in-spoiler-msg" placeholder="예: 핵심 스포일러가 포함되어 있습니다.">
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>캐릭터 이름 (고유 주소 생성)</label>
-                            <input type="text" id="in-name" placeholder="이름을 입력하세요 (예: 루아)" required>
-                        </div>
-                        <div class="form-group">
-                            <label>소제목/영문이름</label>
-                            <input type="text" id="in-sub" placeholder="영문 이름 또는 소제목">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>프로필 대표 사진 파일 업로드</label>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="in-file" accept="image/*" onchange="previewMainImage(event)">
-                        </div>
-                    </div>
-
-                    <!-- 🔓 [공개 프로필 전용 설정 구역] -->
-                    <div class="form-group" id="public-exclusive-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
-                        <label style="color: var(--accent-pink); margin-bottom: 4px;">🎧 [공개 프로필 전용] 무드곡 링크 (유튜브, 틱톡, 사운드클라우드 등)</label>
-                        <input type="text" id="in-bgm" placeholder="https://www.youtube.com/watch?v=유튜브영상아이디">
-                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display:block;">* 공개 프로필 페이지 본문에 플레이어 박스와 함께 노출됩니다.</span>
-                    </div>
-
-                    <div class="form-group" style="background: var(--soft-pink-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;" id="public-lyrics-group">
-                        <label style="color: var(--accent-pink); margin-bottom: 4px;">📜 무드곡 가사 입력</label>
-                        <textarea id="in-lyrics" placeholder="노래 가사를 입력하세요..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label style="margin-bottom: 5px;">
-                            <span>프로필 표 항목 (줄바꿈/엔터 가능)</span>
-                            <button type="button" class="add-field-btn" onclick="addCustomField()">+ 항목 추가</button>
-                        </label>
-                        <div id="custom-fields-container"></div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>대표 한마디 / 명대사</label>
-                        <input type="text" id="in-quote" placeholder="한마디 문구를 입력하세요">
-                    </div>
-
-                    <!-- 👥 인물 관계 및 호칭 편집 구역 -->
-                    <div class="form-group" style="background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
-                        <label style="margin-bottom: 6px; color:var(--accent-pink); font-size:0.9rem;">
-                            <span>👥 인물 관계 (과거 ➔ 현재 비교)</span>
-                            <button type="button" class="add-field-btn" onclick="addRelationBox()">+ 관계 추가</button>
-                        </label>
-                        <span style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 8px; display:block;">* 과거(기본) 인상과 현재 변화된 인상(선택사항)을 작성합니다.</span>
-                        <div id="relations-container"></div>
-                    </div>
-
-                    <div class="form-group" style="background: var(--soft-pink-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px;">
-                        <label style="margin-bottom: 6px; color:var(--accent-pink); font-size:0.9rem;">
-                            <span>🏷️ 호칭 정리 표 (내 캐릭터 ➔ 상대 캐릭터)</span>
-                            <button type="button" class="add-field-btn" onclick="addNicknameRow()">+ 호칭 추가</button>
-                        </label>
-                        <div id="nicknames-container"></div>
-                    </div>
-
-                    <div class="form-group">
-                        <label style="margin-bottom: 5px;">
-                            <span>본문 섹션 (번호 수정 가능, 사진 개별 스포 가능)</span>
-                            <button type="button" class="add-field-btn" onclick="addBodySection()">+ 섹션 추가</button>
-                        </label>
-                        <div id="body-sections-container"></div>
-                    </div>
-
-                    <button type="submit" class="submit-btn" id="submit-btn-text">실시간 서버에 등록하기</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 팝업 및 연출 렌더링 영역 -->
-<div id="glitch-modal-container"></div>
-<div id="epilogue-container"></div>
-
-<!-- 비밀 BGM 백그라운드 재생용 숨겨진 오디오/프레임 영역 -->
-<div id="hidden-secret-audio-container" style="display:none;"></div>
-
-<!-- 모달 창: 스포일러 주의 -->
-<div class="modal-overlay" id="spoiler-modal" style="display:none;">
-    <div class="modal-box">
-        <h3>스포일러 주의</h3>
-        <p id="spoiler-modal-text">해당 캐릭터 프로필에는 스포일러가 포함되어 있습니다.<br>계속해서 프로필을 열람하시겠습니까?</p>
-        <div class="modal-btns">
-            <button class="modal-btn" onclick="confirmSpoilerView(true)">열람하기</button>
-            <button class="modal-btn cancel" onclick="confirmSpoilerView(false)">취소</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyAMPkWKqJb2pR-HYVUdjtSVPq0Dp9Rin1w",
-        authDomain: "character-profile-38add.firebaseapp.com",
-        databaseURL: "https://character-profile-38add-default-rtdb.firebaseio.com",
-        projectId: "character-profile-38add",
-        storageBucket: "character-profile-38add.firebasestorage.app",
-        messagingSenderId: "913191700325",
-        appId: "1:913191700325:web:882770167576ea02dd838c",
-        measurementId: "G-JSZC5B8XR7"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    let isPublic = true;
-    let isLoggedIn = false;
-    let characterList = [];
-    let selectedCharacterId = null;
-    let editingCharacterId = null;
-    let tempMainImg = null;
-    let previousPublicCharacterId = null;
-    let activeTypingTimer = null;
-    let loadingRotationTimer = null;
-
-    const ADMIN_PW = "0828";
-    const defaultFields = ["본명", "출생", "성별", "신체", "소속", "MBTI", "가족 관계"];
-    const defaultBodySections = [
-        { num: "1", title: "개요", content: "", spoiler: "NO", images: [] },
-        { num: "2", title: "특징 및 외모", content: "", spoiler: "NO", images: [] },
-        { num: "3", title: "작중 행적", content: "", spoiler: "NO", images: [] },
-        { num: "4", title: "대인 관계", content: "", spoiler: "NO", images: [] },
-        { num: "5", title: "여담", content: "", spoiler: "NO", images: [] }
-    ];
-
-    function loadSavedData() {
-        db.ref('characters').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                characterList = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-            } else {
-                characterList = [];
-            }
-            updateLinkedPublicDropdown();
-            checkUrlHash();
-            if (document.getElementById('lobby-tab').style.display !== 'none') {
-                renderLobby();
-            }
-        });
-    }
-
-    function updateLinkedPublicDropdown() {
-        const select = document.getElementById('in-linked-public-id');
-        const currentVal = select.value;
-        select.innerHTML = '<option value="">(연결 안 함)</option>';
+    <!-- 메인 컨테이너 (도서관 메인 + 미니홈피 통합) -->
+    <main class="w-full max-w-6xl mx-auto bg-pinkcard/95 backdrop-blur-md rounded-3xl border border-pinkborder shadow-xl overflow-hidden flex flex-col md:flex-row relative z-20">
         
-        characterList.forEach(c => {
-            if (!c.profileType || c.profileType === 'public') {
-                const opt = document.createElement('option');
-                opt.value = c.id;
-                opt.textContent = `[공개] ${c.name}`;
-                select.appendChild(opt);
-            }
-        });
-        select.value = currentVal;
-    }
-
-    function toggleSecretOptions() {
-        const type = document.getElementById('in-profile-type').value;
-        const secretGroup = document.getElementById('secret-exclusive-group');
-        const publicGroup = document.getElementById('public-exclusive-group');
-        const publicLyricsGroup = document.getElementById('public-lyrics-group');
-
-        if (type === 'secret') {
-            secretGroup.style.display = 'block';
-            publicGroup.style.display = 'none';
-            publicLyricsGroup.style.display = 'none';
-        } else {
-            secretGroup.style.display = 'none';
-            publicGroup.style.display = 'block';
-            publicLyricsGroup.style.display = 'block';
-        }
-    }
-
-    function saveDataToFirebase(charData) {
-        db.ref('characters/' + charData.id).set(charData, (error) => {
-            if (error) {
-                alert('저장 실패: ' + error.message);
-            } else {
-                alert('실시간 서버에 성공적으로 저장되었습니다!');
-                switchTab('view', charData.id);
-            }
-        });
-    }
-
-    function checkLogin() {
-        const pwInput = document.getElementById('admin-password').value;
-        if (pwInput === ADMIN_PW) {
-            isLoggedIn = true;
-            document.getElementById('login-required').style.display = 'none';
-            document.getElementById('edit-form-container').style.display = 'block';
-            document.getElementById('auth-status-text').textContent = '권한: 관리자 (수정/삭제 가능)';
-            alert('로그인되었습니다.');
-            renderLobby();
-        } else {
-            alert('비밀번호가 일치하지 않습니다.');
-        }
-    }
-
-    function switchTab(tab, charId = null) {
-        const lobbyTab = document.getElementById('lobby-tab');
-        const viewTab = document.getElementById('view-tab');
-        const editTab = document.getElementById('edit-tab');
-        const tabBtnView = document.getElementById('tab-btn-view');
-        const btns = document.querySelectorAll('.nav-tabs .tab-btn');
-
-        if (activeTypingTimer) {
-            clearTimeout(activeTypingTimer);
-            activeTypingTimer = null;
-        }
-        if (loadingRotationTimer) {
-            clearInterval(loadingRotationTimer);
-            loadingRotationTimer = null;
-        }
-        document.getElementById('epilogue-container').innerHTML = '';
-        document.getElementById('glitch-modal-container').innerHTML = '';
-        document.getElementById('hidden-secret-audio-container').innerHTML = '';
-        const ytPlayer = document.getElementById('youtube-player');
-        if (ytPlayer) ytPlayer.src = '';
-
-        btns.forEach(btn => btn.classList.remove('active'));
-
-        if (tab === 'lobby') {
-            window.location.hash = '';
-            lobbyTab.style.display = 'block';
-            viewTab.style.display = 'none';
-            editTab.style.display = 'none';
-            tabBtnView.style.display = 'none';
-            document.getElementById('tab-btn-lobby').classList.add('active');
-            document.body.classList.remove('secret-mode');
-            renderLobby();
-        } else if (tab === 'view' && charId !== null) {
-            window.location.hash = `character=${charId}`;
-            lobbyTab.style.display = 'none';
-            viewTab.style.display = 'block';
-            editTab.style.display = 'none';
-            tabBtnView.style.display = 'block';
-            tabBtnView.classList.add('active');
-            renderCharacterProfile(charId);
-        } else if (tab === 'edit') {
-            window.location.hash = 'edit';
-            lobbyTab.style.display = 'none';
-            viewTab.style.display = 'none';
-            editTab.style.display = 'block';
-            tabBtnView.style.display = 'none';
-            document.body.classList.remove('secret-mode');
-            btns[btns.length - 1].classList.add('active');
-            toggleSecretOptions();
-        }
-    }
-
-    function checkUrlHash() {
-        const hash = window.location.hash;
-        if (hash.startsWith('#character=')) {
-            const charId = hash.replace('#character=', '');
-            const found = characterList.find(c => c.id === charId);
-            if (found) {
-                switchTab('view', charId);
-                return;
-            }
-        } else if (hash === '#edit') {
-            switchTab('edit');
-            return;
-        }
-        switchTab('lobby');
-    }
-
-    window.addEventListener('hashchange', checkUrlHash);
-
-    function moveUp(btn) {
-        const row = btn.parentElement;
-        if (row.previousElementSibling) row.parentElement.insertBefore(row, row.previousElementSibling);
-    }
-
-    function moveDown(btn) {
-        const row = btn.parentElement;
-        if (row.nextElementSibling) row.parentElement.insertBefore(row.nextElementSibling, row);
-    }
-
-    function addCustomField(label = "", value = "", spoiler = "NO") {
-        const container = document.getElementById('custom-fields-container');
-        const row = document.createElement('div');
-        row.className = 'dynamic-field-row';
-        row.innerHTML = `
-            <button type="button" class="move-btn" onclick="moveUp(this)">▲</button>
-            <button type="button" class="move-btn" onclick="moveDown(this)">▼</button>
-            <input type="text" class="field-label" placeholder="항목 이름" value="${label}">
-            <input type="text" class="field-value" placeholder="내용 (줄바꿈 가능)" value="${value}">
-            <select class="field-spoiler" style="padding:2px 4px; font-size:0.75rem;">
-                <option value="NO" ${spoiler === 'NO' ? 'selected' : ''}>스포 NO</option>
-                <option value="OK" ${spoiler === 'OK' ? 'selected' : ''}>스포 OK</option>
-            </select>
-            <button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">-</button>
-        `;
-        container.appendChild(row);
-    }
-
-    function addRelationBox(target = "", quote = "", desc = "", currQuote = "", currDesc = "") {
-        const container = document.getElementById('relations-container');
-        const box = document.createElement('div');
-        box.className = 'dynamic-section-box rel-edit-box';
-        box.innerHTML = `
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                <input type="text" class="rel-target" placeholder="상대방 이름 (예: 켄시)" value="${target}" style="font-weight:bold; flex:1; margin-right:6px;">
-                <button type="button" class="remove-field-btn" onclick="this.parentElement.parentElement.remove()">관계 삭제</button>
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                <div style="background:var(--card-bg); padding:8px; border:1px solid var(--border-color); border-radius:4px;">
-                    <label style="font-size:0.72rem; color:var(--text-sub); display:block; margin-bottom:4px;">[과거/기본] 인상</label>
-                    <input type="text" class="rel-quote" placeholder="짧은 대사" value="${quote}" style="margin-bottom:6px;">
-                    <textarea class="rel-desc" placeholder="관계 설명">${desc}</textarea>
+        <!-- 좌측 사이드바: 프로필 및 도서관 카테고리 -->
+        <aside class="w-full md:w-80 p-6 bg-pinksoft/60 border-b md:border-b-0 md:border-r border-pinkborder flex flex-col gap-5 relative">
+            <div class="bg-pinkcard p-5 rounded-3xl border border-pinkborder shadow-sm flex flex-col items-center text-center relative overflow-hidden">
+                <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-pinkcard shadow-md my-2 bg-pink-100 relative group z-10 cursor-pointer" onclick="openProfileEditModal()" title="프로필 편집">
+                    <img id="profile-img" src="https://placehold.co/300x300/ffe6eb/ff5c8a?text=Library" alt="Profile" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-pinkaccent/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold">프로필 편집</div>
                 </div>
-                <div style="background:var(--card-bg); padding:8px; border:1px solid var(--border-color); border-radius:4px;">
-                    <label style="font-size:0.72rem; color:var(--accent-pink); display:block; margin-bottom:4px;">[현재] 변동된 인상 (선택)</label>
-                    <input type="text" class="rel-curr-quote" placeholder="변동된 대사" value="${currQuote}" style="margin-bottom:6px;">
-                    <textarea class="rel-curr-desc" placeholder="변동된 관계 설명">${currDesc}</textarea>
+
+                <h2 id="profile-name" class="font-bold text-base text-pinktext z-10 mt-1">도서관 이용자</h2>
+                <p id="profile-sub" class="text-xs text-pinkaccent font-semibold mb-3 z-10">믱믱별 외계인 탐험 중</p>
+
+                <div class="flex items-center justify-center gap-3 w-full text-xs bg-pinksoft py-2.5 px-3 rounded-2xl border border-pinkborder text-pinktext font-medium z-10">
+                    <div>Today <span class="text-pinkaccent font-bold">24</span></div>
+                    <div class="w-px h-3 bg-pinkborder"></div>
+                    <div>Total <span class="text-pinkaccent font-bold">3,150</span></div>
                 </div>
             </div>
-        `;
-        container.appendChild(box);
-    }
 
-    function addNicknameRow(target = "", nickname = "") {
-        const container = document.getElementById('nicknames-container');
-        const row = document.createElement('div');
-        row.className = 'dynamic-field-row';
-        row.innerHTML = `
-            <input type="text" class="nick-target" placeholder="상대 이름 (예: 켄시)" value="${target}">
-            <input type="text" class="nick-name" placeholder="부르는 호칭 (예: 켄시 녀석)" value="${nickname}">
-            <button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">-</button>
-        `;
-        container.appendChild(row);
-    }
-
-    function addBodySection(num = "", title = "", content = "", spoiler = "NO", images = []) {
-        const container = document.getElementById('body-sections-container');
-        const box = document.createElement('div');
-        box.className = 'dynamic-section-box';
-
-        box.innerHTML = `
-            <div class="dynamic-field-row">
-                <button type="button" class="move-btn" onclick="moveUp(this.parentElement)">▲</button>
-                <button type="button" class="move-btn" onclick="moveDown(this.parentElement)">▼</button>
-                <input type="text" class="section-num-input" placeholder="번호 (예: 1)" value="${num}" style="max-width: 60px; text-align: center; font-weight: bold;">
-                <input type="text" class="section-title-input" placeholder="섹션 제목 (예: 개요)" value="${title}" required style="flex: 2;">
-                <select class="section-spoiler-input" style="flex: 1;">
-                    <option value="NO" ${spoiler === 'NO' ? 'selected' : ''}>전체 스포 NO</option>
-                    <option value="OK" ${spoiler === 'OK' ? 'selected' : ''}>전체 스포 OK</option>
-                </select>
-                <button type="button" class="remove-field-btn" onclick="this.parentElement.parentElement.remove()">섹션 삭제</button>
+            <!-- 도서관 네비게이션 탭 -->
+            <div class="bg-pinkcard p-4 rounded-3xl border border-pinkborder shadow-sm">
+                <h3 class="text-xs font-bold text-pinkaccent uppercase tracking-wider mb-3 px-1">LIBRARY MENU</h3>
+                <ul class="space-y-1.5 text-sm font-medium">
+                    <li>
+                        <button onclick="switchTab('library')" id="tab-library-btn" class="nav-btn w-full text-left px-3.5 py-2 rounded-2xl bg-pinkaccent text-white flex items-center justify-between transition">
+                            <span class="flex items-center gap-2.5">📖 도서관 홈</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="switchTab('home')" id="tab-home-btn" class="nav-btn w-full text-left px-3.5 py-2 rounded-2xl hover:bg-pinksoft text-pinktext flex items-center justify-between transition">
+                            <span class="flex items-center gap-2.5">🏠 미니홈피 (전체글)</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="switchTab('posts')" id="tab-posts-btn" class="nav-btn w-full text-left px-3.5 py-2 rounded-2xl hover:bg-pinksoft text-pinktext flex items-center justify-between transition">
+                            <span class="flex items-center gap-2.5">✍️ 게시글 작성</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="switchTab('archive')" id="tab-archive-btn" class="nav-btn w-full text-left px-3.5 py-2 rounded-2xl hover:bg-pinksoft text-pinktext flex items-center justify-between transition">
+                            <span class="flex items-center gap-2.5">🎟️ 티켓 갤러리</span>
+                        </button>
+                    </li>
+                </ul>
             </div>
-            <textarea class="section-content-input" placeholder="섹션 본문 내용을 입력하세요 (엔터로 줄바꿈 가능)">${content}</textarea>
-            
-            <div style="margin-top: 8px;">
-                <label style="font-size:0.78rem; color:var(--accent-pink); margin-bottom:4px; display:block;">📷 본문 사진 추가 (사진마다 스포 여부 개별 지정 가능)</label>
-                <div class="section-images-list"></div>
-                <button type="button" class="add-field-btn" style="margin-top:6px;" onclick="addSectionImageRow(this.previousElementSibling)">+ 사진 추가</button>
+        </aside>
+
+        <!-- 우측 메인 컨텐츠 영역 -->
+        <div class="flex-1 flex flex-col p-6 bg-pinkcard">
+            <div id="content-container" class="flex-1 flex flex-col gap-5">
+                <!-- 탭별 내용이 동적으로 로드됩니다 -->
             </div>
-        `;
-        container.appendChild(box);
+        </div>
+    </main>
 
-        const imgListContainer = box.querySelector('.section-images-list');
-        if (images && images.length > 0) {
-            images.forEach(imgObj => {
-                addSectionImageRow(imgListContainer, imgObj.url, imgObj.spoiler);
-            });
-        }
-    }
+    <!-- 음악 플레이어 위젯 -->
+    <div id="music-player" class="fixed bottom-5 right-5 z-50 w-80 bg-pinkcard rounded-3xl border border-pinkborder shadow-2xl overflow-hidden transition-all duration-300">
+        <div id="youtube-container" class="hidden"></div>
+        <div class="bg-pinksoft px-4 py-2.5 border-b border-pinkborder flex items-center justify-between text-pinktext text-xs font-bold">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-music text-pinkaccent"></i> LIBRARY BGM</span>
+            <div class="flex items-center gap-2">
+                <button onclick="openBgmModal()" class="hover:text-pinkaccent transition"><i class="fa-solid fa-link text-xs"></i></button>
+                <button onclick="toggleMusicPlayer()" class="hover:text-pinktext transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+            </div>
+        </div>
+        <div class="p-4 flex flex-col gap-3.5 bg-pinkcard">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-pinksoft rounded-2xl border border-pinkborder flex items-center justify-center text-pinkaccent">
+                    <i class="fa-solid fa-compact-disc text-xl animate-spin" style="animation-duration: 5s;"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h4 id="song-title" class="text-xs font-bold text-pinktext truncate">도서관 로파이 BGM</h4>
+                    <p id="song-artist" class="text-[11px] text-pinkaccent truncate">YouTube Audio</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+                <button onclick="openBgmModal()" class="text-pinkmuted hover:text-pinktext transition text-xs font-medium"><i class="fa-solid fa-link"></i> 링크설정</button>
+                <button onclick="togglePlayState()" id="play-btn" class="w-10 h-10 bg-pinkaccent hover:bg-pinkaccenthover text-white rounded-full flex items-center justify-center shadow-md transition">
+                    <i class="fa-solid fa-play text-xs" id="play-icon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
-    function addSectionImageRow(container, url = "", spoiler = "NO") {
-        const row = document.createElement('div');
-        row.className = 'sub-img-row';
-        row.innerHTML = `
-            <input type="file" accept="image/*" style="font-size:0.75rem; flex:1;" onchange="previewSubImage(event, this)">
-            <input type="hidden" class="sub-img-data" value="${url}">
-            <select class="sub-img-spoiler" style="font-size:0.75rem; padding:2px;">
-                <option value="NO" ${spoiler === 'NO' ? 'selected' : ''}>사진 스포 NO</option>
-                <option value="OK" ${spoiler === 'OK' ? 'selected' : ''}>사진 스포 OK</option>
-            </select>
-            <button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">삭제</button>
-        `;
-        container.appendChild(row);
-    }
+    <!-- 모달창 모음 -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-pinkcard rounded-3xl border border-pinkborder shadow-2xl max-w-sm w-full p-6 text-center">
+            <h3 class="text-base font-bold text-pinkaccent mb-2">도서관 배경설정</h3>
+            <input type="file" id="bg-file-input" accept="image/*" class="w-full mb-4 text-xs">
+            <div class="flex gap-2.5">
+                <button onclick="closeSettingsModal()" class="flex-1 bg-pink-100 text-pinktext py-2.5 rounded-2xl text-xs font-semibold">취소</button>
+                <button onclick="applyBackgroundFile()" class="flex-1 bg-pinkaccent text-white py-2.5 rounded-2xl text-xs font-semibold">적용</button>
+            </div>
+        </div>
+    </div>
 
-    function previewMainImage(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(evt) { tempMainImg = evt.target.result; };
-            reader.readAsDataURL(file);
-        }
-    }
+    <div id="sticker-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-pinkcard rounded-3xl border border-pinkborder shadow-2xl max-w-sm w-full p-6 text-center">
+            <h3 class="text-base font-bold text-pinkaccent mb-2">스티커 추가</h3>
+            <input type="file" id="sticker-file-input" accept="image/*" class="w-full mb-4 text-xs">
+            <div class="flex gap-2.5">
+                <button onclick="closeStickerModal()" class="flex-1 bg-pink-100 text-pinktext py-2.5 rounded-2xl text-xs font-semibold">닫기</button>
+                <button onclick="uploadSticker()" class="flex-1 bg-pinkaccent text-white py-2.5 rounded-2xl text-xs font-semibold">부착</button>
+            </div>
+        </div>
+    </div>
 
-    function previewSubImage(e, inputElem) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                inputElem.nextElementSibling.value = evt.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    }
+    <div id="bgm-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-pinkcard rounded-3xl border border-pinkborder shadow-2xl max-w-sm w-full p-6 text-center">
+            <h3 class="text-base font-bold text-pinkaccent mb-2">유튜브 BGM 링크 설정</h3>
+            <input type="text" id="youtube-url-input" placeholder="YouTube URL 입력" class="w-full px-4 py-2.5 bg-pinksoft border border-pinkborder rounded-2xl text-xs text-pinktext mb-4 focus:outline-none">
+            <div class="flex gap-2.5">
+                <button onclick="closeBgmModal()" class="flex-1 bg-pink-100 text-pinktext py-2.5 rounded-2xl text-xs font-semibold">취소</button>
+                <button onclick="applyYouTubeBgm()" class="flex-1 bg-pinkaccent text-white py-2.5 rounded-2xl text-xs font-semibold">적용</button>
+            </div>
+        </div>
+    </div>
 
-    function initDefaultForm() {
-        document.getElementById('custom-fields-container').innerHTML = '';
-        defaultFields.forEach(f => addCustomField(f, "", "NO"));
+    <div id="profile-edit-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-pinkcard rounded-3xl border border-pinkborder shadow-2xl max-w-sm w-full p-6 text-center">
+            <h3 class="text-base font-bold text-pinkaccent mb-2">프로필 편집</h3>
+            <input type="file" id="edit-avatar-file" accept="image/*" class="w-full mb-3 text-xs">
+            <input type="text" id="edit-name-input" placeholder="닉네임" class="w-full px-3 py-2 bg-pinksoft border border-pinkborder rounded-xl text-xs mb-2">
+            <input type="text" id="edit-sub-input" placeholder="상태 메시지" class="w-full px-3 py-2 bg-pinksoft border border-pinkborder rounded-xl text-xs mb-4">
+            <div class="flex gap-2.5">
+                <button onclick="closeProfileEditModal()" class="flex-1 bg-pink-100 text-pinktext py-2.5 rounded-2xl text-xs font-semibold">취소</button>
+                <button onclick="applyProfileEdit()" class="flex-1 bg-pinkaccent text-white py-2.5 rounded-2xl text-xs font-semibold">저장</button>
+            </div>
+        </div>
+    </div>
 
-        document.getElementById('relations-container').innerHTML = '';
-        document.getElementById('nicknames-container').innerHTML = '';
+    <div id="custom-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-pinkcard rounded-3xl border border-pinkborder shadow-2xl max-w-sm w-full p-6 text-center">
+            <h3 id="modal-title" class="text-base font-bold text-pinkaccent mb-2">알림</h3>
+            <p id="modal-message" class="text-xs text-pinktext mb-6"></p>
+            <button onclick="closeModal()" class="w-full bg-pinkaccent text-white py-2.5 rounded-2xl text-xs font-semibold">확인</button>
+        </div>
+    </div>
 
-        document.getElementById('body-sections-container').innerHTML = '';
-        defaultBodySections.forEach(s => addBodySection(s.num, s.title, s.content, s.spoiler, s.images));
+    <script>
+        let db = JSON.parse(localStorage.getItem('library_db')) || { users: [], posts: [], tickets: [] };
+        let currentUser = JSON.parse(localStorage.getItem('library_current_user')) || null;
 
-        editingCharacterId = null;
-        tempMainImg = null;
-        document.getElementById('in-color').value = '#ff85a2';
-        document.getElementById('in-bgm').value = '';
-        document.getElementById('in-secret-bgm').value = '';
-        document.getElementById('in-secret-page-bgm').value = '';
-        document.getElementById('in-secret-lyrics').value = '';
-        document.getElementById('in-lyrics').value = '';
-        document.getElementById('in-profile-type').value = 'public';
-        document.getElementById('in-linked-public-id').value = '';
-        document.getElementById('in-epilogue-text').value = '';
-        document.getElementById('in-epilogue-color').value = '#ff0055';
-        document.getElementById('form-title').textContent = "새 캐릭터 사이트 생성 및 등록";
-        document.getElementById('submit-btn-text').textContent = "실시간 서버에 등록하기";
-        toggleSecretOptions();
-    }
-
-    function saveWiki(e) {
-        e.preventDefault();
-
-        if (!isLoggedIn) {
-            alert('로그인이 필요한 기능입니다.');
-            return;
-        }
-
-        const customRows = document.querySelectorAll('#custom-fields-container .dynamic-field-row');
-        const customFields = [];
-        customRows.forEach(row => {
-            const label = row.querySelector('.field-label').value.trim();
-            const val = row.querySelector('.field-value').value;
-            const spoiler = row.querySelector('.field-spoiler').value;
-            if (label !== "") customFields.push({ label: label, value: val || "-", spoiler: spoiler });
-        });
-
-        const relBoxes = document.querySelectorAll('.rel-edit-box');
-        const relations = [];
-        relBoxes.forEach(box => {
-            const target = box.querySelector('.rel-target').value.trim();
-            const quote = box.querySelector('.rel-quote').value;
-            const desc = box.querySelector('.rel-desc').value;
-            const currQuote = box.querySelector('.rel-curr-quote').value;
-            const currDesc = box.querySelector('.rel-curr-desc').value;
-            if (target !== "") {
-                relations.push({ target, quote, desc, currQuote, currDesc });
+        window.onload = function() {
+            if (currentUser) {
+                document.getElementById('auth-container').classList.add('hidden');
+                initSession();
             }
-        });
-
-        const nickRows = document.querySelectorAll('#nicknames-container .dynamic-field-row');
-        const nicknames = [];
-        nickRows.forEach(row => {
-            const target = row.querySelector('.nick-target').value.trim();
-            const name = row.querySelector('.nick-name').value.trim();
-            if (target !== "" || name !== "") {
-                nicknames.push({ target, name });
-            }
-        });
-
-        const sectionBoxes = document.querySelectorAll('#body-sections-container .dynamic-section-box');
-        const bodySections = [];
-        sectionBoxes.forEach(box => {
-            const num = box.querySelector('.section-num-input').value.trim() || "1";
-            const title = box.querySelector('.section-title-input').value.trim();
-            const content = box.querySelector('.section-content-input').value;
-            const spoiler = box.querySelector('.section-spoiler-input').value;
-            
-            const imgRows = box.querySelectorAll('.sub-img-row');
-            const images = [];
-            imgRows.forEach(iRow => {
-                const url = iRow.querySelector('.sub-img-data').value;
-                const imgSpoiler = iRow.querySelector('.sub-img-spoiler').value;
-                if (url) {
-                    images.push({ url: url, spoiler: imgSpoiler });
-                }
-            });
-
-            if (title !== "") {
-                bodySections.push({ num: num, title: title, content: content, spoiler: spoiler, images: images });
-            }
-        });
-
-        const existingChar = editingCharacterId !== null ? characterList.find(c => c.id === editingCharacterId) : null;
-        const existingImg = existingChar ? existingChar.img : 'https://via.placeholder.com/300x380/000000/FFFFFF?text=No+Image';
-
-        const characterData = {
-            id: editingCharacterId || 'char_' + Date.now(),
-            name: document.getElementById('in-name').value,
-            sub: document.getElementById('in-sub').value,
-            tags: document.getElementById('in-tags').value,
-            color: document.getElementById('in-color').value,
-            profileType: document.getElementById('in-profile-type').value,
-            linkedPublicId: document.getElementById('in-linked-public-id').value,
-            secretBgm: document.getElementById('in-secret-bgm').value,
-            secretPageBgm: document.getElementById('in-secret-page-bgm').value,
-            secretLyrics: document.getElementById('in-secret-lyrics').value,
-            epilogueText: document.getElementById('in-epilogue-text').value,
-            epilogueColor: document.getElementById('in-epilogue-color').value,
-            spoilerOk: document.getElementById('in-spoiler-ok').value,
-            spoilerMsg: document.getElementById('in-spoiler-msg').value,
-            img: tempMainImg || existingImg,
-            bgm: document.getElementById('in-bgm').value,
-            lyrics: document.getElementById('in-lyrics').value,
-            customFields: customFields,
-            relations: relations,
-            nicknames: nicknames,
-            quote: document.getElementById('in-quote').value,
-            bodySections: bodySections
         };
 
-        saveDataToFirebase(characterData);
-    }
-
-    function deleteCharacter(id, event) {
-        event.stopPropagation();
-        if (!isLoggedIn) {
-            alert('삭제 권한이 없습니다.');
-            return;
+        function openModal(title, msg) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = msg;
+            document.getElementById('custom-modal').classList.remove('hidden');
         }
+        function closeModal() { document.getElementById('custom-modal').classList.add('hidden'); }
 
-        const char = characterList.find(c => c.id === id);
-        if (confirm(`'${char ? char.name : ''}' 캐릭터 사이트를 정말 삭제하시겠습니까?`)) {
-            db.ref('characters/' + id).remove().then(() => {
-                alert('삭제되었습니다.');
-                switchTab('lobby');
-            });
-        }
-    }
+        // 회원가입 및 로그인 관리
+        function handleRegister() {
+            const u = document.getElementById('username-input').value.trim();
+            const p = document.getElementById('password-input').value.trim();
+            if(!u || !p) return openModal('오류', '아이디와 비밀번호를 입력해주세요.');
+            if(db.users.find(user => user.username === u)) return openModal('오류', '이미 존재하는 아이디입니다.');
 
-    function editCharacter(id, event) {
-        event.stopPropagation();
-        if (!isLoggedIn) {
-            alert('수정 권한이 없습니다.');
-            return;
-        }
-
-        editingCharacterId = id;
-        const char = characterList.find(c => c.id === id);
-        if (!char) return;
-
-        document.getElementById('form-title').textContent = `'${char.name}' 캐릭터 사이트 수정`;
-        document.getElementById('submit-btn-text').textContent = "수정사항 실시간 반영하기";
-
-        document.getElementById('in-tags').value = char.tags || '';
-        document.getElementById('in-color').value = char.color || '#ff85a2';
-        document.getElementById('in-profile-type').value = char.profileType || 'public';
-        document.getElementById('in-linked-public-id').value = char.linkedPublicId || '';
-        document.getElementById('in-secret-bgm').value = char.secretBgm || '';
-        document.getElementById('in-secret-page-bgm').value = char.secretPageBgm || '';
-        document.getElementById('in-secret-lyrics').value = char.secretLyrics || '';
-        document.getElementById('in-epilogue-text').value = char.epilogueText || '';
-        document.getElementById('in-epilogue-color').value = char.epilogueColor || '#ff0055';
-        document.getElementById('in-spoiler-ok').value = char.spoilerOk || 'NO';
-        document.getElementById('in-spoiler-msg').value = char.spoilerMsg || '';
-        document.getElementById('in-name').value = char.name || '';
-        document.getElementById('in-sub').value = char.sub || '';
-        document.getElementById('in-bgm').value = char.bgm || '';
-        document.getElementById('in-lyrics').value = char.lyrics || '';
-        document.getElementById('in-quote').value = char.quote || '';
-
-        toggleSecretOptions();
-
-        const customContainer = document.getElementById('custom-fields-container');
-        customContainer.innerHTML = '';
-        if (char.customFields) {
-            char.customFields.forEach(f => addCustomField(f.label, f.value, f.spoiler || "NO"));
-        }
-
-        const relContainer = document.getElementById('relations-container');
-        relContainer.innerHTML = '';
-        if (char.relations) {
-            char.relations.forEach(r => addRelationBox(r.target, r.quote, r.desc, r.currQuote, r.currDesc));
-        }
-
-        const nickContainer = document.getElementById('nicknames-container');
-        nickContainer.innerHTML = '';
-        if (char.nicknames) {
-            char.nicknames.forEach(n => addNicknameRow(n.target, n.name));
-        }
-
-        const bodyContainer = document.getElementById('body-sections-container');
-        bodyContainer.innerHTML = '';
-        if (char.bodySections) {
-            char.bodySections.forEach(s => addBodySection(s.num || "1", s.title, s.content, s.spoiler, s.images));
-        }
-
-        switchTab('edit');
-    }
-
-    function renderLobby() {
-        const container = document.getElementById('lobby-list');
-        container.innerHTML = '';
-
-        const displayCharacters = isLoggedIn ? characterList : characterList.filter(c => !c.profileType || c.profileType === 'public');
-
-        if (displayCharacters.length === 0) {
-            container.innerHTML = '<p style="color:var(--text-sub); grid-column: 1/-1; text-align:center; padding: 40px 0;">생성된 캐릭터 사이트가 없습니다. 새 캐릭터를 등록해 주세요.</p>';
-            return;
-        }
-
-        displayCharacters.forEach((char) => {
-            const card = document.createElement('div');
-            const isSecret = char.profileType === 'secret';
-            card.className = `character-card ${isSecret ? 'secret-card' : ''}`;
-            card.onclick = () => {
-                previousPublicCharacterId = null;
-                switchTab('view', char.id);
+            const newUser = {
+                username: u,
+                password: p,
+                role: '믱믱별 외계인',
+                profile: { name: u, sub: '우주 도서관 탐험 중', img: '' },
+                world: '여기는 나의 도서관 세계입니다.'
             };
-
-            const actionBtns = isLoggedIn ? `
-                <div class="card-actions">
-                    <button onclick="editCharacter('${char.id}', event)">수정</button>
-                    <button onclick="deleteCharacter('${char.id}', event)">삭제</button>
-                </div>
-            ` : '';
-
-            card.innerHTML = `
-                <img src="${char.img}" alt="${char.name}">
-                <div class="card-info">
-                    <div class="card-title">${char.name}</div>
-                    <div class="card-sub">${char.sub || ''}</div>
-                    ${isSecret ? '<div class="secret-badge">🔒 비밀 프로필</div>' : ''}
-                    ${char.spoilerOk === 'OK' ? '<div class="spoiler-tag">스포 방지 OK</div>' : ''}
-                </div>
-                ${actionBtns}
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    function renderCharacterProfile(id) {
-        const char = characterList.find(c => c.id === id);
-        if (!char) {
-            switchTab('lobby');
-            return;
+            db.users.push(newUser);
+            localStorage.setItem('library_db', JSON.stringify(db));
+            openModal('가입 완료', '회원가입이 완료되었습니다! 로그인해주세요.');
         }
 
-        selectedCharacterId = id;
+        function handleLogin() {
+            const u = document.getElementById('username-input').value.trim();
+            const p = document.getElementById('password-input').value.trim();
+            const user = db.users.find(user => user.username === u && user.password === p);
+            if(!user) return openModal('로그인 실패', '아이디 또는 비밀번호가 올바르지 않습니다.');
 
-        if (char.profileType === 'secret') {
-            document.body.classList.add('secret-mode');
-        } else {
-            document.body.classList.remove('secret-mode');
+            currentUser = user;
+            localStorage.setItem('library_current_user', JSON.stringify(currentUser));
+            document.getElementById('auth-container').classList.add('hidden');
+            initSession();
         }
 
-        proceedProfileLoad(char);
-    }
-
-    function proceedProfileLoad(char) {
-        if (char.spoilerOk === 'OK') {
-            const msg = char.spoilerMsg || '해당 캐릭터 프로필에는 스포일러가 포함되어 있습니다.\n계속해서 프로필을 열람하시겠습니까?';
-            document.getElementById('spoiler-modal-text').innerText = msg;
-            document.getElementById('spoiler-modal').style.display = 'flex';
-        } else {
-            showWikiDetails(char);
-        }
-    }
-
-    function confirmSpoilerView(accept) {
-        document.getElementById('spoiler-modal').style.display = 'none';
-        if (accept && selectedCharacterId !== null) {
-            const char = characterList.find(c => c.id === selectedCharacterId);
-            if (char) showWikiDetails(char);
-        } else {
-            if (previousPublicCharacterId) {
-                switchTab('view', previousPublicCharacterId);
-            } else {
-                switchTab('lobby');
-            }
-        }
-    }
-
-    function revealSpoilerSection(element) {
-        element.style.display = 'none';
-        element.nextElementSibling.style.display = 'block';
-    }
-
-    function handleProfileImageClick() {
-        const char = characterList.find(c => c.id === selectedCharacterId);
-        if (!char) return;
-
-        if (char.profileType === 'secret' && char.linkedPublicId) {
-            const imgTd = document.querySelector('.infobox-img-td');
-            if (imgTd) {
-                const censor = imgTd.querySelector('.face-censor-overlay');
-                if (censor) censor.remove();
-            }
-            switchTab('view', char.linkedPublicId);
-        } else {
-            const linkedSecret = characterList.find(c => c.profileType === 'secret' && c.linkedPublicId === char.id);
-            if (linkedSecret) {
-                const imgTd = document.querySelector('.infobox-img-td');
-                if (imgTd) {
-                    if (!imgTd.querySelector('.face-censor-overlay')) {
-                        const censor = document.createElement('div');
-                        censor.className = 'face-censor-overlay';
-                        imgTd.appendChild(censor);
-                    }
-                }
-
-                const ytPlayer = document.getElementById('youtube-player');
-                if (ytPlayer) ytPlayer.src = '';
-                const bgmBox = document.getElementById('bgm-box');
-                if (bgmBox) bgmBox.style.display = 'none';
-
-                previousPublicCharacterId = selectedCharacterId;
-                
-                setTimeout(() => {
-                    startGlitchSequence(linkedSecret);
-                }, 700);
-            }
-        }
-    }
-
-    function startGlitchSequence(secretChar) {
-        const loadingTexts = [
-            `시스템 로딩 중... [보안 데이터를 분석하고 있습니다]`,
-            `경고: 외부 접근자의 신호가 감지되었습니다.`,
-            `오류! 이 영역에 도달하는 것은 허용되지 않습니다...`,
-            `방화벽이 무너지고 있습니다. 곧 연결됩니다.`
-        ];
-        
-        let textIdx = 0;
-        const container = document.getElementById('glitch-modal-container');
-
-        container.innerHTML = `
-            <div class="glitch-modal-overlay">
-                <div class="glitch-modal-box">
-                    <h3>⚠️ SYSTEM_SECURITY_BREACH</h3>
-                    <p id="glitch-rotating-text">${loadingTexts[0]}</p>
-                    <button class="glitch-btn" onclick="nextGlitchText('${secretChar.id}')">다음 단계</button>
-                </div>
-            </div>
-        `;
-
-        window.nextGlitchText = function(targetId) {
-            textIdx++;
-            if (textIdx < loadingTexts.length) {
-                document.getElementById('glitch-rotating-text').textContent = loadingTexts[textIdx];
-            } else {
-                document.getElementById('glitch-modal-container').innerHTML = '';
-                const sChar = characterList.find(c => c.id === targetId);
-                if (sChar && sChar.epilogueText) {
-                    showEpilogueTyping(sChar.epilogueText, sChar.epilogueColor || '#ff0055', sChar.id);
-                } else {
-                    switchTab('view', targetId);
-                }
-            }
-        };
-    }
-
-    function showEpilogueTyping(rawText, textColor, targetSecretId) {
-        const container = document.getElementById('epilogue-container');
-
-        container.innerHTML = `
-            <div class="epilogue-overlay">
-                <div class="epilogue-content-wrapper">
-                    <div class="epilogue-text-box" id="epilogue-typing-target" style="color: ${textColor};"></div>
-                </div>
-            </div>
-        `;
-
-        const targetElem = document.getElementById('epilogue-typing-target');
-        let charIndex = 0;
-
-        function typeWriter() {
-            if (charIndex < rawText.length) {
-                targetElem.textContent += rawText.charAt(charIndex);
-                charIndex++;
-                activeTypingTimer = setTimeout(typeWriter, 35);
-            } else {
-                activeTypingTimer = setTimeout(() => {
-                    finishEpilogue(targetSecretId);
-                }, 2000);
-            }
+        function handleLogout() {
+            localStorage.removeItem('library_current_user');
+            location.reload();
         }
 
-        typeWriter();
-    }
-
-    window.finishEpilogue = function(targetSecretId) {
-        if (activeTypingTimer) {
-            clearTimeout(activeTypingTimer);
-            activeTypingTimer = null;
-        }
-        document.getElementById('epilogue-container').innerHTML = '';
-        switchTab('view', targetSecretId);
-    };
-
-    function goBackFromProfile() {
-        const char = characterList.find(c => c.id === selectedCharacterId);
-        
-        const imgTd = document.querySelector('.infobox-img-td');
-        if (imgTd) {
-            const censor = imgTd.querySelector('.face-censor-overlay');
-            if (censor) censor.remove();
+        function initSession() {
+            document.getElementById('user-role-badge').innerText = `등급: ${currentUser.role}`;
+            document.getElementById('profile-name').innerText = currentUser.profile.name;
+            document.getElementById('profile-sub').innerText = currentUser.profile.sub;
+            if(currentUser.profile.img) document.getElementById('profile-img').src = currentUser.profile.img;
+            switchTab('library');
         }
 
-        document.getElementById('hidden-secret-audio-container').innerHTML = '';
-        const ytPlayer = document.getElementById('youtube-player');
-        if (ytPlayer) ytPlayer.src = '';
-
-        if (char && char.profileType === 'secret' && char.linkedPublicId) {
-            switchTab('view', char.linkedPublicId);
-        } else if (previousPublicCharacterId) {
-            const backId = previousPublicCharacterId;
-            previousPublicCharacterId = null;
-            switchTab('view', backId);
-        } else {
-            switchTab('lobby');
-        }
-    }
-
-    function showWikiDetails(char) {
-        const infoboxColor = char.color || '#ff85a2';
-        document.documentElement.style.setProperty('--infobox-color', infoboxColor);
-
-        const imgTdElem = document.querySelector('.infobox-img-td');
-        if (imgTdElem) {
-            const existingCensor = imgTdElem.querySelector('.face-censor-overlay');
-            if (existingCensor) existingCensor.remove();
-        }
-
-        const tagsContainer = document.getElementById('out-tags');
-        tagsContainer.innerHTML = '';
-        if (char.tags && char.tags.trim() !== '') {
-            char.tags.split(',').forEach(t => {
-                if (t.trim() !== '') {
-                    const span = document.createElement('span');
-                    span.className = 'tag-item';
-                    span.textContent = t.trim();
-                    tagsContainer.appendChild(span);
-                }
+        // 탭 전환 시스템 (도서관 홈이 최우선 맨 앞에 위치)
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn w-full text-left px-3.5 py-2 rounded-2xl hover:bg-pinksoft text-pinktext flex items-center justify-between transition";
             });
-        } else {
-            tagsContainer.innerHTML = '<span class="tag-item">자캐</span>';
-        }
+            const activeBtn = document.getElementById('tab-' + tabId + '-btn');
+            if(activeBtn) activeBtn.className = "nav-btn w-full text-left px-3.5 py-2 rounded-2xl bg-pinkaccent text-white flex items-center justify-between transition";
 
-        document.getElementById('out-name').textContent = char.name;
-        document.getElementById('out-sub').textContent = char.sub;
-        document.getElementById('out-card-title').textContent = char.name + (char.sub ? ` (${char.sub})` : '');
-        document.getElementById('out-img').src = char.img;
+            const area = document.getElementById('content-container');
+            area.innerHTML = '';
 
-        const tbody = document.getElementById('custom-fields-tbody');
-        tbody.innerHTML = '';
-
-        const colorTr = document.createElement('tr');
-        colorTr.innerHTML = `<th>대표색</th><td><span class="color-badge" style="background-color:${infoboxColor};"></span>${infoboxColor}</td>`;
-        tbody.appendChild(colorTr);
-
-        if (char.customFields && char.customFields.length > 0) {
-            char.customFields.forEach(f => {
-                const tr = document.createElement('tr');
-                let cellContent = f.value;
-
-                if (f.spoiler === 'OK') {
-                    cellContent = `
-                        <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)">
-                            <span>⚠️ 스포일러 보기</span>
+            if(tabId === 'library') {
+                area.innerHTML = `
+                    <div class="bg-pinksoft/70 rounded-3xl border border-pinkborder p-6 shadow-sm space-y-4">
+                        <div class="w-full h-44 rounded-2xl bg-gradient-to-r from-pink-400 to-pinkaccent p-6 text-white flex flex-col justify-end shadow-inner">
+                            <h2 class="text-xl font-extrabold">📖 우주 도서관 로비에 오신 것을 환영합니다</h2>
+                            <p class="text-xs text-pink-100 mt-1">지식과 감성을 공유하고, 나만의 미니홈피를 꾸며보세요.</p>
                         </div>
-                        <div class="spoiler-section-content">${f.value}</div>
-                    `;
-                }
-
-                tr.innerHTML = `<th>${f.label}</th><td>${cellContent}</td>`;
-                tbody.appendChild(tr);
-            });
-        }
-
-        document.getElementById('out-quote').textContent = char.quote || '“ ... ”';
-
-        const tocList = document.getElementById('out-toc-list');
-        const sectionsView = document.getElementById('dynamic-sections-view');
-        tocList.innerHTML = '';
-        sectionsView.innerHTML = '';
-
-        let dynamicSectionsWithRel = [];
-        if (char.bodySections) {
-            dynamicSectionsWithRel = [...char.bodySections];
-        }
-
-        let hasRelationsData = (char.relations && char.relations.length > 0) || (char.nicknames && char.nicknames.length > 0);
-        
-        if (hasRelationsData) {
-            let relSectionIndex = dynamicSectionsWithRel.findIndex(s => s.title.includes('여담'));
-            if (relSectionIndex === -1) relSectionIndex = dynamicSectionsWithRel.length;
-
-            let extraHtml = '';
-            
-            if (char.relations && char.relations.length > 0) {
-                extraHtml += `<div class="section-header">인물 관계</div>`;
-                char.relations.forEach(r => {
-                    let hasCurr = (r.currQuote && r.currQuote.trim() !== '') || (r.currDesc && r.currDesc.trim() !== '');
-                    
-                    if (hasCurr) {
-                        extraHtml += `
-                            <div class="rel-card">
-                                <div class="rel-title">${char.name} &rarr; ${r.target}</div>
-                                <div class="rel-flex-container">
-                                    <div class="rel-box-side">
-                                        <div class="rel-side-label">[과거 / 기본]</div>
-                                        ${r.quote ? `<div style="font-style:italic; color:var(--accent-pink); font-weight:bold; margin-bottom:4px;">“ ${r.quote} ”</div>` : ''}
-                                        ${r.desc ? `<div>${r.desc}</div>` : ''}
-                                    </div>
-                                    <div class="rel-arrow-center">&rarr;</div>
-                                    <div class="rel-box-side">
-                                        <div class="rel-side-label" style="color:var(--accent-pink);">[현재 / 변동]</div>
-                                        ${r.currQuote ? `<div style="font-style:italic; color:var(--accent-pink); font-weight:bold; margin-bottom:4px;">“ ${r.currQuote} ”</div>` : ''}
-                                        ${r.currDesc ? `<div>${r.currDesc}</div>` : ''}
-                                    </div>
-                                </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-pinkcard p-4 rounded-2xl border border-pinkborder shadow-xs">
+                                <h4 class="text-xs font-bold text-pinkaccent mb-1">💡 도서관 공지</h4>
+                                <p class="text-xs text-pinktext">모든 이용자분들은 자유롭게 글을 작성하고 스티커를 부착할 수 있습니다.</p>
                             </div>
-                        `;
-                    } else {
-                        extraHtml += `
-                            <div class="rel-card">
-                                <div class="rel-title">${char.name} &rarr; ${r.target}</div>
-                                <div class="rel-box-side" style="width:100%;">
-                                    <div class="rel-side-label">[관계 설명]</div>
-                                    ${r.quote ? `<div style="font-style:italic; color:var(--accent-pink); font-weight:bold; margin-bottom:4px;">“ ${r.quote} ”</div>` : ''}
-                                    ${r.desc ? `<div>${r.desc}</div>` : ''}
-                                </div>
+                            <div class="bg-pinkcard p-4 rounded-2xl border border-pinkborder shadow-xs">
+                                <h4 class="text-xs font-bold text-pinkaccent mb-1">✨ 오늘의 방문자</h4>
+                                <p class="text-xs text-pinktext">현재 접속 중인 외계인들과 소통을 시작해보세요!</p>
                             </div>
-                        `;
-                    }
-                });
-            }
-
-            if (char.nicknames && char.nicknames.length > 0) {
-                extraHtml += `<div class="section-header">호칭 정리</div>`;
-                extraHtml += `
-                    <table class="relation-table">
-                        <thead>
-                            <tr>
-                                <th style="width:50%;">대상</th>
-                                <th style="width:50%;">부르는 호칭</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                char.nicknames.forEach(n => {
-                    extraHtml += `
-                        <tr>
-                            <td><b>${n.target}</b></td>
-                            <td>${n.name}</td>
-                        </tr>
-                    `;
-                });
-                extraHtml += `</tbody></table>`;
-            }
-
-            dynamicSectionsWithRel.splice(relSectionIndex, 0, {
-                num: "",
-                title: "인물 관계 및 호칭",
-                isCustomInjected: true,
-                customHtml: extraHtml,
-                spoiler: "NO"
-            });
-        }
-
-        if (dynamicSectionsWithRel.length > 0) {
-            dynamicSectionsWithRel.forEach((sec, idx) => {
-                const secId = `sec-dyn-${idx + 1}`;
-                const sectionNumLabel = sec.num !== undefined && sec.num !== "" ? `${sec.num}. ` : `${idx + 1}. `;
-                
-                const li = document.createElement('li');
-                li.innerHTML = `<a href="#${secId}">${sectionNumLabel}${sec.title}</a>`;
-                tocList.appendChild(li);
-
-                let innerHtml = '';
-                if (sec.isCustomInjected) {
-                    innerHtml = sec.customHtml;
-                } else {
-                    if (sec.content) {
-                        innerHtml += `<div class="section-content-p">${sec.content}</div>`;
-                    }
-
-                    if (sec.images && sec.images.length > 0) {
-                        sec.images.forEach(imgObj => {
-                            if (imgObj.spoiler === 'OK') {
-                                innerHtml += `
-                                    <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)">
-                                        <span>⚠️ 스포일러 사진 보기</span>
-                                    </div>
-                                    <div class="spoiler-section-content">
-                                        <img src="${imgObj.url}" class="section-image" alt="섹션 이미지">
-                                    </div>
-                                `;
-                            } else {
-                                innerHtml += `<img src="${imgObj.url}" class="section-image" alt="섹션 이미지">`;
-                            }
-                        });
-                    }
-                }
-
-                if (!innerHtml) innerHtml = '<p>내용이 없습니다.</p>';
-
-                let fullSectionHtml = `
-                    <div class="section-header" id="${secId}">
-                        ${sectionNumLabel}${sec.title}
+                        </div>
                     </div>
                 `;
-
-                if (sec.spoiler === 'OK') {
-                    fullSectionHtml += `
-                        <div class="spoiler-section-blur" onclick="revealSpoilerSection(this)">
-                            <span>⚠️ 클릭 시 '${sec.title}' 전체 스포일러 내용을 확인합니다.</span>
+            } else if(tabId === 'home') {
+                area.innerHTML = `
+                    <div class="bg-pinksoft/70 rounded-3xl border border-pinkborder p-6 shadow-sm space-y-4">
+                        <h3 class="text-sm font-bold text-pinkaccent">미니홈피 전체 게시글</h3>
+                        <div id="posts-preview-list" class="space-y-3">
+                            <div class="p-4 bg-pinkcard rounded-2xl border border-pinkborder text-xs text-center text-pinkmuted">아직 작성된 글이 없습니다.</div>
                         </div>
-                        <div class="spoiler-section-content">${innerHtml}</div>
-                    `;
-                } else {
-                    fullSectionHtml += innerHtml;
-                }
-
-                const secDiv = document.createElement('div');
-                secDiv.innerHTML = fullSectionHtml;
-                sectionsView.appendChild(secDiv);
-            });
+                    </div>
+                `;
+                loadPostsPreview();
+            } else if(tabId === 'posts') {
+                area.innerHTML = `
+                    <div class="bg-pinksoft/70 rounded-3xl border border-pinkborder p-6 shadow-sm space-y-3">
+                        <h3 class="text-sm font-bold text-pinkaccent">새로운 글 작성</h3>
+                        <input type="text" id="post-title" placeholder="제목을 입력하세요..." class="w-full px-4 py-2.5 bg-pinkcard border border-pinkborder rounded-2xl text-xs text-pinktext focus:outline-none">
+                        <textarea id="post-content" rows="4" placeholder="따뜻한 이야기를 남겨주세요..." class="w-full px-4 py-3 bg-pinkcard border border-pinkborder rounded-2xl text-xs text-pinktext resize-none focus:outline-none"></textarea>
+                        <div class="flex justify-end">
+                            <button onclick="submitPost()" class="bg-pinkaccent text-white px-5 py-2.5 rounded-2xl text-xs font-semibold shadow-md">등록하기</button>
+                        </div>
+                    </div>
+                `;
+            } else if(tabId === 'archive') {
+                area.innerHTML = `
+                    <div class="bg-pinksoft/70 rounded-3xl border border-pinkborder p-6 shadow-sm space-y-4">
+                        <h3 class="text-sm font-bold text-pinkaccent">🎟️ 콜렉터블 티켓 갤러리</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="ticket-grid">
+                            <div class="bg-white p-4 rounded-2xl border-2 border-dashed border-pinkaccent shadow-md flex items-center justify-between">
+                                <span class="text-xs font-bold text-pinkaccent">기본 도서관 패스</span>
+                                <span class="text-[10px] text-pinkmuted">#2026-0923</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
-        const bgmBox = document.getElementById('bgm-box');
-        const bgmPlayerContainer = document.getElementById('bgm-player-container');
-        const lyricsBox = document.getElementById('out-lyrics');
-        const hiddenAudioContainer = document.getElementById('hidden-secret-audio-container');
-        
-        hiddenAudioContainer.innerHTML = '';
-        const ytPlayer = document.getElementById('youtube-player');
-        if (ytPlayer) ytPlayer.src = '';
+        // 게시글 작성 로직
+        function submitPost() {
+            const t = document.getElementById('post-title').value.trim();
+            const c = document.getElementById('post-content').value.trim();
+            if(!t || !c) return openModal('알림', '제목과 내용을 모두 입력해주세요.');
 
-        if (char.profileType === 'secret') {
-            if (char.secretBgm && char.secretBgm.trim() !== '') {
-                let secretUrl = char.secretBgm.trim();
-                const ytMatch = secretUrl.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-                
-                if (ytMatch && ytMatch[2].length === 11) {
-                    hiddenAudioContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1" allow="autoplay" style="display:none; width:0; height:0;"></iframe>`;
-                } else if (secretUrl.includes('soundcloud.com')) {
-                    const scEncoded = encodeURIComponent(secretUrl);
-                    hiddenAudioContainer.innerHTML = `<iframe src="https://w.soundcloud.com/player/?url=${scEncoded}&auto_play=true&show_artwork=false&show_comments=false&show_user=false&show_reposts=false" style="display:none; width:0; height:0;" allow="autoplay"></iframe>`;
-                } else {
-                    hiddenAudioContainer.innerHTML = `<iframe src="${secretUrl}" allow="autoplay" style="display:none; width:0; height:0;"></iframe>`;
-                }
+            db.posts = db.posts || [];
+            db.posts.unshift({ title: t, content: c, author: currentUser.username, time: new Date().toLocaleDateString() });
+            localStorage.setItem('library_db', JSON.stringify(db));
+            openModal('성공', '게시글이 등록되었습니다!');
+            switchTab('home');
+        }
+
+        function loadPostsPreview() {
+            const list = document.getElementById('posts-preview-list');
+            if(!db.posts || db.posts.length === 0) return;
+            list.innerHTML = db.posts.map(p => `
+                <div class="p-4 bg-pinkcard rounded-2xl border border-pinkborder text-xs flex justify-between items-center">
+                    <div><span class="text-pinkaccent font-bold">[글]</span> ${p.title}</div>
+                    <span class="text-[10px] text-pinkmuted">${p.author} | ${p.time}</span>
+                </div>
+            `).join('');
+        }
+
+        // 모달 및 설정 관리
+        function openSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); }
+        function closeSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); }
+        function openBgmModal() { document.getElementById('bgm-modal').classList.remove('hidden'); }
+        function closeBgmModal() { document.getElementById('bgm-modal').classList.add('hidden'); }
+        function openStickerModal() { document.getElementById('sticker-modal').classList.remove('hidden'); }
+        function closeStickerModal() { document.getElementById('sticker-modal').classList.add('hidden'); }
+        function openProfileEditModal() { document.getElementById('profile-edit-modal').classList.remove('hidden'); }
+        function closeProfileEditModal() { document.getElementById('profile-edit-modal').classList.add('hidden'); }
+
+        function applyBackgroundFile() {
+            const fileInput = document.getElementById('bg-file-input');
+            if(fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('main-body').style.backgroundImage = `url('${e.target.result}')`;
+                    closeSettingsModal();
+                    openModal('적용', '배경화면이 적용되었습니다!');
+                };
+                reader.readAsDataURL(fileInput.files[0]);
             }
+        }
 
-            if (char.secretPageBgm && char.secretPageBgm.trim() !== '') {
-                bgmBox.style.display = 'block';
-                bgmPlayerContainer.style.display = 'block';
+        function applyProfileEdit() {
+            const name = document.getElementById('edit-name-input').value.trim();
+            const sub = document.getElementById('edit-sub-input').value.trim();
+            const fileInput = document.getElementById('edit-avatar-file');
 
-                if (char.secretLyrics && char.secretLyrics.trim() !== '') {
-                    lyricsBox.style.display = 'block';
-                    lyricsBox.textContent = char.secretLyrics;
-                } else {
-                    lyricsBox.style.display = 'none';
-                }
+            if(name) currentUser.profile.name = name;
+            if(sub) currentUser.profile.sub = sub;
 
-                const ytMatch = char.secretPageBgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-                if (ytMatch && ytMatch[2].length === 11) {
-                    ytPlayer.src = `https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1`;
-                } else if (char.secretPageBgm.includes('soundcloud.com')) {
-                    const scEncoded = encodeURIComponent(char.secretPageBgm);
-                    bgmPlayerContainer.innerHTML = `<iframe src="https://w.soundcloud.com/player/?url=${scEncoded}&auto_play=true&visual=false" allow="autoplay" style="width:100%; height:120px; border:0;"></iframe>`;
-                } else {
-                    ytPlayer.src = char.secretPageBgm;
-                }
+            if(fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentUser.profile.img = e.target.result;
+                    document.getElementById('profile-img').src = e.target.result;
+                    saveUserChanges();
+                };
+                reader.readAsDataURL(fileInput.files[0]);
             } else {
-                bgmBox.style.display = 'none';
-            }
-        } else {
-            if (char.bgm && char.bgm.trim() !== '') {
-                bgmBox.style.display = 'block';
-                bgmPlayerContainer.style.display = 'block';
-
-                if (char.lyrics && char.lyrics.trim() !== '') {
-                    lyricsBox.style.display = 'block';
-                    lyricsBox.textContent = char.lyrics;
-                } else {
-                    lyricsBox.style.display = 'none';
-                }
-
-                const ytMatch = char.bgm.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-                if (ytMatch && ytMatch[2].length === 11) {
-                    ytPlayer.src = `https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1`;
-                } else if (char.bgm.includes('soundcloud.com')) {
-                    const scEncoded = encodeURIComponent(char.bgm);
-                    bgmPlayerContainer.innerHTML = `<iframe src="https://w.soundcloud.com/player/?url=${scEncoded}&auto_play=true&visual=false" allow="autoplay" style="width:100%; height:120px; border:0;"></iframe>`;
-                } else {
-                    ytPlayer.src = char.bgm;
-                }
-            } else {
-                bgmBox.style.display = 'none';
+                saveUserChanges();
             }
         }
-    }
 
-    function toggleVisibility() {
-        isPublic = !isPublic;
-        const btn = document.getElementById('visibility-btn');
-        const publicView = document.getElementById('public-view');
-        const privateView = document.getElementById('private-view');
-
-        if (isPublic) {
-            btn.textContent = '공개';
-            btn.className = 'action-btn';
-            publicView.style.display = 'block';
-            privateView.style.display = 'none';
-        } else {
-            btn.textContent = '비공개';
-            btn.className = 'action-btn private';
-            publicView.style.display = 'none';
-            privateView.style.display = 'block';
+        function saveUserChanges() {
+            const idx = db.users.findIndex(u => u.username === currentUser.username);
+            if(idx !== -1) db.users[idx] = currentUser;
+            localStorage.setItem('library_db', JSON.stringify(db));
+            localStorage.setItem('library_current_user', JSON.stringify(currentUser));
+            initSession();
+            closeProfileEditModal();
+            openModal('수정 완료', '프로필이 업데이트되었습니다!');
         }
-    }
 
-    loadSavedData();
-    initDefaultForm();
-</script>
+        let stickerCount = 0;
+        function uploadSticker() {
+            const fileInput = document.getElementById('sticker-file-input');
+            if(fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    stickerCount++;
+                    document.getElementById('sticker-count').innerText = stickerCount;
+                    const el = document.createElement('div');
+                    el.className = 'sticker-item';
+                    el.style.left = (50 + (stickerCount * 25)) + 'px';
+                    el.style.top = (100 + (stickerCount * 25)) + 'px';
+                    el.innerHTML = `<img src="${e.target.result}" class="w-16 h-16 object-contain pointer-events-none">`;
+                    document.getElementById('sticker-layer').appendChild(el);
+                    closeStickerModal();
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
 
+        let isPlaying = false;
+        function togglePlayState() {
+            isPlaying = !isPlaying;
+            document.getElementById('play-icon').className = isPlaying ? "fa-solid fa-pause text-xs" : "fa-solid fa-play text-xs";
+            openModal('BGM', isPlaying ? '음악 재생 중 🎶' : '음악 일시정지');
+        }
+        function toggleMusicPlayer() {
+            document.getElementById('music-player').classList.toggle('translate-y-full');
+        }
+        function applyYouTubeBgm() {
+            closeBgmModal();
+            openModal('설정 완료', '유튜브 BGM이 설정되었습니다!');
+        }
+    </script>
 </body>
 </html>
