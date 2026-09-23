@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">도서관 - 우주 공간 커뮤니티</title>
+    <title id="page-title">도서관 - 믱믱별 외계인 공간</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for icons -->
@@ -15,466 +15,456 @@
             theme: {
                 extend: {
                     colors: {
-                        pinkbg: '#fff5f7',
-                        pinkcard: '#ffffff',
-                        pinkborder: '#ffccd5',
-                        pinkaccent: '#ff5c8a',
-                        pinkaccenthover: '#ff3366',
-                        pinkmuted: '#ffa3b5',
-                        pinktext: '#4a3b40',
-                        pinksoft: '#fff0f3'
+                        spacebg: '#0f0c29',
+                        spacecard: '#1a1a2e',
+                        spaceborder: '#4a4e69',
+                        spaceaccent: '#ff007f',
+                        spaceaccenthover: '#e0006d',
+                        spacemuted: '#8d99ae',
+                        spacetext: '#f8f9fa',
+                        spacesoft: '#22223b'
                     }
                 }
             }
         }
     </script>
     <style>
-        :root {
-            --bg-color: #fff5f7;
-            --text-color: #4a3b40;
-        }
         body {
-            font-family: 'Pretendard', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            transition: background 0.3s ease;
-            position: relative;
+            font-family: var(--custom-font, 'Pretendard'), sans-serif;
+            background-color: var(--custom-bg, #0f0c29);
+            color: var(--custom-text, #f8f9fa);
+            transition: background 0.3s ease, color 0.3s ease;
             min-height: 100vh;
         }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #ffe6eb; }
-        ::-webkit-scrollbar-thumb { background: #ffb3c6; border-radius: 9999px; }
-        ::-webkit-scrollbar-thumb:hover { background: #ff5c8a; }
-        .sticker-item {
-            position: absolute;
-            cursor: move;
-            user-select: none;
-            touch-action: none;
-            z-index: 40;
-        }
+        ::-webkit-scrollbar-track { background: #1a1a2e; }
+        ::-webkit-scrollbar-thumb { background: #ff007f; border-radius: 9999px; }
         .hidden { display: none !important; }
+        .profile-layer-back { opacity: 0.6; transform: scale(0.95); pointer-events: none; }
     </style>
 </head>
-<body id="main-body" class="min-h-screen flex flex-col justify-between p-3 sm:p-6 overflow-x-hidden">
+<body class="min-h-screen flex flex-col justify-between p-3 sm:p-6 overflow-x-hidden">
 
-    <!-- 로그인 / 회원가입 인증 레이어 -->
-    <div id="auth-container" class="fixed inset-0 bg-[#0f0c29]/90 backdrop-blur-md flex justify-center items-center z-50">
-        <div class="bg-white/10 p-8 rounded-3xl backdrop-blur-md text-center w-80 shadow-2xl border border-white/20 text-white">
-            <h2 class="text-xl font-bold mb-2 text-pink-300">📖 도서관 입장</h2>
-            <p class="text-xs text-pink-200 mb-6">아이디를 입력해 도서관에 접속하세요.</p>
-            <input type="text" id="username-input" placeholder="아이디" class="w-full px-4 py-3 mb-3 rounded-2xl bg-white/20 border border-white/30 text-white placeholder-pink-200 text-xs focus:outline-none">
-            <input type="password" id="password-input" placeholder="비밀번호" class="w-full px-4 py-3 mb-4 rounded-2xl bg-white/20 border border-white/30 text-white placeholder-pink-200 text-xs focus:outline-none">
-            <button onclick="handleLogin()" class="w-full py-3 bg-pinkaccent text-white rounded-2xl font-bold text-xs shadow-md hover:bg-pinkaccenthover transition mb-2">로그인</button>
-            <button onclick="handleRegister()" class="w-full py-3 bg-white/20 text-white rounded-2xl font-bold text-xs shadow-md hover:bg-white/35 transition">회원가입</button>
+    <!-- 인증 화면 (로그인 / 회원가입) -->
+    <div id="auth-screen" class="fixed inset-0 bg-[#0f0c29] z-50 flex items-center justify-center p-4">
+        <div class="bg-[#1a1a2e] border border-[#4a4e69] rounded-3xl p-8 max-w-md w-full shadow-2xl text-center">
+            <h2 class="text-2xl font-bold text-[#ff007f] mb-2">📚 도서관 & 우주 공간</h2>
+            <p class="text-xs text-gray-400 mb-6">믱믱별 외계인들의 통합 커뮤니티에 로그인하세요</p>
+            
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="text-xs font-semibold text-gray-300 mb-1 block">아이디</label>
+                    <input type="text" id="auth-id" placeholder="아이디를 입력하세요" class="w-full px-4 py-3 bg-[#22223b] border border-[#4a4e69] rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#ff007f]">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-300 mb-1 block">비밀번호</label>
+                    <input type="password" id="auth-pw" placeholder="비밀번호를 입력하세요" class="w-full px-4 py-3 bg-[#22223b] border border-[#4a4e69] rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#ff007f]">
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="handleLogin()" class="flex-1 bg-[#ff007f] hover:bg-[#e0006d] text-white py-3 rounded-2xl text-sm font-bold shadow-lg transition">로그인</button>
+                <button onclick="handleRegister()" class="flex-1 bg-[#4a4e69] hover:bg-[#5c617e] text-white py-3 rounded-2xl text-sm font-bold shadow-lg transition">회원가입</button>
+            </div>
         </div>
     </div>
 
-    <!-- 스티커 레이어 -->
-    <div id="sticker-layer" class="absolute inset-0 pointer-events-none overflow-hidden z-30"></div>
-
-    <!-- 상단 도서관 네비게이션 바 -->
-    <header class="w-full max-w-6xl mx-auto flex items-center justify-between mb-4 px-3 relative z-50">
-        <div class="flex items-center space-x-2 font-bold text-xs sm:text-sm">
-            <span class="bg-pinkcard border border-pinkborder px-3.5 py-1.5 rounded-full text-xs text-pinkaccent shadow-sm flex items-center gap-1.5">
-                <i class="fa-solid fa-book-open"></i> <span id="site-name-text">도서관 (Library)</span>
-            </span>
-            <span id="user-role-badge" class="text-[11px] bg-pinksoft px-2.5 py-1 rounded-full border border-pinkborder text-pinktext font-semibold"></span>
-        </div>
-        <div class="flex items-center gap-2 text-xs font-medium">
-            <button onclick="openStickerModal()" class="bg-pinkcard hover:bg-pinksoft border border-pinkborder px-3.5 py-1.5 rounded-full text-pinktext shadow-sm transition flex items-center gap-1.5 font-semibold">
-                <i class="fa-solid fa-note-sticky text-[11px] text-pinkaccent"></i> 스티커 (<span id="sticker-count">0</span>)
-            </button>
-            <button onclick="openSettingsModal()" class="bg-pinkcard hover:bg-pinksoft border border-pinkborder px-3.5 py-1.5 rounded-full text-pinktext shadow-sm transition flex items-center gap-1.5 font-semibold">
-                <i class="fa-solid fa-gear text-[11px] text-pinkaccent"></i> 설정
-            </button>
-            <button onclick="handleLogout()" class="bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-full text-red-500 shadow-sm transition font-semibold">
-                로그아웃
-            </button>
-        </div>
-    </header>
-
-    <!-- 메인 컨테이너 (도서관 메인 + 미니홈피 통합) -->
-    <main class="w-full max-w-6xl mx-auto bg-pinkcard/95 backdrop-blur-md rounded-3xl border border-pinkborder shadow-xl overflow-hidden flex flex-col md:flex-row relative z-20">
+    <!-- 메인 서비스 컨테이너 -->
+    <div id="main-app-container" class="hidden flex flex-col min-h-screen justify-between">
         
-        <!-- 좌측 사이드바: 프로필 및 도서관 카테고리 -->
-        <aside class="w-full md:w-80 p-6 bg-pinksoft/60 border-b md:border-b-0 md:border-r border-pinkborder flex flex-col gap-5 relative">
-            <div class="bg-pinkcard p-5 rounded-3xl border border-pinkborder shadow-sm flex flex-col items-center text-center relative overflow-hidden">
-                <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-pinkcard shadow-md my-2 bg-pink-100 relative group z-10 cursor-pointer" onclick="openProfileEditModal()" title="프로필 편집">
-                    <img id="profile-img" src="https://placehold.co/300x300/ffe6eb/ff5c8a?text=Library" alt="Profile" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-pinkaccent/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold">프로필 편집</div>
-                </div>
-
-                <h2 id="profile-name" class="font-bold text-base text-pinktext z-10 mt-1">도서관 이용자</h2>
-                <p id="profile-sub" class="text-xs text-pinkaccent font-semibold mb-3 z-10">믱믱별 외계인 탐험 중</p>
-
-                <div class="flex items-center justify-center gap-3 w-full text-xs bg-pinksoft py-2.5 px-3 rounded-2xl border border-pinkborder text-pinktext font-medium z-10">
-                    <div>Today <span class="text-pinkaccent font-bold">24</span></div>
-                    <div class="w-px h-3 bg-pinkborder"></div>
-                    <div>Total <span class="text-pinkaccent font-bold">3,150</span></div>
-                </div>
+        <!-- 상단 네비게이션 바 -->
+        <header class="w-full max-w-6xl mx-auto flex items-center justify-between mb-4 px-3 relative z-50">
+            <div class="flex items-center space-x-2 font-bold text-xs sm:text-sm">
+                <span class="bg-[#1a1a2e] border border-[#4a4e69] px-4 py-2 rounded-full text-xs text-[#ff007f] shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-book-open"></i> <span id="header-site-title">도서관 (Lobby)</span>
+                </span>
             </div>
-
-            <!-- 도서관 네비게이션 탭 -->
-            <div class="bg-pinkcard p-4 rounded-3xl border border-pinkborder shadow-sm">
-                <h3 class="text-xs font-bold text-pinkaccent uppercase tracking-wider mb-3 px-1">LIBRARY MENU</h3>
-                <ul class="space-y-1.5 text-sm font-medium">
-                    <li>
-                        <button onclick="switchTab('library')" id="tab-library-btn" class="nav-btn w-full text-left px-3.5 py-2 rounded-2xl bg-pinkaccent text-white flex items-center justify-between transition">
-                            <span class="flex items-center gap-2.5">📖 도서관 홈</span>
-                        </button>
-                    </li>
-                    <li>
-                        <button onclick="switchTab('home')" id="tab-home-btn" class="nav-btn w-full text-left px-3.5 py-2 rounded-2xl hover:bg-pinksoft text-pinktext flex items-center justify-between transition">
-                            <span class="flex items-center gap-2.5">🏠 미니홈피 (전체글)</span>
-                        </button>
-                    </li>
-                    <li>
-                        <button onclick="switchTab('posts')" id="tab-posts-btn" class="nav-btn w-full text-left px-3.5 py-2 rounded-2xl hover:bg-pinksoft text-pinktext flex items-center justify-between transition">
-                            <span class="flex items-center gap-2.5">✍️ 게시글 작성</span>
-                        </button>
-                    </li>
-                    <li>
-                        <button onclick="switchTab('archive')" id="tab-archive-btn" class="nav-btn w-full text-left px-3.5 py-2 rounded-2xl hover:bg-pinksoft text-pinktext flex items-center justify-between transition">
-                            <span class="flex items-center gap-2.5">🎟️ 티켓 갤러리</span>
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </aside>
-
-        <!-- 우측 메인 컨텐츠 영역 -->
-        <div class="flex-1 flex flex-col p-6 bg-pinkcard">
-            <div id="content-container" class="flex-1 flex flex-col gap-5">
-                <!-- 탭별 내용이 동적으로 로드됩니다 -->
-            </div>
-        </div>
-    </main>
-
-    <!-- 음악 플레이어 위젯 -->
-    <div id="music-player" class="fixed bottom-5 right-5 z-50 w-80 bg-pinkcard rounded-3xl border border-pinkborder shadow-2xl overflow-hidden transition-all duration-300">
-        <div id="youtube-container" class="hidden"></div>
-        <div class="bg-pinksoft px-4 py-2.5 border-b border-pinkborder flex items-center justify-between text-pinktext text-xs font-bold">
-            <span class="flex items-center gap-2"><i class="fa-solid fa-music text-pinkaccent"></i> LIBRARY BGM</span>
-            <div class="flex items-center gap-2">
-                <button onclick="openBgmModal()" class="hover:text-pinkaccent transition"><i class="fa-solid fa-link text-xs"></i></button>
-                <button onclick="toggleMusicPlayer()" class="hover:text-pinktext transition"><i class="fa-solid fa-xmark text-sm"></i></button>
-            </div>
-        </div>
-        <div class="p-4 flex flex-col gap-3.5 bg-pinkcard">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-pinksoft rounded-2xl border border-pinkborder flex items-center justify-center text-pinkaccent">
-                    <i class="fa-solid fa-compact-disc text-xl animate-spin" style="animation-duration: 5s;"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <h4 id="song-title" class="text-xs font-bold text-pinktext truncate">도서관 로파이 BGM</h4>
-                    <p id="song-artist" class="text-[11px] text-pinkaccent truncate">YouTube Audio</p>
-                </div>
-            </div>
-            <div class="flex items-center justify-between pt-1">
-                <button onclick="openBgmModal()" class="text-pinkmuted hover:text-pinktext transition text-xs font-medium"><i class="fa-solid fa-link"></i> 링크설정</button>
-                <button onclick="togglePlayState()" id="play-btn" class="w-10 h-10 bg-pinkaccent hover:bg-pinkaccenthover text-white rounded-full flex items-center justify-center shadow-md transition">
-                    <i class="fa-solid fa-play text-xs" id="play-icon"></i>
+            <div class="flex items-center gap-3 text-xs font-medium">
+                <span id="user-info-badge" class="text-gray-300"></span>
+                <button onclick="handleLogout()" class="bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 px-3.5 py-1.5 rounded-full text-red-300 shadow-sm transition">
+                    로그아웃
                 </button>
             </div>
-        </div>
-    </div>
+        </header>
 
-    <!-- 모달창 모음 -->
-    <div id="settings-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-pinkcard rounded-3xl border border-pinkborder shadow-2xl max-w-sm w-full p-6 text-center">
-            <h3 class="text-base font-bold text-pinkaccent mb-2">도서관 배경설정</h3>
-            <input type="file" id="bg-file-input" accept="image/*" class="w-full mb-4 text-xs">
-            <div class="flex gap-2.5">
-                <button onclick="closeSettingsModal()" class="flex-1 bg-pink-100 text-pinktext py-2.5 rounded-2xl text-xs font-semibold">취소</button>
-                <button onclick="applyBackgroundFile()" class="flex-1 bg-pinkaccent text-white py-2.5 rounded-2xl text-xs font-semibold">적용</button>
+        <!-- 메인 콘텐츠 영역 -->
+        <main class="w-full max-w-6xl mx-auto bg-[#1a1a2e]/95 backdrop-blur-md rounded-3xl border border-[#4a4e69] shadow-xl overflow-hidden flex flex-col md:flex-row relative z-20 flex-1">
+            
+            <!-- 사이드바 (도서관 앞 네비게이션) -->
+            <aside class="w-full md:w-80 p-6 bg-[#22223b]/60 border-b md:border-b-0 md:border-r border-[#4a4e69] flex flex-col gap-5">
+                <div class="bg-[#1a1a2e] p-5 rounded-3xl border border-[#4a4e69] shadow-sm flex flex-col items-center text-center">
+                    <div class="w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#ff007f] shadow-md my-2 bg-gray-800">
+                        <img id="side-profile-img" src="https://placehold.co/200x200/22223b/ff007f?text=Alien" alt="Avatar" class="w-full h-full object-cover">
+                    </div>
+                    <h2 id="side-username" class="font-bold text-sm text-white mt-1">믱믱별 외계인</h2>
+                    <p id="side-role" class="text-[11px] text-[#ff007f] font-semibold mt-0.5">등급: 믱믱별 외계인</p>
+                </div>
+
+                <div class="bg-[#1a1a2e] p-4 rounded-3xl border border-[#4a4e69] shadow-sm">
+                    <h3 class="text-xs font-bold text-[#ff007f] uppercase tracking-wider mb-3 px-1">도서관 메뉴</h3>
+                    <ul class="space-y-1.5 text-sm font-medium">
+                        <li><button onclick="switchTab('library')" id="btn-library" class="w-full text-left px-3.5 py-2.5 rounded-2xl bg-[#ff007f] text-white flex items-center gap-2.5 transition shadow-sm"><i class="fa-solid fa-landmark"></i> 도서관 (로비)</button></li>
+                        <li><button onclick="switchTab('feed')" id="btn-feed" class="w-full text-left px-3.5 py-2.5 rounded-2xl hover:bg-[#22223b] text-gray-300 flex items-center gap-2.5 transition"><i class="fa-solid fa-globe"></i> SNS 피드 (인스타/트위터)</button></li>
+                        <li><button onclick="switchTab('world')" id="btn-world" class="w-full text-left px-3.5 py-2.5 rounded-2xl hover:bg-[#22223b] text-gray-300 flex items-center gap-2.5 transition"><i class="fa-solid fa-meteor"></i> 나의 세계 (개인 홈페이지)</button></li>
+                        <li><button onclick="switchTab('profile')" id="btn-profile" class="w-full text-left px-3.5 py-2.5 rounded-2xl hover:bg-[#22223b] text-gray-300 flex items-center gap-2.5 transition"><i class="fa-solid fa-user-astronaut"></i> 캐릭터 프로필</button></li>
+                        <li><button onclick="switchTab('settings')" id="btn-settings" class="w-full text-left px-3.5 py-2.5 rounded-2xl hover:bg-[#22223b] text-gray-300 flex items-center gap-2.5 transition"><i class="fa-solid fa-gear"></i> 개인 꾸미기 설정</button></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- 컨텐츠 출력 영역 -->
+            <div class="flex-1 flex flex-col p-6 bg-[#1a1a2e] relative overflow-y-auto">
+                
+                <!-- 1. 도서관 (로비) 탭 -->
+                <div id="tab-library" class="tab-pane flex flex-col gap-5">
+                    <div class="p-6 bg-[#22223b]/70 rounded-3xl border border-[#4a4e69]">
+                        <h2 class="text-xl font-bold text-[#ff007f] mb-2"><i class="fa-solid fa-book-bookmark"></i> 도서관에 오신 것을 환영합니다!</h2>
+                        <p class="text-xs text-gray-300 leading-relaxed mb-4">이곳은 모든 믱믱별 외계인들이 모이는 도서관 앞 로비입니다. 다른 외계인들의 도서관을 구경하거나 나의 세계로 이동하세요.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="library-user-list">
+                            <!-- 사용자 목록이 동적으로 로드됩니다 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. SNS 피드 탭 -->
+                <div id="tab-feed" class="tab-pane hidden flex flex-col gap-5">
+                    <div class="p-5 bg-[#22223b]/70 rounded-3xl border border-[#4a4e69]">
+                        <h3 class="text-sm font-bold text-[#ff007f] mb-3">우주 SNS 소식 남기기</h3>
+                        <textarea id="feed-input" rows="3" placeholder="오늘 믱믱별에서 어떤 일이 있었나요?" class="w-full p-3 bg-[#1a1a2e] border border-[#4a4e69] rounded-2xl text-sm text-white resize-none focus:outline-none focus:ring-2 focus:ring-[#ff007f]"></textarea>
+                        <div class="flex justify-end mt-3">
+                            <button onclick="postFeed()" class="bg-[#ff007f] hover:bg-[#e0006d] text-white px-5 py-2 rounded-2xl text-xs font-bold transition shadow-sm">게시하기</button>
+                        </div>
+                    </div>
+                    <div id="feed-container" class="space-y-4">
+                        <!-- 피드 목록 -->
+                    </div>
+                </div>
+
+                <!-- 3. 나의 세계 탭 (개인 홈페이지) -->
+                <div id="tab-world" class="tab-pane hidden flex flex-col gap-5">
+                    <div class="p-6 bg-[#22223b]/70 rounded-3xl border border-[#4a4e69]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-base font-bold text-[#ff007f]"><span id="world-owner-name">나</span>의 세계 (개인 홈페이지)</h3>
+                            <button id="world-edit-btn" onclick="openWorldEdit()" class="bg-[#ff007f] text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition">홈페이지 편집</button>
+                        </div>
+                        <div id="world-content-box" class="p-5 bg-[#1a1a2e] rounded-2xl border border-[#4a4e69] text-sm text-gray-200 min-h-[150px] whitespace-pre-wrap">
+                            등록된 소개가 없습니다.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. 캐릭터 프로필 탭 -->
+                <div id="tab-profile" class="tab-pane hidden flex flex-col gap-5">
+                    <div class="p-6 bg-[#22223b]/70 rounded-3xl border border-[#4a4e69] relative">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-base font-bold text-[#ff007f]">👤 캐릭터 프로필</h3>
+                            <button id="profile-edit-btn" onclick="openProfileEdit()" class="bg-[#ff007f] text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition">프로필 수정</button>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <p><b>이름:</b> <span id="profile-display-name">외계인</span></p>
+                            <p><b>자기소개:</b> <span id="profile-display-bio">안녕!</span></p>
+                            <div class="p-4 bg-[#1a1a2e] rounded-2xl border border-[#4a4e69] space-y-2 mt-4">
+                                <p class="text-xs text-[#ff007f] font-bold"><i class="fa-solid fa-music"></i> 무드곡</p>
+                                <p id="profile-display-song" class="text-xs text-gray-300">지정된 무드곡이 없습니다.</p>
+                                <p class="text-xs text-[#ff007f] font-bold mt-2"><i class="fa-solid fa-align-left"></i> 가사</p>
+                                <p id="profile-display-lyrics" class="text-xs text-gray-300 whitespace-pre-wrap">가사가 없습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. 개인 꾸미기 설정 탭 -->
+                <div id="tab-settings" class="tab-pane hidden flex flex-col gap-5">
+                    <div class="p-6 bg-[#22223b]/70 rounded-3xl border border-[#4a4e69]">
+                        <h3 class="text-base font-bold text-[#ff007f] mb-4">⚙️ 개인 꾸미기 설정 (나만의 스타일)</h3>
+                        <p class="text-xs text-gray-400 mb-4">여기서 변경한 설정은 오직 나의 화면에만 적용되며, 다른 사용자에게 영향을 주지 않습니다.</p>
+                        
+                        <div class="space-y-4 text-xs">
+                            <div>
+                                <label class="font-semibold text-gray-300 mb-1 block">배경 색상</label>
+                                <input type="color" id="setting-bg-color" value="#0f0c29" class="w-16 h-10 rounded-xl bg-transparent cursor-pointer border border-[#4a4e69]">
+                            </div>
+                            <div>
+                                <label class="font-semibold text-gray-300 mb-1 block">글자 색상</label>
+                                <input type="color" id="setting-text-color" value="#f8f9fa" class="w-16 h-10 rounded-xl bg-transparent cursor-pointer border border-[#4a4e69]">
+                            </div>
+                            <div>
+                                <label class="font-semibold text-gray-300 mb-1 block">폰트 선택</label>
+                                <select id="setting-font" class="w-full p-2.5 bg-[#1a1a2e] border border-[#4a4e69] rounded-xl text-white">
+                                    <option value="Pretendard">프리텐다드 (Pretendard)</option>
+                                    <option value="Malgun Gothic">맑은 고딕</option>
+                                    <option value="Gulim">굴림체</option>
+                                </select>
+                            </div>
+                            <button onclick="savePersonalSettings()" class="bg-[#ff007f] hover:bg-[#e0006d] text-white px-5 py-2.5 rounded-2xl font-bold transition shadow-sm mt-2">개인 설정 저장</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-        </div>
+        </main>
     </div>
 
-    <div id="sticker-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-pinkcard rounded-3xl border border-pinkborder shadow-2xl max-w-sm w-full p-6 text-center">
-            <h3 class="text-base font-bold text-pinkaccent mb-2">스티커 추가</h3>
-            <input type="file" id="sticker-file-input" accept="image/*" class="w-full mb-4 text-xs">
-            <div class="flex gap-2.5">
-                <button onclick="closeStickerModal()" class="flex-1 bg-pink-100 text-pinktext py-2.5 rounded-2xl text-xs font-semibold">닫기</button>
-                <button onclick="uploadSticker()" class="flex-1 bg-pinkaccent text-white py-2.5 rounded-2xl text-xs font-semibold">부착</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="bgm-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-pinkcard rounded-3xl border border-pinkborder shadow-2xl max-w-sm w-full p-6 text-center">
-            <h3 class="text-base font-bold text-pinkaccent mb-2">유튜브 BGM 링크 설정</h3>
-            <input type="text" id="youtube-url-input" placeholder="YouTube URL 입력" class="w-full px-4 py-2.5 bg-pinksoft border border-pinkborder rounded-2xl text-xs text-pinktext mb-4 focus:outline-none">
-            <div class="flex gap-2.5">
-                <button onclick="closeBgmModal()" class="flex-1 bg-pink-100 text-pinktext py-2.5 rounded-2xl text-xs font-semibold">취소</button>
-                <button onclick="applyYouTubeBgm()" class="flex-1 bg-pinkaccent text-white py-2.5 rounded-2xl text-xs font-semibold">적용</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="profile-edit-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-pinkcard rounded-3xl border border-pinkborder shadow-2xl max-w-sm w-full p-6 text-center">
-            <h3 class="text-base font-bold text-pinkaccent mb-2">프로필 편집</h3>
-            <input type="file" id="edit-avatar-file" accept="image/*" class="w-full mb-3 text-xs">
-            <input type="text" id="edit-name-input" placeholder="닉네임" class="w-full px-3 py-2 bg-pinksoft border border-pinkborder rounded-xl text-xs mb-2">
-            <input type="text" id="edit-sub-input" placeholder="상태 메시지" class="w-full px-3 py-2 bg-pinksoft border border-pinkborder rounded-xl text-xs mb-4">
-            <div class="flex gap-2.5">
-                <button onclick="closeProfileEditModal()" class="flex-1 bg-pink-100 text-pinktext py-2.5 rounded-2xl text-xs font-semibold">취소</button>
-                <button onclick="applyProfileEdit()" class="flex-1 bg-pinkaccent text-white py-2.5 rounded-2xl text-xs font-semibold">저장</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="custom-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-pinkcard rounded-3xl border border-pinkborder shadow-2xl max-w-sm w-full p-6 text-center">
-            <h3 id="modal-title" class="text-base font-bold text-pinkaccent mb-2">알림</h3>
-            <p id="modal-message" class="text-xs text-pinktext mb-6"></p>
-            <button onclick="closeModal()" class="w-full bg-pinkaccent text-white py-2.5 rounded-2xl text-xs font-semibold">확인</button>
-        </div>
-    </div>
+    <!-- 다중 프로필 적층 컨테이너 (요구사항 1: 이전에 연 프로필이 뒤로 가도록 적층) -->
+    <div id="profile-stack-container" class="fixed inset-0 pointer-events-none z-50 flex items-center justify-center"></div>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('library_db')) || { users: [], posts: [], tickets: [] };
-        let currentUser = JSON.parse(localStorage.getItem('library_current_user')) || null;
+        // 로컬 스토리지 기반 데이터 베이스 초기화
+        let db = JSON.parse(localStorage.getItem('space_integrated_db')) || {
+            users: [
+                { id: 'admin', pw: 'admin123', role: '관리자', custom: { bg: '#0f0c29', text: '#f8f9fa', font: 'Pretendard' }, profile: { name: '관리자', bio: '도서관 관리자입니다.', song: '宇宙 Ambient', lyrics: '별빛이 내리는 밤...' }, world: '도서관 총괄 안내 홈피입니다.' },
+                { id: 'alien1', pw: '1234', role: '믱믱별 외계인', custom: { bg: '#0f0c29', text: '#f8f9fa', font: 'Pretendard' }, profile: { name: '외계인1', bio: '안녕! 지구 탐험 중', song: 'Galaxy Flight', lyrics: '저 너머 별을 향해' }, world: '외계인1의 우주 탐사 일지' }
+            ],
+            posts: []
+        };
+
+        let currentUser = JSON.parse(localStorage.getItem('space_current_user')) || null;
+        let viewingUser = null; // 현재 보고 있는 유저 (다른 사람 프로필/홈피 열람용)
+        let profileStack = []; // 프로필 적층 스택 (요구사항 1)
 
         window.onload = function() {
             if (currentUser) {
-                document.getElementById('auth-container').classList.add('hidden');
-                initSession();
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-app-container').classList.remove('hidden');
+                applyPersonalCustom(currentUser);
+                initSessionUI();
             }
         };
 
-        function openModal(title, msg) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-message').innerText = msg;
-            document.getElementById('custom-modal').classList.remove('hidden');
-        }
-        function closeModal() { document.getElementById('custom-modal').classList.add('hidden'); }
-
-        // 회원가입 및 로그인 관리
         function handleRegister() {
-            const u = document.getElementById('username-input').value.trim();
-            const p = document.getElementById('password-input').value.trim();
-            if(!u || !p) return openModal('오류', '아이디와 비밀번호를 입력해주세요.');
-            if(db.users.find(user => user.username === u)) return openModal('오류', '이미 존재하는 아이디입니다.');
+            const id = document.getElementById('auth-id').value.trim();
+            const pw = document.getElementById('auth-pw').value.trim();
+            if(!id || !pw) return alert('아이디와 비밀번호를 입력해주세요.');
+
+            if(db.users.find(u => u.id === id)) return alert('이미 존재하는 아이디입니다.');
 
             const newUser = {
-                username: u,
-                password: p,
-                role: '믱믱별 외계인',
-                profile: { name: u, sub: '우주 도서관 탐험 중', img: '' },
-                world: '여기는 나의 도서관 세계입니다.'
+                id: id,
+                pw: pw,
+                role: '믱믱별 외계인', // 요구사항 6: 모두 믱믱별 외계인으로 부여
+                custom: { bg: '#0f0c29', text: '#f8f9fa', font: 'Pretendard' },
+                profile: { name: id, bio: '안녕하세요!', song: '무드곡 없음', lyrics: '가사 없음' },
+                world: `${id}님의 개인 홈페이지입니다.`
             };
+
             db.users.push(newUser);
-            localStorage.setItem('library_db', JSON.stringify(db));
-            openModal('가입 완료', '회원가입이 완료되었습니다! 로그인해주세요.');
+            localStorage.setItem('space_integrated_db', JSON.stringify(db));
+            alert('회원가입 완료! 로그인해주세요.');
         }
 
         function handleLogin() {
-            const u = document.getElementById('username-input').value.trim();
-            const p = document.getElementById('password-input').value.trim();
-            const user = db.users.find(user => user.username === u && user.password === p);
-            if(!user) return openModal('로그인 실패', '아이디 또는 비밀번호가 올바르지 않습니다.');
+            const id = document.getElementById('auth-id').value.trim();
+            const pw = document.getElementById('auth-pw').value.trim();
+
+            const user = db.users.find(u => u.id === id && u.pw === pw);
+            if(!user) return alert('아이디 또는 비밀번호가 올바르지 않습니다.');
 
             currentUser = user;
-            localStorage.setItem('library_current_user', JSON.stringify(currentUser));
-            document.getElementById('auth-container').classList.add('hidden');
-            initSession();
+            viewingUser = user;
+            localStorage.setItem('space_current_user', JSON.stringify(currentUser));
+
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-app-container').classList.remove('hidden');
+            applyPersonalCustom(currentUser);
+            initSessionUI();
         }
 
         function handleLogout() {
-            localStorage.removeItem('library_current_user');
+            localStorage.removeItem('space_current_user');
             location.reload();
         }
 
-        function initSession() {
-            document.getElementById('user-role-badge').innerText = `등급: ${currentUser.role}`;
-            document.getElementById('profile-name').innerText = currentUser.profile.name;
-            document.getElementById('profile-sub').innerText = currentUser.profile.sub;
-            if(currentUser.profile.img) document.getElementById('profile-img').src = currentUser.profile.img;
+        function initSessionUI() {
+            document.getElementById('side-username').innerText = currentUser.id;
+            document.getElementById('side-role').innerText = `등급: ${currentUser.role}`;
+            document.getElementById('user-info-badge').innerText = `접속 계정: @${currentUser.id} (${currentUser.role})`;
             switchTab('library');
         }
 
-        // 탭 전환 시스템 (도서관 홈이 최우선 맨 앞에 위치)
+        function applyPersonalCustom(userObj) {
+            const c = userObj.custom || { bg: '#0f0c29', text: '#f8f9fa', font: 'Pretendard' };
+            document.documentElement.style.setProperty('--custom-bg', c.bg);
+            document.documentElement.style.setProperty('--custom-text', c.text);
+            document.documentElement.style.setProperty('--custom-font', c.font);
+        }
+
+        // 탭 전환 시스템
         function switchTab(tabId) {
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.className = "nav-btn w-full text-left px-3.5 py-2 rounded-2xl hover:bg-pinksoft text-pinktext flex items-center justify-between transition";
-            });
-            const activeBtn = document.getElementById('tab-' + tabId + '-btn');
-            if(activeBtn) activeBtn.className = "nav-btn w-full text-left px-3.5 py-2 rounded-2xl bg-pinkaccent text-white flex items-center justify-between transition";
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('aside button').forEach(el => el.classList.remove('bg-[#ff007f]', 'text-white'));
+            document.querySelectorAll('aside button').forEach(el => el.classList.add('hover:bg-[#22223b]', 'text-gray-300'));
 
-            const area = document.getElementById('content-container');
-            area.innerHTML = '';
+            const targetTab = document.getElementById('tab-' + tabId);
+            if(targetTab) targetTab.classList.remove('hidden');
 
-            if(tabId === 'library') {
-                area.innerHTML = `
-                    <div class="bg-pinksoft/70 rounded-3xl border border-pinkborder p-6 shadow-sm space-y-4">
-                        <div class="w-full h-44 rounded-2xl bg-gradient-to-r from-pink-400 to-pinkaccent p-6 text-white flex flex-col justify-end shadow-inner">
-                            <h2 class="text-xl font-extrabold">📖 우주 도서관 로비에 오신 것을 환영합니다</h2>
-                            <p class="text-xs text-pink-100 mt-1">지식과 감성을 공유하고, 나만의 미니홈피를 꾸며보세요.</p>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="bg-pinkcard p-4 rounded-2xl border border-pinkborder shadow-xs">
-                                <h4 class="text-xs font-bold text-pinkaccent mb-1">💡 도서관 공지</h4>
-                                <p class="text-xs text-pinktext">모든 이용자분들은 자유롭게 글을 작성하고 스티커를 부착할 수 있습니다.</p>
-                            </div>
-                            <div class="bg-pinkcard p-4 rounded-2xl border border-pinkborder shadow-xs">
-                                <h4 class="text-xs font-bold text-pinkaccent mb-1">✨ 오늘의 방문자</h4>
-                                <p class="text-xs text-pinktext">현재 접속 중인 외계인들과 소통을 시작해보세요!</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if(tabId === 'home') {
-                area.innerHTML = `
-                    <div class="bg-pinksoft/70 rounded-3xl border border-pinkborder p-6 shadow-sm space-y-4">
-                        <h3 class="text-sm font-bold text-pinkaccent">미니홈피 전체 게시글</h3>
-                        <div id="posts-preview-list" class="space-y-3">
-                            <div class="p-4 bg-pinkcard rounded-2xl border border-pinkborder text-xs text-center text-pinkmuted">아직 작성된 글이 없습니다.</div>
-                        </div>
-                    </div>
-                `;
-                loadPostsPreview();
-            } else if(tabId === 'posts') {
-                area.innerHTML = `
-                    <div class="bg-pinksoft/70 rounded-3xl border border-pinkborder p-6 shadow-sm space-y-3">
-                        <h3 class="text-sm font-bold text-pinkaccent">새로운 글 작성</h3>
-                        <input type="text" id="post-title" placeholder="제목을 입력하세요..." class="w-full px-4 py-2.5 bg-pinkcard border border-pinkborder rounded-2xl text-xs text-pinktext focus:outline-none">
-                        <textarea id="post-content" rows="4" placeholder="따뜻한 이야기를 남겨주세요..." class="w-full px-4 py-3 bg-pinkcard border border-pinkborder rounded-2xl text-xs text-pinktext resize-none focus:outline-none"></textarea>
-                        <div class="flex justify-end">
-                            <button onclick="submitPost()" class="bg-pinkaccent text-white px-5 py-2.5 rounded-2xl text-xs font-semibold shadow-md">등록하기</button>
-                        </div>
-                    </div>
-                `;
-            } else if(tabId === 'archive') {
-                area.innerHTML = `
-                    <div class="bg-pinksoft/70 rounded-3xl border border-pinkborder p-6 shadow-sm space-y-4">
-                        <h3 class="text-sm font-bold text-pinkaccent">🎟️ 콜렉터블 티켓 갤러리</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="ticket-grid">
-                            <div class="bg-white p-4 rounded-2xl border-2 border-dashed border-pinkaccent shadow-md flex items-center justify-between">
-                                <span class="text-xs font-bold text-pinkaccent">기본 도서관 패스</span>
-                                <span class="text-[10px] text-pinkmuted">#2026-0923</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
+            const targetBtn = document.getElementById('btn-' + tabId);
+            if(targetBtn) {
+                targetBtn.classList.remove('hover:bg-[#22223b]', 'text-gray-300');
+                targetBtn.classList.add('bg-[#ff007f]', 'text-white');
             }
+
+            // 탭별 데이터 렌더링
+            if(tabId === 'library') renderLibrary();
+            if(tabId === 'feed') renderFeed();
+            if(tabId === 'world') renderWorld(currentUser);
+            if(tabId === 'profile') renderProfile(currentUser);
         }
 
-        // 게시글 작성 로직
-        function submitPost() {
-            const t = document.getElementById('post-title').value.trim();
-            const c = document.getElementById('post-content').value.trim();
-            if(!t || !c) return openModal('알림', '제목과 내용을 모두 입력해주세요.');
-
-            db.posts = db.posts || [];
-            db.posts.unshift({ title: t, content: c, author: currentUser.username, time: new Date().toLocaleDateString() });
-            localStorage.setItem('library_db', JSON.stringify(db));
-            openModal('성공', '게시글이 등록되었습니다!');
-            switchTab('home');
-        }
-
-        function loadPostsPreview() {
-            const list = document.getElementById('posts-preview-list');
-            if(!db.posts || db.posts.length === 0) return;
-            list.innerHTML = db.posts.map(p => `
-                <div class="p-4 bg-pinkcard rounded-2xl border border-pinkborder text-xs flex justify-between items-center">
-                    <div><span class="text-pinkaccent font-bold">[글]</span> ${p.title}</div>
-                    <span class="text-[10px] text-pinkmuted">${p.author} | ${p.time}</span>
+        // 도서관(로비) 렌더링
+        function renderLibrary() {
+            const container = document.getElementById('library-user-list');
+            container.innerHTML = db.users.map(u => `
+                <div class="p-4 bg-[#1a1a2e] rounded-2xl border border-[#4a4e69] flex items-center justify-between shadow-sm">
+                    <div>
+                        <h4 class="font-bold text-white text-sm">@${u.id}</h4>
+                        <p class="text-xs text-[#ff007f]">${u.role}</p>
+                    </div>
+                    <button onclick="openTargetUserProfile('${u.id}')" class="bg-[#ff007f] hover:bg-[#e0006d] text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition">프로필 열기</button>
                 </div>
             `).join('');
         }
 
-        // 모달 및 설정 관리
-        function openSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); }
-        function closeSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); }
-        function openBgmModal() { document.getElementById('bgm-modal').classList.remove('hidden'); }
-        function closeBgmModal() { document.getElementById('bgm-modal').classList.add('hidden'); }
-        function openStickerModal() { document.getElementById('sticker-modal').classList.remove('hidden'); }
-        function closeStickerModal() { document.getElementById('sticker-modal').classList.add('hidden'); }
-        function openProfileEditModal() { document.getElementById('profile-edit-modal').classList.remove('hidden'); }
-        function closeProfileEditModal() { document.getElementById('profile-edit-modal').classList.add('hidden'); }
+        // 요구사항 1: 프로필 열기 시 이전에 연 프로필이 뒤로 가도록 적층 (Stack 구조)
+        function openTargetUserProfile(targetId) {
+            const targetUser = db.users.find(u => u.id === targetId);
+            if(!targetUser) return;
 
-        function applyBackgroundFile() {
-            const fileInput = document.getElementById('bg-file-input');
-            if(fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('main-body').style.backgroundImage = `url('${e.target.result}')`;
-                    closeSettingsModal();
-                    openModal('적용', '배경화면이 적용되었습니다!');
-                };
-                reader.readAsDataURL(fileInput.files[0]);
+            // 기존 스택에 있는 카드들의 투명도와 크기를 줄여서 뒤로 보냄 (적층 효과)
+            profileStack.forEach((item, idx) => {
+                item.style.transform = `scale(${0.9 + (idx * 0.02)}) translateY(-${(profileStack.length - idx) * 15}px)`;
+                item.style.opacity = '0.5';
+            });
+
+            const stackContainer = document.getElementById('profile-stack-container');
+            const modalEl = document.createElement('div');
+            modalEl.className = "absolute bg-[#1a1a2e] border-2 border-[#ff007f] rounded-3xl p-6 max-w-md w-full shadow-2xl pointer-events-auto transition-all duration-300";
+            modalEl.style.zIndex = 100 + profileStack.length;
+
+            const isSelf = currentUser.id === targetUser.id;
+            // 요구사항 6: 다른 사람 껀 관리자만 만질 수 있음 (일반 유저는 본인 것만 수정 가능)
+            const canEdit = currentUser.role === '관리자' || isSelf;
+
+            modalEl.innerHTML = `
+                <div class="flex justify-between items-center mb-4 border-b border-[#4a4e69] pb-3">
+                    <h3 class="text-base font-bold text-[#ff007f]">👤 @${targetUser.id} 의 프로필</h3>
+                    <button onclick="closeProfileStack(this)" class="text-gray-400 hover:text-white font-bold text-sm">✕ 닫기</button>
+                </div>
+                <div class="space-y-3 text-sm text-gray-200">
+                    <p><b>등급:</b> ${targetUser.role}</p>
+                    <p><b>자기소개:</b> ${targetUser.profile.bio}</p>
+                    <div class="p-4 bg-[#22223b] rounded-2xl border border-[#4a4e69] space-y-2">
+                        <!-- 요구사항 2: 백그라운드 재생 음악 삭제, 무드곡과 가사는 유지 -->
+                        <p class="text-xs text-[#ff007f] font-bold"><i class="fa-solid fa-music"></i> 무드곡</p>
+                        <p class="text-xs">${targetUser.profile.song}</p>
+                        <p class="text-xs text-[#ff007f] font-bold mt-2"><i class="fa-solid fa-align-left"></i> 가사</p>
+                        <p class="text-xs whitespace-pre-wrap">${targetUser.profile.lyrics}</p>
+                    </div>
+                    ${canEdit ? `<button onclick="editUserModalData('${targetUser.id}')" class="w-full mt-3 bg-[#ff007f] text-white py-2 rounded-xl text-xs font-bold">프로필 편집하기</button>` : `<p class="text-[11px] text-gray-400 text-center mt-2">※ 관리자 또는 본인만 수정할 수 있습니다.</p>`}
+                </div>
+            `;
+
+            stackContainer.appendChild(modalEl);
+            profileStack.push(modalEl);
+        }
+
+        function closeProfileStack(btn) {
+            const modalEl = btn.closest('div.absolute');
+            const index = profileStack.indexOf(modalEl);
+            if(index !== -1) {
+                profileStack.splice(index, 1);
+                modalEl.remove();
+            }
+            // 남은 스택 카드들의 위치 복원
+            profileStack.forEach((item, idx) => {
+                item.style.transform = `scale(1) translateY(0px)`;
+                item.style.opacity = '1';
+            });
+        }
+
+        // 프로필 및 홈페이지 렌더링
+        function renderProfile(user) {
+            document.getElementById('profile-display-name').innerText = user.profile.name;
+            document.getElementById('profile-display-bio').innerText = user.profile.bio;
+            document.getElementById('profile-display-song').innerText = user.profile.song;
+            document.getElementById('profile-display-lyrics').innerText = user.profile.lyrics;
+        }
+
+        function renderWorld(user) {
+            document.getElementById('world-owner-name').innerText = user.id;
+            document.getElementById('world-content-box').innerText = user.world;
+        }
+
+        // 수정 기능 (본인 또는 관리자 권한)
+        function openProfileEdit() {
+            const newBio = prompt('새로운 자기소개를 입력하세요:', currentUser.profile.bio);
+            if(newBio !== null) {
+                currentUser.profile.bio = newBio;
+                updateUserDataInDB();
+                renderProfile(currentUser);
             }
         }
 
-        function applyProfileEdit() {
-            const name = document.getElementById('edit-name-input').value.trim();
-            const sub = document.getElementById('edit-sub-input').value.trim();
-            const fileInput = document.getElementById('edit-avatar-file');
-
-            if(name) currentUser.profile.name = name;
-            if(sub) currentUser.profile.sub = sub;
-
-            if(fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentUser.profile.img = e.target.result;
-                    document.getElementById('profile-img').src = e.target.result;
-                    saveUserChanges();
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                saveUserChanges();
+        function openWorldEdit() {
+            const newWorld = prompt('나의 세계(개인 홈페이지) 내용을 입력하세요:', currentUser.world);
+            if(newWorld !== null) {
+                currentUser.world = newWorld;
+                updateUserDataInDB();
+                renderWorld(currentUser);
             }
         }
 
-        function saveUserChanges() {
-            const idx = db.users.findIndex(u => u.username === currentUser.username);
-            if(idx !== -1) db.users[idx] = currentUser;
-            localStorage.setItem('library_db', JSON.stringify(db));
-            localStorage.setItem('library_current_user', JSON.stringify(currentUser));
-            initSession();
-            closeProfileEditModal();
-            openModal('수정 완료', '프로필이 업데이트되었습니다!');
-        }
-
-        let stickerCount = 0;
-        function uploadSticker() {
-            const fileInput = document.getElementById('sticker-file-input');
-            if(fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    stickerCount++;
-                    document.getElementById('sticker-count').innerText = stickerCount;
-                    const el = document.createElement('div');
-                    el.className = 'sticker-item';
-                    el.style.left = (50 + (stickerCount * 25)) + 'px';
-                    el.style.top = (100 + (stickerCount * 25)) + 'px';
-                    el.innerHTML = `<img src="${e.target.result}" class="w-16 h-16 object-contain pointer-events-none">`;
-                    document.getElementById('sticker-layer').appendChild(el);
-                    closeStickerModal();
-                };
-                reader.readAsDataURL(fileInput.files[0]);
+        function editUserModalData(targetId) {
+            const user = db.users.find(u => u.id === targetId);
+            if(!user) return;
+            const newBio = prompt('수정할 자기소개를 입력하세요:', user.profile.bio);
+            if(newBio !== null) {
+                user.profile.bio = newBio;
+                updateUserDataInDB();
+                alert('수정되었습니다.');
+                location.reload();
             }
         }
 
-        let isPlaying = false;
-        function togglePlayState() {
-            isPlaying = !isPlaying;
-            document.getElementById('play-icon').className = isPlaying ? "fa-solid fa-pause text-xs" : "fa-solid fa-play text-xs";
-            openModal('BGM', isPlaying ? '음악 재생 중 🎶' : '음악 일시정지');
+        function updateUserDataInDB() {
+            const idx = db.users.findIndex(u => u.id === currentUser.id);
+            if(idx !== -1) {
+                db.users[idx] = currentUser;
+                localStorage.setItem('space_integrated_db', JSON.stringify(db));
+                localStorage.setItem('space_current_user', JSON.stringify(currentUser));
+            }
         }
-        function toggleMusicPlayer() {
-            document.getElementById('music-player').classList.toggle('translate-y-full');
+
+        // 개인 설정 저장 (다른 사람에게 영향 없음)
+        function savePersonalSettings() {
+            currentUser.custom.bg = document.getElementById('setting-bg-color').value;
+            currentUser.custom.text = document.getElementById('setting-text-color').value;
+            currentUser.custom.font = document.getElementById('setting-font').value;
+            updateUserDataInDB();
+            applyPersonalCustom(currentUser);
+            alert('개인 꾸미기 설정이 저장되었습니다! (나의 화면에만 적용됩니다)');
         }
-        function applyYouTubeBgm() {
-            closeBgmModal();
-            openModal('설정 완료', '유튜브 BGM이 설정되었습니다!');
+
+        // SNS 피드 기능 (인스타/트위터형)
+        function postFeed() {
+            const text = document.getElementById('feed-input').value.trim();
+            if(!text) return;
+            db.posts.unshift({ author: currentUser.id, text: text, time: new Date().toLocaleString() });
+            localStorage.setItem('space_integrated_db', JSON.stringify(db));
+            document.getElementById('feed-input').value = '';
+            renderFeed();
+        }
+
+        function renderFeed() {
+            const container = document.getElementById('feed-container');
+            container.innerHTML = (db.posts || []).map(p => `
+                <div class="p-4 bg-[#22223b]/70 rounded-2xl border border-[#4a4e69]">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-xs text-[#ff007f]">@${p.author}</span>
+                        <span class="text-[10px] text-gray-400">${p.time}</span>
+                    </div>
+                    <p class="text-sm text-gray-200">${p.text}</p>
+                </div>
+            `).join('');
         }
     </script>
 </body>
